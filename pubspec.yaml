@@ -1,0 +1,44 @@
+name: movieboxclone
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+
+dependencies:
+  cached_network_image: ^3.3.1
+  carousel_slider: ^4.2.1
+  dio: ^5.4.3+1
+  flutter:
+    sdk: flutter
+  go_router: ^14.2.0
+  hive: ^2.2.3
+  json_annotation: ^4.9.0
+  motion_toast: ^2.10.0
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+  youtube_player_flutter: ^9.0.1
+  youtube_video_player: ^0.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  json_serializable: ^6.8.0
+  build_runner: ^2.4.11
+  test: ^1.25.2
+
+dependency_overrides:
+  webview_flutter_android: 3.16.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/food_banana.jpg
+    - assets/images/food_brussels_sprouts.jpg
+    - assets/images/food_burger.jpg
+    - assets/images/food_cucumber.jpg
+    - assets/images/food_cupcake.jpg
+    - assets/images/food_salmon.jpg
+    - assets/images/ypf.png
