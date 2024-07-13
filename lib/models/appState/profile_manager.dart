@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProfileManager extends ChangeNotifier {
+  final bool _isAdmin = true;
+  final bool _isLogin = false;
   final String _username = 'John Doe';
   final String _email = 'john.doe@example.com';
   final String _profileImageUrl =
@@ -18,6 +20,8 @@ class ProfileManager extends ChangeNotifier {
   List<String> get favoriteMovies => _favoriteMovies;
   bool get didSelectUser => _didSelectUser;
   bool get darkMode => _darkMode;
+  bool get isAdmin => _isAdmin;
+  bool get isLogin => _isLogin;
 
   bool _darkMode = true;
   bool _didSelectUser = false;

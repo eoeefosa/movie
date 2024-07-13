@@ -42,3 +42,10 @@ flutter:
     - assets/images/food_cupcake.jpg
     - assets/images/food_salmon.jpg
     - assets/images/ypf.png
+    # 2Geda asset
+    - assets/2geda/
+    - assets/2geda/images/
+    - assets/2geda/adverts/
+    - assets/2geda/icons/
+    - images/
+

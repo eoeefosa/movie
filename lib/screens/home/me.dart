@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:movieboxclone/Commerce/Screens/commerce_dashboard.dart';
+import 'package:movieboxclone/screens/auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/appState/profile_manager.dart';
+import '../upload/addmovie.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -34,7 +37,6 @@ class UnSigned extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,38 +84,77 @@ class SignedIn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CachedNetworkImage(
-          imageUrl: userProfile.profileImageUrl,
-          imageBuilder: (context, imageProvider) => CircleAvatar(
-            radius: 50,
-            backgroundImage: imageProvider,
-          ),
-          placeholder: (context, url) => CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.grey[200],
-            child: const CircularProgressIndicator(),
-          ),
-          errorWidget: (context, url, error) => CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.grey[200],
-            child: const Icon(
-              Icons.person,
-              size: 50,
-              color: Colors.grey,
-            ),
-          ),
-        ),
+        userProfile.isLogin
+            ? CachedNetworkImage(
+                imageUrl: userProfile.profileImageUrl,
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  radius: 50,
+                  backgroundImage: imageProvider,
+                ),
+                placeholder: (context, url) => CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[200],
+                  child: const CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[200],
+                  child: const Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+            : Column(
+                children: [
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return const Login();
+                          },
+                        ));
+                      },
+                      child: const Text("Login")),
+                  ElevatedButton(
+                      onPressed: () {}, child: const Text("Create Account"))
+                ],
+              ),
         const SizedBox(height: 16),
-        Text(
-          userProfile.username,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+        userProfile.isLogin
+            ? Text(
+                userProfile.username,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              )
+            : Container(),
         const SizedBox(height: 8),
-        Text(
-          userProfile.email,
-          style: const TextStyle(fontSize: 16, color: Colors.grey),
-        ),
+        userProfile.isLogin
+            ? Text(
+                userProfile.email,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              )
+            : Container(),
         const SizedBox(height: 24),
+        userProfile.isAdmin
+            ? TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const Upload();
+                      },
+                    ),
+                  );
+                },
+                child: const Text("Upload Movie"))
+            : Container(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -137,8 +178,20 @@ class SignedIn extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: userProfile.favoriteMovies.length,
           itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(userProfile.favoriteMovies[index]),
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const CommerceDashboard();
+                    },
+                  ),
+                );
+              },
+              child: ListTile(
+                title: Text(userProfile.favoriteMovies[index]),
+              ),
             );
           },
         ),
