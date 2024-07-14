@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/appState/profile_manager.dart';
 import '../upload/addmovie.dart';
+import '../upload/image_upload.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -154,6 +155,20 @@ class SignedIn extends StatelessWidget {
                   );
                 },
                 child: const Text("Upload Movie"))
+            : Container(),
+        userProfile.isAdmin
+            ? TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const ImageUpload();
+                      },
+                    ),
+                  );
+                },
+                child: const Text("Image Picker"))
             : Container(),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

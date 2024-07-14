@@ -7,5 +7,10 @@ void showsnackBar(String message) {
   );
 }
 
+void hideSnackBar() {
+  final messenger = scaffoldMessengerKey.currentState;
+  messenger?.hideCurrentSnackBar();
+}
+
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey(debugLabel: 'scaffoldMessengerKey');
