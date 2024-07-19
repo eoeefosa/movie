@@ -28,6 +28,8 @@ class ProfileManager extends ChangeNotifier {
 
   void toggleDarkmode() {
     _darkMode = !darkMode;
+    notifyListeners();
+
   }
 
   set darkMode(bool darkMode) {

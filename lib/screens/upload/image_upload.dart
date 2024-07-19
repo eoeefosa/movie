@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:video_player/video_player.dart';
@@ -262,27 +260,30 @@ class _ImageUploadState extends State<ImageUpload> {
       return Semantics(
         label: "Torhi hd",
         child: ListView.builder(
-            key: UniqueKey(),
-            itemBuilder: (BuildContext context, int index) {
-              final String? mime = lookupMimeType(_mediaFileList![index].path);
+          key: UniqueKey(),
+          itemBuilder: (BuildContext context, int index) {
+            print(index);
+            final String? mime = lookupMimeType(_mediaFileList![index].path);
 
-              return Semantics(
-                label: 'Torhi image',
-                child: kIsWeb
-                    ? Image.network(_mediaFileList![index].path)
-                    : (mime == null || mime.startsWith('image/')
-                        ? Image.file(
-                            File(_mediaFileList![index].path),
-                            errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) {
-                              return const Center(
-                                child: Text('This image type is not supported'),
-                              );
-                            },
-                          )
-                        : _buildInlineVideoPlayer(index)),
-              );
-            }),
+            return Semantics(
+              label: 'Torhi image',
+              child: kIsWeb
+                  ? Image.network(_mediaFileList![index].path)
+                  : (mime == null || mime.startsWith('image/')
+                      ? Image.file(
+                          File(_mediaFileList![index].path),
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
+                            return const Center(
+                              child: Text('This image type is not supported'),
+                            );
+                          },
+                        )
+                      : _buildInlineVideoPlayer(index)),
+            );
+          },
+          itemCount: _mediaFileList!.length,
+        ),
       );
     } else if (_pickImageError != null) {
       return Text(
@@ -314,7 +315,7 @@ class _ImageUploadState extends State<ImageUpload> {
 
   Widget _handlePreview() {
     if (isVideo) {
-      return _previewImages();
+      return _previewVideo();
     } else {
       return _previewImages();
     }
@@ -367,22 +368,44 @@ class _ImageUploadState extends State<ImageUpload> {
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
-                      return const Text(
-                        'You have not yet picked an image.',
-                        textAlign: TextAlign.center,
+                      return TextButton(
+                        onPressed: () {
+                          _onImageButtonPressed(
+                            ImageSource.gallery,
+                            context: context,
+                            isMultiImage: false,
+                          );
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Tap to Select a Movie Image',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       );
                     case ConnectionState.done:
                       return _handlePreview();
                     case ConnectionState.active:
                       if (snapshot.hasError) {
                         return Text(
-                          'Pick image/video error: ${snapshot.error}}',
+                          'Pick image/video error: ${snapshot.error}',
                           textAlign: TextAlign.center,
                         );
                       } else {
-                        return const Text(
-                          'You have not yet picked an image.',
-                          textAlign: TextAlign.center,
+                        return TextButton(
+                          onPressed: () {
+                            _onImageButtonPressed(
+                              ImageSource.gallery,
+                              context: context,
+                              isMultiImage: false,
+                            );
+                          },
+                          child: const Center(
+                            child: Text(
+                              'Tap to Select a Movie Image',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         );
                       }
                   }

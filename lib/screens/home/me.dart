@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/Commerce/Screens/commerce_dashboard.dart';
 import 'package:movieboxclone/screens/auth/login.dart';
+import 'package:movieboxclone/screens/home/downloads/downloads.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/appState/profile_manager.dart';
+import '../download/download.dart';
 import '../upload/addmovie.dart';
 import '../upload/image_upload.dart';
+import '../upload/uploadmovie.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -149,7 +151,7 @@ class SignedIn extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return const Upload();
+                        return const UploadMovie();
                       },
                     ),
                   );
@@ -163,7 +165,7 @@ class SignedIn extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return const ImageUpload();
+                        return const FileDownloader();
                       },
                     ),
                   );
@@ -193,20 +195,8 @@ class SignedIn extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: userProfile.favoriteMovies.length,
           itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const CommerceDashboard();
-                    },
-                  ),
-                );
-              },
-              child: ListTile(
-                title: Text(userProfile.favoriteMovies[index]),
-              ),
+            return ListTile(
+              title: Text(userProfile.favoriteMovies[index]),
             );
           },
         ),
