@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:movieboxclone/screens/auth/login.dart';
-import 'package:movieboxclone/screens/home/downloads/downloads.dart';
+import 'package:movieboxclone/screens/whatsapp/page.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/appState/profile_manager.dart';
 import '../download/download.dart';
-import '../upload/addmovie.dart';
-import '../upload/image_upload.dart';
 import '../upload/uploadmovie.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -125,7 +123,17 @@ class SignedIn extends StatelessWidget {
                       },
                       child: const Text("Login")),
                   ElevatedButton(
-                      onPressed: () {}, child: const Text("Create Account"))
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const WhatappPage();
+                            },
+                          ),
+                        );
+                      },
+                      child: const Text("Create Account"))
                 ],
               ),
         const SizedBox(height: 16),
