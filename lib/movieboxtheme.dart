@@ -100,7 +100,7 @@ class MovieBoxTheme {
     return ThemeData(
       brightness: Brightness.dark,
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+        fillColor: WidgetStateColor.resolveWith((states) => Colors.white),
       ),
       // textButtonTheme: const TextButtonThemeData(
       //     style:

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:movieboxclone/screens/whatsapp/home/video_play.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
+
+
 final Directory _videoDir =
     Directory('/storage/emulated/0/WhatsApp/Media/.Statuses');
 
