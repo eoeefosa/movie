@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 
+import '../../api/api_calls/auth.dart';
+import '../usermodel.dart';
+
 class ProfileManager extends ChangeNotifier {
   final bool _isAdmin = true;
   final bool _isLogin = false;
-  final String _username = 'John Doe';
-  final String _email = 'john.doe@example.com';
-  final String _profileImageUrl =
+  String _username = '';
+  String _email = '';
+  String _profileImageUrl =
       'https://th.bing.com/th/id/R.76c882edad7141df823d9a41b8c7820e?rik=NAn9mL%2fpwz%2fLNw&pid=ImgRaw&r=0';
-  final List<String> _favoriteMovies = [
+  bool isloading=false;
+  final authapi=Auth();
+
+
+
+  Future<Usermodel?> signIn(String email, String password) async{
+    isloading=true;
+    final Usermodel? result= await  authapi.signUpuser(email, password);
+    if(result!=null){
+    _username=result.username ?? '';
+    _email=result.email ?? '';
+    _profileImageUrl=result.profileImageUrl ?? '';
+    }
+    isloading=false;
+    notifyListeners();
+ return result;
+}
+     final List<String> _favoriteMovies = [
     'Inception',
     'The Dark Knight',
     'Interstellar',

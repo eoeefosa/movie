@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "113549816013",
+    "firebase_url": "https://torihd-1ed20-default-rtdb.firebaseio.com",
+    "project_id": "torihd-1ed20",
+    "storage_bucket": "torihd-1ed20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113549816013:android:e0ab942772fdcd8d3fb984",
+        "android_client_info": {
+          "package_name": "com.example.movieboxclone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "113549816013-h5v7i611cdskn5qo43vf2mfjnvbifek0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDITfxQG0x_CCjf_T7dOO9MEjC0fRPlQnI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "113549816013-h5v7i611cdskn5qo43vf2mfjnvbifek0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
