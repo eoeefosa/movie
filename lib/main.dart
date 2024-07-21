@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:movieboxclone/models/appState/app_state_manager.dart';
 import 'package:movieboxclone/models/appState/profile_manager.dart';
 import 'package:movieboxclone/movieboxtheme.dart';
 import 'package:movieboxclone/navigation/app_router.dart';
 import 'package:movieboxclone/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//  
+// }
+Future<void> main() async {
+WidgetsFlutterBinding.ensureInitialized();
+await Firebase.initializeApp();
+
+// Ideal time to initialize
+await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+//...
+ SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
   ));
   final appstateManager = AppStateManager();
