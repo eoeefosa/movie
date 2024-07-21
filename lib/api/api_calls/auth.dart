@@ -14,12 +14,13 @@ Future<Usermodel?> signUpuser(
     await _firebaseAuth.createUserWithEmailAndPassword(email: email.trim(), password: password.trim(),);
     final User? firebaseUser= userCredential.user;
     if(firebaseUser!=null){
-      return Usermodel(id: firebaseUser.uid, email: firebaseUser.email??'', displayName: firebaseUser.displayName??'');
+      return Usermodel(id: firebaseUser.uid, email: firebaseUser.email??'', displayName: firebaseUser.displayName??'', profileImageUrl: firebaseUser.photoURL??'', username: firebaseUser.displayName??'');
     }
   } on FirebaseAuthException catch (e){
     hideSnackBar();
     showsnackBar(e.toString());
   }
+  return null;
 }
 
 Future<void> signOutUser() async{
