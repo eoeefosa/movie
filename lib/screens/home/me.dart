@@ -23,7 +23,9 @@ class ProfilePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SignedIn(userProfile: userProfile),
+          child: userProfile.user == null
+              ? SignedIn(userProfile: userProfile)
+              : UnSigned(userProfile: userProfile),
         ),
       ),
     );
@@ -39,6 +41,47 @@ class UnSigned extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        CachedNetworkImage(
+          imageUrl: userProfile.user!.photoURL == null
+              ? userProfile.profileImageUrl
+              : userProfile.user!.photoURL!,
+          imageBuilder: (context, imageProvider) => CircleAvatar(
+            radius: 50,
+            backgroundImage: imageProvider,
+          ),
+          placeholder: (context, url) => CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey[200],
+            child: const CircularProgressIndicator(),
+          ),
+          errorWidget: (context, url, error) => CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.grey[200],
+            child: const Icon(
+              Icons.person,
+              size: 50,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(userProfile.user!.email!),
+        const SizedBox(height: 24),
+        userProfile.isAdmin
+            ? TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const UploadMovie();
+                      },
+                    ),
+                  );
+                },
+                child: const Text("Upload Movie"),
+              )
+            : Container(),
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,6 +111,16 @@ class UnSigned extends StatelessWidget {
             );
           },
         ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () {
+            Provider.of<ProfileManager>(context, listen: false).signOut();
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 50),
+            child: Text("Logout"),
+          ),
+        )
       ],
     );
   }
@@ -124,17 +177,18 @@ class SignedIn extends StatelessWidget {
                       },
                       child: const Text("Login")),
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const CreateAccount();
-                            },
-                          ),
-                        );
-                      },
-                      child: const Text("Create Account"))
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const CreateAccount();
+                          },
+                        ),
+                      );
+                    },
+                    child: const Text("Create Account"),
+                  )
                 ],
               ),
         const SizedBox(height: 16),

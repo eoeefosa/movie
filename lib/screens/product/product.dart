@@ -53,7 +53,7 @@ class _VideoplayerState extends State<Videoplayer> {
       initialVideoId: _ids.first,
       flags: const YoutubePlayerFlags(
           mute: false,
-          autoPlay: true,
+          autoPlay: false,
           disableDragSeek: false,
           loop: false,
           isLive: false,
@@ -154,7 +154,6 @@ class _VideoplayerState extends State<Videoplayer> {
               onEnded: (data) {
                 _controller
                     .load(_ids[(_ids.indexOf(data.videoId) + 1) % _ids.length]);
-                //  _showSnackBar(data)
                 showsnackBar('Next Video Started!');
               },
             ),
@@ -186,97 +185,89 @@ class _VideoplayerState extends State<Videoplayer> {
                 // style: El,
                 onPressed: () {},
               ),
-              body: ListView(
-                children: [
-                  player,
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView(
+                  children: [
+                    player,
+                    gap,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        gap,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(movies["title"]),
-                            IconButton(
-                              onPressed: () {
-                                print("hello");
-                              },
-                              icon: const Icon(Icons.favorite),
-                            )
-                          ],
-                        ),
-                        gap,
-                        SizedBox(
-                          height: height / 7,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: width * 0.6,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      movies["title"],
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Flexible(
-                                      child: Text(
-                                        movies["description"],
-                                        overflow: TextOverflow.clip,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
-                              SizedBox(
-                                width: width * 0.2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0, vertical: 4.0),
-                                      child: Text(
-                                        "${movies["rating"]}",
-                                      ),
-                                    ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.save_alt_sharp))
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        gap,
-                        const Text("Resource Detector"),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 800),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.0),
-                            color: _getStateColor(_playerState),
-                          ),
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            _playerState.toString(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w300,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                        Text(movies["title"]),
+                        IconButton(
+                          onPressed: () {
+                            print("hello");
+                          },
+                          icon: const Icon(Icons.favorite),
                         )
                       ],
                     ),
-                  )
-                ],
+                    gap,
+                    SizedBox(
+                      height: height / 7,
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: width * 0.6,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  movies["title"],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    movies["description"],
+                                    overflow: TextOverflow.clip,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            width: width * 0.2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0, vertical: 4.0),
+                                  child: Text(
+                                    "${movies["rating"]}",
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.save_alt_sharp))
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    gap,
+                    const Row(
+                      children: [
+                        Text("Description"),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 100,
+                      child: Flexible(
+                        child: Text(
+                          "${movies["rating"]}",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

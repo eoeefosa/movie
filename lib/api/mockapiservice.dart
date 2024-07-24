@@ -1,4 +1,22 @@
+import 'dart:ffi';
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
+
 class MovieBoxCloneApi {
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+ Future<String> uploadFile(File file) async {
+  String downloadLink;
+  Reference ref = _storage.ref().child("image1${DateTime.now()}");
+  UploadTask uploadTask = ref.putFile(file);
+  
+  TaskSnapshot taskSnapshot = await uploadTask;
+  downloadLink = await taskSnapshot.ref.getDownloadURL();
+  
+  return downloadLink;
+}
+
   final movie = {
     'title': 'Furiosa',
     'title_img': "assets/images/food_cupcake.jpg",

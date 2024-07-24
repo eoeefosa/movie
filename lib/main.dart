@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:movieboxclone/models/appState/app_state_manager.dart';
+import 'package:movieboxclone/models/appState/movie_controller.dart';
 import 'package:movieboxclone/models/appState/profile_manager.dart';
 import 'package:movieboxclone/movieboxtheme.dart';
 import 'package:movieboxclone/navigation/app_router.dart';
@@ -10,20 +11,16 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
-//  
+//
 // }
 Future<void> main() async {
-WidgetsFlutterBinding.ensureInitialized();
- await Firebase.initializeApp(
-   options: DefaultFirebaseOptions.currentPlatform,
- );
-// Ideal time to initialize
-// await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-//...
- SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
   ));
   final appstateManager = AppStateManager();
@@ -53,7 +50,7 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
-        ChangeNotifierProvider(create: (context) => _profileManager)
+        ChangeNotifierProvider(create: (context) => _profileManager),
       ],
       child: Consumer<ProfileManager>(
         builder: (context, profileManager, child) {

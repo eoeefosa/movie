@@ -2,8 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:movieboxclone/api/mockapiservice.dart';
+import 'package:movieboxclone/screens/upload/previewmovie.dart';
+import 'package:movieboxclone/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/appState/profile_manager.dart';
@@ -18,7 +22,7 @@ class UploadMovie extends StatefulWidget {
 class _UploadMovieState extends State<UploadMovie> {
   List<XFile>? _mediaFileList;
   String? _retrieveDataError;
-  String? selectedState;
+  String? selectedState = "Movie";
 
   void _setImageFileListFromFile(XFile? value) {
     _mediaFileList = value == null ? null : <XFile>[value];
@@ -135,6 +139,7 @@ class _UploadMovieState extends State<UploadMovie> {
   }
 
   final TextEditingController stateController = TextEditingController();
+  final MovieBoxCloneApi mockapi = MovieBoxCloneApi();
 
   Text? _getRetrieveErrorWidget() {
     if (_retrieveDataError != null) {
@@ -176,11 +181,14 @@ class _UploadMovieState extends State<UploadMovie> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-
-    String movieTitle = '';
-    String movieDescription = '';
-    String downloadlink = '';
-    String youtubeTrailerLink = '';
+    final TextEditingController movieTitleController = TextEditingController();
+    final TextEditingController ratingController = TextEditingController();
+    final TextEditingController movieDescriptionController =
+        TextEditingController();
+    final TextEditingController downloadlinkController =
+        TextEditingController();
+    final TextEditingController youtubeTrailerlinkController =
+        TextEditingController();
 
     void submit() {
       if (formKey.currentState!.validate()) {
@@ -275,43 +283,34 @@ class _UploadMovieState extends State<UploadMovie> {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                DropdownMenu(
-                  initialSelection: "Movie",
-                  controller: stateController,
-                  requestFocusOnTap: true,
-                  // enableFilter: true,
-                  enableSearch: true,
-                  inputDecorationTheme: const InputDecorationTheme(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Type"),
+                    DropdownButton<String>(
+                      value: selectedState,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedState = newValue!;
+                        });
+                      },
+                      items: <String>[
+                        "Movie",
+                        "TV series",
+                        "Trending",
+                        "Top Picks"
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
                     ),
-                  ),
-
-                  // label: const Text('Color'),
-                  onSelected: (String? state) {
-                    setState(() {
-                      selectedState = state;
-                    });
-                  },
-                  dropdownMenuEntries: [
-                    "Movie",
-                    "TV series",
-                    "Trending",
-                    "Top Picks"
-                  ].map<DropdownMenuEntry<String>>((String state) {
-                    return DropdownMenuEntry(
-                      value: state,
-                      label: state,
-                      enabled: true,
-                      style: MenuItemButton.styleFrom(),
-                    );
-                  }).toList(),
+                  ],
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
+                  controller: movieTitleController,
                   decoration: const InputDecoration(
                     labelText: 'Movie Title',
                     border: OutlineInputBorder(),
@@ -323,14 +322,37 @@ class _UploadMovieState extends State<UploadMovie> {
                     }
                     return null;
                   },
-                  onSaved: (value) => movieTitle = value!,
+                  // onSaved: (value) => movieTitle = value!,
                 ),
                 const SizedBox(
                   height: 8.0,
                 ),
                 TextFormField(
+                  controller: ratingController,
                   decoration: const InputDecoration(
-                    labelText: 'Movie Description',
+                    labelText: 'Movie detail',
+                    hintText:
+                        "e.g Australia/Action, Adventure, Sci-Fi/2024-05-24/2h 28m",
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the movie Title';
+                    }
+                    return null;
+                  },
+                  // onSaved: (value) => movieTitle = value!,
+                ),
+                const SizedBox(
+                  height: 8.0,
+                ),
+                TextFormField(
+                  controller: movieDescriptionController,
+                  maxLines: 9,
+                  decoration: const InputDecoration(
+                    // labelText: 'Movie Description',
+                    hintText: 'Movie Description',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
@@ -341,10 +363,11 @@ class _UploadMovieState extends State<UploadMovie> {
 
                     return null;
                   },
-                  onSaved: (value) => movieDescription = value!,
+                  // onSaved: (value) => movieDescription = value!,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
+                  controller: downloadlinkController,
                   decoration: const InputDecoration(
                     labelText: 'Download link',
                     border: OutlineInputBorder(),
@@ -357,10 +380,11 @@ class _UploadMovieState extends State<UploadMovie> {
 
                     return null;
                   },
-                  onSaved: (value) => downloadlink = value!,
+                  // onSaved: (value) => downloadlink = value!,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
+                  controller: youtubeTrailerlinkController,
                   decoration: const InputDecoration(
                     labelText: 'Youtube Trailer link',
                     border: OutlineInputBorder(),
@@ -373,30 +397,79 @@ class _UploadMovieState extends State<UploadMovie> {
 
                     return null;
                   },
-                  onSaved: (value) => youtubeTrailerLink = value!,
+                  // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: submit,
+                      onPressed: () async {
+                        if (_mediaFileList != null &&
+                            _mediaFileList!.isNotEmpty &&
+                            formKey.currentState!.validate()) {
+                          try {
+                            String filePath = _mediaFileList!.first.path;
+                            var uploadedImageUrl =
+                                await mockapi.uploadFile(File(filePath));
+                            if (!context.mounted) return;
+
+                            await context.read<ProfileManager>().addMovie(
+                                  movieTitleController.text,
+                                  selectedState!,
+                                  uploadedImageUrl,
+                                  movieDescriptionController.text,
+                                  downloadlinkController.text,
+                                  youtubeTrailerlinkController.text,
+                                );
+                            showsnackBar('upload successfull');
+                            if (!context.mounted) return;
+                            context.go("/home/2");
+                          } catch (e) {
+                            showsnackBar('Failed to sign in $e');
+                          }
+                        }
+                      },
                       child: const Text('Upload movie'),
                     ),
                     ElevatedButton(
-                      onPressed: submit,
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          if (_mediaFileList != null &&
+                              _mediaFileList!.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MoviePreviewScreen(
+                                  movieTitle: movieTitleController.text,
+                                  movieDescription:
+                                      movieDescriptionController.text,
+                                  downloadLink: downloadlinkController.text,
+                                  youtubeTrailerLink:
+                                      youtubeTrailerlinkController.text,
+                                  category: stateController.text,
+                                  imagePath: _mediaFileList!.first.path,
+                                ),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please select a movie image.'),
+                              ),
+                            );
+                          }
+                        }
+                      },
                       child: const Text('Preview Movie'),
                     ),
                   ],
                 ),
+                const SizedBox(height: 16.0),
               ],
             ),
           ),
         ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [Semantics()],
       ),
     );
   }

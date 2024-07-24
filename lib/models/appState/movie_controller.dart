@@ -5,9 +5,16 @@ import 'package:movieboxclone/models/other/movie_model.dart';
 class MovieController extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> addMovie(String title) async {
+  Future<void> addMovie(
+    String title,
+    String description,
+  ) async {
     try {
-      await _firestore.collection('movies').add({"title": title});
+      await _firestore.collection('movies').add({
+        "title": title,
+        "description": description,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
       notifyListeners();
     } catch (e) {
       print(e);
@@ -22,9 +29,16 @@ class MovieController extends ChangeNotifier {
           .map((doc) =>
               MovieModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
           .toList();
-    } catch (e) {
+      } catch (e) {
       print(e);
       rethrow;
     }
+  }
+
+  Stream<QuerySnapshot> fetchMovies() {
+    return _firestore
+        .collection('movies')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 }

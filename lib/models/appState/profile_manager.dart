@@ -1,16 +1,92 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../api/api_calls/auth.dart';
+import '../other/movie_model.dart';
 import '../usermodel.dart';
 
 class ProfileManager extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  User? user;
   User? get currentUser => _auth.currentUser;
+
+  Future<void> addMovie(
+    String title,
+    String type,
+    String movieImgurl,
+    String description,
+    String downloadlink,
+    String youtubetrailerlink,
+  ) async {
+    try {
+      await _firestore.collection('movies').add({
+        "title": title,
+        "movieImgUrl": movieImgurl,
+        "description": description,
+        "type": type,
+        "downloadlink": downloadlink,
+        "youtubetrailer": youtubetrailerlink,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> updateMovie(
+    String docId,
+    String title,
+    String type,
+    String description,
+    String downloadlink,
+    String youtubetrailerlink,
+  ) async {
+    try {
+      await _firestore.collection('movies').doc(docId).update({
+        "title": title,
+        "description": type,
+        "type": description,
+        "downloadlink": downloadlink,
+        "youtubetrailer": youtubetrailerlink,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<List<MovieModel>> getMovies() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('movies').get();
+      return snapshot.docs
+          .map((doc) =>
+              MovieModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+          .toList();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Stream<QuerySnapshot> fetchMovies() {
+    return _firestore
+        .collection('movies')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
 
   Future<void> signIn(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      UserCredential result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      user = result.user;
       notifyListeners();
     } catch (e) {
       print(e);
@@ -20,8 +96,9 @@ class ProfileManager extends ChangeNotifier {
 
   Future<void> signUp(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      user = result.user;
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -30,6 +107,7 @@ class ProfileManager extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    user = null;
     notifyListeners();
   }
 
@@ -37,7 +115,7 @@ class ProfileManager extends ChangeNotifier {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
-  final bool _isAdmin = true;
+  // final bool _isAdmin = false;
   final bool _isLogin = false;
   final String _username = '';
   final String _email = '';
@@ -75,7 +153,8 @@ class ProfileManager extends ChangeNotifier {
   List<String> get favoriteMovies => _favoriteMovies;
   bool get didSelectUser => _didSelectUser;
   bool get darkMode => _darkMode;
-  bool get isAdmin => _isAdmin;
+  bool get isAdmin =>
+      user == null ? false : user!.email == 'eoeefosa@gmail.com';
   bool get isLogin => _isLogin;
 
   bool _darkMode = true;
