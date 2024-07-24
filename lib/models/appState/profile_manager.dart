@@ -10,24 +10,26 @@ class ProfileManager extends ChangeNotifier {
   String _email = '';
   String _profileImageUrl =
       'https://th.bing.com/th/id/R.76c882edad7141df823d9a41b8c7820e?rik=NAn9mL%2fpwz%2fLNw&pid=ImgRaw&r=0';
-  bool isloading=false;
-  final authapi=Auth();
+  bool isloading = false;
+  final authapi = Auth();
 
-
-
-  Future<Usermodel?> signIn(String email, String password) async{
-    isloading=true;
-    final Usermodel? result= await  authapi.signUpuser(email, password);
-    if(result!=null){
-    _username=result.username ?? '';
-    _email=result.email ?? '';
-    _profileImageUrl=result.profileImageUrl ?? '';
+  void signIn(String email, String password) async {
+    isloading = true;
+    final Usermodel? result = await authapi.signUpuser(email, password);
+    if (result != null) {
+      _username = result.username ?? '';
+      _email = result.email ?? '';
+      _profileImageUrl = result.profileImageUrl ?? '';
     }
-    isloading=false;
+    isloading = false;
     notifyListeners();
- return result;
-}
-     final List<String> _favoriteMovies = [
+  }
+  void signUp(String email, String password) async{
+    isloading = true;
+
+  }
+
+  final List<String> _favoriteMovies = [
     'Inception',
     'The Dark Knight',
     'Interstellar',
@@ -49,7 +51,6 @@ class ProfileManager extends ChangeNotifier {
   void toggleDarkmode() {
     _darkMode = !darkMode;
     notifyListeners();
-
   }
 
   set darkMode(bool darkMode) {

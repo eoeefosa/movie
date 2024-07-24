@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';import 'package:firebase_core/firebase_core.dart';
+import 'package:movieboxclone/models/appState/profile_manager.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -14,8 +14,13 @@ class _LoginState extends State<Login> {
   String _email = '';
   String _password = '';
   void _submit() {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate())  {
+
       _formKey.currentState?.save();
+      Provider.of<ProfileManager>(context, listen: false)
+                      .signIn(_email, _password);
+      
+      
       // Perform the login action here, e.g., send the email and password to your server
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Logging in...')));
