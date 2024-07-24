@@ -6,35 +6,11 @@ class Downloads extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          body: ListView(
-        children: const [
-          SizedBox(
-            height: 50,
-            width: 350,
-            child: TabBar(
-              indicatorSize: TabBarIndicatorSize.label,
-              isScrollable: true,
-              tabs: <Tab>[
-                Tab(text: 'Downloads'),
-                Tab(text: 'Local Videos'),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 500,
-            width: 350,
-            child: TabBarView(
-              children: [
-                TabDownload(),
-                Center(child: Text('Explorer context')),
-              ],
-            ),
-          )
-        ],
-      )),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Download"),
+      ),
+      body: const TabDownload(),
     );
   }
 }

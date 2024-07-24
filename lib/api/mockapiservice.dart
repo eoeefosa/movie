@@ -6,16 +6,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 class MovieBoxCloneApi {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
- Future<String> uploadFile(File file) async {
-  String downloadLink;
-  Reference ref = _storage.ref().child("image1${DateTime.now()}");
-  UploadTask uploadTask = ref.putFile(file);
-  
-  TaskSnapshot taskSnapshot = await uploadTask;
-  downloadLink = await taskSnapshot.ref.getDownloadURL();
-  
-  return downloadLink;
-}
+  Future<String> uploadFile(File file) async {
+    String downloadLink;
+    Reference ref = _storage.ref().child("image1${DateTime.now()}");
+    UploadTask uploadTask = ref.putFile(file);
+
+    TaskSnapshot taskSnapshot = await uploadTask;
+    downloadLink = await taskSnapshot.ref.getDownloadURL();
+
+    return downloadLink;
+  }
 
   final movie = {
     'title': 'Furiosa',
@@ -121,6 +121,114 @@ class MovieBoxCloneApi {
     {
       "Category": "Top Picks",
       "movies": [
+        {
+          "title": "Kaiju No.8",
+          "type": "Japan Anime",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.4,
+        },
+        {
+          "title": "The Wife",
+          "type": "South Africa crime",
+          "img": "assets/images/food_banana.jpg",
+          "rating": 8.5,
+        },
+        {
+          "title": "White Collar",
+          "type": "United States Comedy",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.2,
+        },
+        {
+          "title": "Hercules",
+          "type": "United States Action",
+          "img": "assets/images/food_brussels_sprouts.jpg",
+          "rating": 6.0,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_burger.jpg",
+          "rating": 7.1,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_cucumber.jpg",
+          "rating": 7.1,
+        },
+        {
+          "title": "Kaiju No.8",
+          "type": "Japan Anime",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.4,
+        },
+        {
+          "title": "The Wife",
+          "type": "South Africa crime",
+          "img": "assets/images/food_banana.jpg",
+          "rating": 8.5,
+        },
+        {
+          "title": "White Collar",
+          "type": "United States Comedy",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.2,
+        },
+        {
+          "title": "Hercules",
+          "type": "United States Action",
+          "img": "assets/images/food_brussels_sprouts.jpg",
+          "rating": 6.0,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_burger.jpg",
+          "rating": 7.1,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_cucumber.jpg",
+          "rating": 7.1,
+        },
+        {
+          "title": "Kaiju No.8",
+          "type": "Japan Anime",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.4,
+        },
+        {
+          "title": "The Wife",
+          "type": "South Africa crime",
+          "img": "assets/images/food_banana.jpg",
+          "rating": 8.5,
+        },
+        {
+          "title": "White Collar",
+          "type": "United States Comedy",
+          "img": "assets/images/food_cupcake.jpg",
+          "rating": 8.2,
+        },
+        {
+          "title": "Hercules",
+          "type": "United States Action",
+          "img": "assets/images/food_brussels_sprouts.jpg",
+          "rating": 6.0,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_burger.jpg",
+          "rating": 7.1,
+        },
+        {
+          "title": "DC League of Super-Pets",
+          "type": "United States Action",
+          "img": "assets/images/food_cucumber.jpg",
+          "rating": 7.1,
+        },
         {
           "title": "Kaiju No.8",
           "type": "Japan Anime",

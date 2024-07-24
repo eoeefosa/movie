@@ -1,31 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/api/mockapiservice.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
-import '../../../../movieboxtheme.dart';
-import '../../../../utils/constants.dart';
+class Downloads extends StatelessWidget {
+  const Downloads({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Download"),
+      ),
+      body: const TabDownload(),
+    );
+  }
+}
 
 class TabDownload extends StatelessWidget {
   const TabDownload({super.key});
 
+  Future<List<FileSystemEntity>> _getDownloads() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final downloadDir = Directory('${directory.path}/downloads');
+    if (await downloadDir.exists()) {
+      return downloadDir.listSync();
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final mockservice = MovieBoxCloneApi();
     return FutureBuilder(
-        future: mockservice.getsdownloads(),
-        builder: (context, AsyncSnapshot snapshot) {
+        future: _getDownloads(),
+        builder: (context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            final List downloads = snapshot.data;
+            final List<FileSystemEntity> downloads = snapshot.data ?? [];
             return ListView(
               children: [
-                Text("Downloaded(${downloads.length})"),
+                Text("Downloaded (${downloads.length})"),
                 ...List.generate(
-                    downloads.length,
-                    (index) => DownloadCard(
-                        title: downloads[index]['title'],
-                        size: downloads[index]['size'],
-                        movieimg: downloads[index]['movieImg'],
-                        folder: downloads[index]['folder'],
-                        duration: downloads[index]['duration']))
+                  downloads.length,
+                  (index) {
+                    final file = downloads[index] as File;
+                    return DownloadCard(
+                      title: file.path.split('/').last,
+                      size: file.lengthSync() / (1024 * 1024),
+                      movieimg: file.path,
+                      folder: file.parent.path,
+                      duration: _getVideoDuration(
+                          file), // Implement this method to get video duration
+                    );
+                  },
+                ),
               ],
             );
           } else {
@@ -34,6 +61,12 @@ class TabDownload extends StatelessWidget {
             );
           }
         });
+  }
+
+  double _getVideoDuration(File file) {
+    // Implement a method to get the video duration in seconds
+    // You can use a video metadata extraction package to achieve this
+    return 0; // Placeholder
   }
 }
 
@@ -71,7 +104,7 @@ class DownloadCard extends StatelessWidget {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   colorFilter: const ColorFilter.srgbToLinearGamma(),
-                  image: AssetImage(movieimg),
+                  image: FileImage(File(movieimg)),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: const BorderRadius.all(
@@ -84,9 +117,8 @@ class DownloadCard extends StatelessWidget {
                     bottom: 4,
                     right: 0,
                     child: Text(
-                      // TODO: duration to time function
                       secondsToHoursMinutes(duration),
-                      style: MovieBoxTheme.darkTextTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                 ],
@@ -101,7 +133,7 @@ class DownloadCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title),
-                Text("$size MB"),
+                Text("${size.toStringAsFixed(2)} MB"),
                 Row(
                   children: [
                     const Icon(
@@ -116,5 +148,12 @@ class DownloadCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String secondsToHoursMinutes(double seconds) {
+    final duration = Duration(seconds: seconds.toInt());
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
 }

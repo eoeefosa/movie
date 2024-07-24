@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movieboxclone/api/mockapiservice.dart';
+import 'package:movieboxclone/screens/home/trending/Movie.dart';
 import 'package:movieboxclone/screens/home/trending/trending.dart';
+import 'package:movieboxclone/screens/home/trending/tv_series.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
@@ -40,16 +42,16 @@ class Dashboard extends StatelessWidget {
                           .toList(),
                     ),
                   ),
-                  body: const SizedBox(
+                  body: SizedBox(
                     height: 500,
                     child: Column(
                       children: [
                         // TODO: ALLOW SLIDE SCROLLING OF APPBAR
                         Expanded(
                           child: TabBarView(children: [
-                            Trending(),
-                            Center(child: Text('Explorer context')),
-                            Center(child: Text('Following context')),
+                            const Trending(),
+                            const MoviesScreen(),
+                            TVSeries(),
                             // const Center(child: Text('Following context')),
                             // const Center(child: Text('Following context')),
                             // const Center(child: Text('Following context')),

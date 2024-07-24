@@ -164,12 +164,13 @@ class CaroselCard extends StatelessWidget {
 //           "rating": 7.1,
 
 class TopPickCard extends StatelessWidget {
-  const TopPickCard(
-      {super.key,
-      required this.title,
-      required this.type,
-      required this.imgUrl,
-      required this.rating});
+  const TopPickCard({
+    super.key,
+    required this.title,
+    required this.type,
+    required this.imgUrl,
+    required this.rating,
+  });
 
   final String title;
   final String type;
@@ -178,15 +179,21 @@ class TopPickCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Calculate the width and height based on the screen width
+    double cardWidth = screenWidth * 0.3;
+    double cardHeight = cardWidth * 1.3;
+
     return Column(
       children: [
         InkWell(
           onTap: () => context.go('/home/0/player'),
           child: Container(
             padding: const EdgeInsets.all(4),
-            constraints: const BoxConstraints.expand(
-              width: 100,
-              height: 150,
+            constraints: BoxConstraints.expand(
+              width: cardWidth,
+              height: cardHeight,
             ),
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -227,15 +234,23 @@ class TopPickCard extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        SizedBox(
+          width: cardWidth,
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
         ),
-        Text(
-          type,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        SizedBox(
+          width: cardWidth,
+          child: Text(
+            type,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
         )
       ],
     );
