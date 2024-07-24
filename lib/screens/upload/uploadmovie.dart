@@ -9,6 +9,7 @@ import 'package:movieboxclone/api/mockapiservice.dart';
 import 'package:movieboxclone/screens/upload/previewmovie.dart';
 import 'package:movieboxclone/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../models/appState/profile_manager.dart';
 
@@ -313,7 +314,9 @@ class _UploadMovieState extends State<UploadMovie> {
                   controller: movieTitleController,
                   decoration: const InputDecoration(
                     labelText: 'Movie Title',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                        // borderSide: Border.al
+                        ),
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) {
@@ -328,6 +331,7 @@ class _UploadMovieState extends State<UploadMovie> {
                   height: 8.0,
                 ),
                 TextFormField(
+                  maxLines: 2,
                   controller: ratingController,
                   decoration: const InputDecoration(
                     labelText: 'Movie detail',
@@ -343,6 +347,15 @@ class _UploadMovieState extends State<UploadMovie> {
                     return null;
                   },
                   // onSaved: (value) => movieTitle = value!,
+                ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "e.g Australia/Action, Adventure, Sci-Fi/2024-05-24/2h 28m",
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 8.0,
@@ -413,6 +426,9 @@ class _UploadMovieState extends State<UploadMovie> {
                             var uploadedImageUrl =
                                 await mockapi.uploadFile(File(filePath));
                             if (!context.mounted) return;
+                            String? videoId = YoutubePlayer.convertUrlToId(
+                              youtubeTrailerlinkController.text,
+                            );
 
                             await context.read<ProfileManager>().addMovie(
                                   movieTitleController.text,
@@ -420,7 +436,7 @@ class _UploadMovieState extends State<UploadMovie> {
                                   uploadedImageUrl,
                                   movieDescriptionController.text,
                                   downloadlinkController.text,
-                                  youtubeTrailerlinkController.text,
+                                  videoId ?? youtubeTrailerlinkController.text,
                                 );
                             showsnackBar('upload successfull');
                             if (!context.mounted) return;
