@@ -7,12 +7,13 @@ class StatusVideo extends StatefulWidget {
   final bool looping;
   final String videoSrc;
   final double? aspectRatio;
-  const StatusVideo(
-      {super.key,
-      required this.videoPlayerController,
-      required this.looping,
-      required this.videoSrc,
-      this.aspectRatio});
+  const StatusVideo({
+    super.key,
+    required this.videoPlayerController,
+    required this.looping,
+    required this.videoSrc,
+    this.aspectRatio,
+  });
 
   @override
   State<StatusVideo> createState() => _StatusVideoState();

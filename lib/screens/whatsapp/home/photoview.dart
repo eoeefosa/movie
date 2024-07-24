@@ -36,8 +36,9 @@ class _ViewPhotosState extends State<ViewPhotos> {
               children: <Widget>[
                 Center(
                   child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: const CircularProgressIndicator()),
+                    padding: const EdgeInsets.all(10.0),
+                    child: const CircularProgressIndicator(),
+                  ),
                 ),
               ],
             );
