@@ -4,6 +4,7 @@ import 'package:movieboxclone/styles/snack_bar.dart';
 
 class Auth{
 final FirebaseAuth _firebaseAuth= FirebaseAuth.instance;
+// User? get cur
 
 Future<Usermodel?> signUpuser(
   String email,

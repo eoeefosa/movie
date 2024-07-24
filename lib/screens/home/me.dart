@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movieboxclone/screens/auth/create_account.dart';
 import 'package:movieboxclone/screens/auth/login.dart';
 import 'package:movieboxclone/screens/whatsapp/page.dart';
 import 'package:provider/provider.dart';
@@ -128,7 +129,7 @@ class SignedIn extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) {
-                              return const WhatappPage();
+                              return const CreateAccount();
                             },
                           ),
                         );

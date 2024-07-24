@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:movieboxclone/models/appState/profile_manager.dart';
+import 'package:movieboxclone/screens/upload/uploadmovie.dart';
 import 'package:provider/provider.dart';
+
+import '../../styles/snack_bar.dart';
+import '../whatsapp/page.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -11,19 +16,27 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  String _email = '';
-  String _password = '';
-  void _submit() {
-    if (_formKey.currentState!.validate())  {
-
-      _formKey.currentState?.save();
-      Provider.of<ProfileManager>(context, listen: false)
-                      .signIn(_email, _password);
-      
-      
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  // String _email = '';
+  // String _password = '';
+  void _submit(BuildContext context) async {
+    try {
+      await context.read<ProfileManager>().signIn(
+            _emailController.text,
+            _passwordController.text,
+          );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const UploadMovie()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to sign in')),
+      );
       // Perform the login action here, e.g., send the email and password to your server
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Logging in...')));
+      // ScaffoldMessenger.of(context)
+      //     .showSnackBar(const SnackBar(content: Text('Logging in...')));
     }
   }
 
@@ -49,6 +62,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               TextFormField(
+                controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
@@ -60,10 +74,11 @@ class _LoginState extends State<Login> {
                   }
                   return null;
                 },
-                onSaved: (value) => _email = value!,
+                // onSaved: (value) => _email = value!,
               ),
               const SizedBox(height: 16.0),
               TextFormField(
+                controller: _passwordController,
                 decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
@@ -75,13 +90,34 @@ class _LoginState extends State<Login> {
                   }
                   return null;
                 },
-                onSaved: (value) => _password = value!,
+                // onSaved: (value) => _password = value!,
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: _submit,
+                onPressed: () async {
+                  try {
+                    await context.read<ProfileManager>().signIn(
+                          _emailController.text,
+                          _passwordController.text,
+                        );
+                    showsnackBar('Signed in Successfull');
+                    if (!context.mounted) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const WhatappPage();
+                        },
+                      ),
+                    );
+                  } catch (e) {
+                    showsnackBar('Failed to sign in $e');
+                  }
+                },
                 child: const Text('Login'),
               ),
+              // child: const Text('Login'),
+              // ),
             ],
           ),
         ),

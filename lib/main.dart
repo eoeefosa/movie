@@ -21,7 +21,7 @@ WidgetsFlutterBinding.ensureInitialized();
    options: DefaultFirebaseOptions.currentPlatform,
  );
 // Ideal time to initialize
-await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+// await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 //...
  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
