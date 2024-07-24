@@ -17,6 +17,14 @@ class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +64,16 @@ class _CreateAccountState extends State<CreateAccount> {
               const SizedBox(height: 16.0),
               TextFormField(
                 controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: _togglePasswordVisibility,
+                  ),
+                ),
+                obscureText: _obscureText,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter your password';
@@ -67,7 +83,6 @@ class _CreateAccountState extends State<CreateAccount> {
                   }
                   return null;
                 },
-                // onSaved: (value) => _password = value!,
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
@@ -79,14 +94,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         );
                     showsnackBar('Signed in Successfull');
                     if (!context.mounted) return;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return const WhatappPage();
-                        },
-                      ),
-                    );
+                    Navigator.pop(context);
                   } catch (e) {
                     showsnackBar('Failed to sign in $e');
                   }
