@@ -73,7 +73,7 @@ class _CreateAccountState extends State<CreateAccount> {
               ElevatedButton(
                 onPressed: () async {
                   try {
-                    await context.read<ProfileManager>().signIn(
+                    await context.read<ProfileManager>().signUp(
                           _emailController.text,
                           _passwordController.text,
                         );
