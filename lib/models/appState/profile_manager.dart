@@ -155,8 +155,10 @@ class ProfileManager extends ChangeNotifier {
   List<String> get favoriteMovies => _favoriteMovies;
   bool get didSelectUser => _didSelectUser;
   bool get darkMode => _darkMode;
-  bool get isAdmin =>
-      user == null ? false : user!.email == 'eoeefosa@gmail.com';
+  bool get isAdmin => user == null
+      ? false
+      : user!.email == 'eoeefosa@gmail.com' ||
+          user!.email == 'toriHd@gmail.com';
   bool get isLogin => _isLogin;
 
   bool _darkMode = true;
