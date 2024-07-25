@@ -158,7 +158,8 @@ class ProfileManager extends ChangeNotifier {
   bool get isAdmin => user == null
       ? false
       : user!.email == 'eoeefosa@gmail.com' ||
-          user!.email == 'toriHd@gmail.com';
+          user!.email == 'Torihd247@gmail.com' ||
+          user!.email == 'torihd247@gmail.com';
   bool get isLogin => _isLogin;
 
   bool _darkMode = true;
