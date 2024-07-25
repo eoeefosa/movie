@@ -5,22 +5,6 @@ import 'package:movieboxclone/models/other/movie_model.dart';
 class MovieController extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> addMovie(
-    String title,
-    String description,
-  ) async {
-    try {
-      await _firestore.collection('movies').add({
-        "title": title,
-        "description": description,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      notifyListeners();
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
 
   Future<List<MovieModel>> getMovies() async {
     try {

@@ -49,8 +49,8 @@ class MoviesGrid extends StatelessWidget {
             print(movie);
             return MovieCard(
               title: movie["title"] ?? 'Untitled',
-              // type: movie["type"],
-              type: "movies",
+              type: movie["type"],
+              // type: "movies",
               imgUrl: movie["movieImgUrl"] ??
                   "https://images6.alphacoders.com/683/thumb-1920-683023.jpg",
               rating: movie['rating'] ?? "7.5",
