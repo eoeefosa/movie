@@ -1,78 +1,127 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:movieboxclone/api/mockapiservice.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:movieboxclone/movieboxtheme.dart';
+import 'package:movieboxclone/screens/product/product.dart';
 
-class Trending extends StatelessWidget {
+class Trending extends StatefulWidget {
   const Trending({super.key});
 
   @override
+  _TrendingState createState() => _TrendingState();
+}
+
+class _TrendingState extends State<Trending> {
+  late Future<List<dynamic>> _trendingData;
+
+  @override
+  void initState() {
+    super.initState();
+    _trendingData = fetchTrendingData();
+  }
+
+  Future<List<dynamic>> fetchTrendingData() async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Fetch Trending Carousel data
+    final carouselSnapshot =
+        await firestore.collection('Trending Carousel').get();
+    final trendingCarosel =
+        carouselSnapshot.docs.map((doc) => doc.data()).toList();
+
+    // Fetch Top Picks data
+    final topPicksSnapshot = await firestore.collection('Top Picks').get();
+    final trendingContent =
+        topPicksSnapshot.docs.map((doc) => doc.data()).toList();
+
+    return [trendingCarosel, trendingContent];
+  }
+
+  Future<void> _refreshTrendingData() async {
+    setState(() {
+      _trendingData = fetchTrendingData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final mockService = MovieBoxCloneApi();
     return FutureBuilder(
-      future: mockService.getTrending(),
+      future: _trendingData,
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           final List trendingCarosel = snapshot.data[0] ?? [];
           final List trendingContent = snapshot.data[1] ?? [];
 
-          return ListView(scrollDirection: Axis.vertical, children: [
-            const SizedBox(
-              height: 20,
-            ),
-            CarouselSlider(
-              items: trendingCarosel
-                  .map((item) => CaroselCard(
-                      title: item["title"],
-                      imgUrl: item["img_url"],
-                      ads: item["ads"]))
-                  .toList(),
-              options: CarouselOptions(
-                aspectRatio: 16 / 6,
-                viewportFraction: 0.85,
-                initialPage: 0,
-                enableInfiniteScroll: true,
-                reverse: false,
-                autoPlay: true,
-                autoPlayInterval: const Duration(seconds: 3),
-                autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                autoPlayCurve: Curves.fastOutSlowIn,
-                enlargeCenterPage: true,
-                enlargeFactor: 0.1,
-                scrollDirection: Axis.horizontal,
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          return RefreshIndicator(
+            onRefresh: _refreshTrendingData,
+            child: ListView(
+              scrollDirection: Axis.vertical,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  child: Text(
-                    trendingContent[0]["Category"],
-                    style: Theme.of(context).textTheme.titleLarge,
+                const SizedBox(
+                  height: 20,
+                ),
+                CarouselSlider(
+                  items: trendingCarosel
+                      .map((item) => CaroselCard(
+                          title: item["title"],
+                          imgUrl:
+                              item["movieImgUrl"] ?? 'assets/images/ypf.png',
+                          ads: false))
+                      .toList(),
+                  options: CarouselOptions(
+                    aspectRatio: 16 / 6,
+                    viewportFraction: 0.85,
+                    initialPage: 0,
+                    enableInfiniteScroll: true,
+                    reverse: false,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 3),
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enlargeCenterPage: true,
+                    enlargeFactor: 0.1,
+                    scrollDirection: Axis.horizontal,
                   ),
                 ),
-                GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: 6,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, childAspectRatio: 3 / 5),
-                  itemBuilder: (context, index) {
-                    final movies = trendingContent[0]["movies"][index];
-                    return TopPickCard(
-                      title: movies["title"],
-                      type: movies["type"],
-                      imgUrl: movies["img"],
-                      rating: movies["rating"],
-                    );
-                  },
-                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      child: Text(
+                        trendingContent.isNotEmpty
+                            ? trendingContent[0]["Category"]
+                            : 'Category',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      itemCount: trendingContent.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, childAspectRatio: 3 / 5),
+                      itemBuilder: (context, index) {
+                        final movies = trendingContent[index];
+                        return TopPickCard(
+                          title: movies["title"] ?? 'Untitled',
+                          type: movies["type"],
+                          imgUrl:
+                              movies["movieImgUrl"] ?? 'assets/images/ypf.png',
+                          rating: movies['rating'] ?? 7.5,
+                          youtubeid: movies["rating"],
+                          movieid: movies["id"],
+                        );
+                      },
+                    ),
+                  ],
+                )
               ],
-            )
-          ]);
+            ),
+          );
         } else {
           return const Center(
             child: CircularProgressIndicator(),
@@ -83,12 +132,18 @@ class Trending extends StatelessWidget {
   }
 }
 
+//  "title": "DC League of Super-Pets",
+//           "type": "United States Action",
+//           "img": "assets/images/food_burger.jpg",
+//           "rating": 7.1,
+
 class CaroselCard extends StatelessWidget {
-  const CaroselCard(
-      {super.key,
-      required this.title,
-      required this.imgUrl,
-      required this.ads});
+  const CaroselCard({
+    super.key,
+    required this.title,
+    required this.imgUrl,
+    required this.ads,
+  });
 
   final String title;
   final String imgUrl;
@@ -105,7 +160,8 @@ class CaroselCard extends StatelessWidget {
       decoration: BoxDecoration(
         image: DecorationImage(
           colorFilter: const ColorFilter.srgbToLinearGamma(),
-          image: AssetImage(imgUrl),
+          image:
+              NetworkImage(imgUrl), // Changed to NetworkImage to fetch from URL
           fit: BoxFit.cover,
         ),
         borderRadius: const BorderRadius.all(
@@ -116,7 +172,7 @@ class CaroselCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: MovieBoxTheme.darkTextTheme.bodyLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           !ads
               ? Positioned(
@@ -145,7 +201,7 @@ class CaroselCard extends StatelessWidget {
                         ),
                         Text(
                           "Free Download",
-                          style: MovieBoxTheme.darkTextTheme.bodySmall,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),
@@ -158,11 +214,6 @@ class CaroselCard extends StatelessWidget {
   }
 }
 
-//  "title": "DC League of Super-Pets",
-//           "type": "United States Action",
-//           "img": "assets/images/food_burger.jpg",
-//           "rating": 7.1,
-
 class TopPickCard extends StatelessWidget {
   const TopPickCard({
     super.key,
@@ -170,12 +221,16 @@ class TopPickCard extends StatelessWidget {
     required this.type,
     required this.imgUrl,
     required this.rating,
+    required this.youtubeid,
+    required this.movieid,
   });
 
   final String title;
   final String type;
+  final String youtubeid;
   final String imgUrl;
   final double rating;
+  final String movieid;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +243,16 @@ class TopPickCard extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-          onTap: () => context.go('/home/0/player'),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => Videoplayer(
+                movieid: movieid,
+                type: type,
+                youtubeid: youtubeid,
+              ),
+            ),
+          ),
           child: Container(
             padding: const EdgeInsets.all(4),
             constraints: BoxConstraints.expand(

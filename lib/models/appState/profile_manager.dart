@@ -16,16 +16,18 @@ class ProfileManager extends ChangeNotifier {
   Future<void> addMovie(
     String title,
     String type,
+    String rating,
     String movieImgurl,
     String description,
     String downloadlink,
     String youtubetrailerlink,
   ) async {
     try {
-      await _firestore.collection('movies').add({
+      await _firestore.collection(type).add({
         "title": title,
         "movieImgUrl": movieImgurl,
         "description": description,
+        "rating": rating,
         "type": type,
         "downloadlink": downloadlink,
         "youtubetrailer": youtubetrailerlink,

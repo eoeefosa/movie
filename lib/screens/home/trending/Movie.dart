@@ -43,9 +43,9 @@ class MoviesGrid extends StatelessWidget {
             final movie = movies[index].data() as Map<String, dynamic>;
             return MovieCard(
               title: movie["title"] ?? 'Untitled',
-              imgUrl: movie["movieImgUrl"] ?? 'assets/placeholder.png',
-              rating:
-                  movie['rating'] != null ? movie['rating'].toDouble() : 0.0,
+              imgUrl: movie["movieImgUrl"] ?? 'assets/images/ypf.png',
+              rating: movie['rating'] ?? 7.5,
+
             );
           },
           staggeredTileBuilder: (int index) => const StaggeredTile.fit(1),

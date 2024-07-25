@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
@@ -14,7 +15,14 @@ import '../home/trending/trending.dart';
 import 'video_list.dart';
 
 class Videoplayer extends StatefulWidget {
-  const Videoplayer({super.key});
+  const Videoplayer(
+      {super.key,
+      required this.movieid,
+      required this.youtubeid,
+      required this.type});
+  final String movieid;
+  final String youtubeid;
+  final String type;
 
   @override
   State<Videoplayer> createState() => _VideoplayerState();
@@ -44,13 +52,11 @@ class _VideoplayerState extends State<Videoplayer> {
     '34_PXCzGw1M',
   ];
 
-  final mockService = MovieBoxCloneApi();
   @override
   void initState() {
     super.initState();
-    _movieFuture = mockService.getmovie();
     _controller = YoutubePlayerController(
-      initialVideoId: _ids.first,
+      initialVideoId: widget.youtubeid,
       flags: const YoutubePlayerFlags(
           mute: false,
           autoPlay: false,
@@ -98,7 +104,10 @@ class _VideoplayerState extends State<Videoplayer> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     return FutureBuilder(
-        future: _movieFuture,
+        future: FirebaseFirestore.instance
+            .collection(widget.type)
+            .doc(widget.movieid)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
@@ -185,89 +194,93 @@ class _VideoplayerState extends State<Videoplayer> {
                 // style: El,
                 onPressed: () {},
               ),
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  children: [
-                    player,
-                    gap,
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              body: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
                       children: [
-                        Text(movies["title"]),
-                        IconButton(
-                          onPressed: () {
-                            print("hello");
-                          },
-                          icon: const Icon(Icons.favorite),
-                        )
-                      ],
-                    ),
-                    gap,
-                    SizedBox(
-                      height: height / 7,
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: width * 0.6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  movies["title"],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                        player,
+                        gap,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(movies["title"]),
+                            IconButton(
+                              onPressed: () {
+                                print("hello");
+                              },
+                              icon: const Icon(Icons.favorite),
+                            )
+                          ],
+                        ),
+                        gap,
+                        SizedBox(
+                          height: height / 7,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: width * 0.6,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      movies["title"],
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Flexible(
+                                      child: Text(
+                                        movies["description"],
+                                        overflow: TextOverflow.clip,
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                Flexible(
-                                  child: Text(
-                                    movies["description"],
-                                    overflow: TextOverflow.clip,
-                                  ),
-                                )
-                              ],
+                              ),
+                              const Spacer(),
+                              SizedBox(
+                                width: width * 0.2,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0, vertical: 4.0),
+                                      child: Text(
+                                        "${movies["rating"]}",
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.save_alt_sharp))
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        gap,
+                        const Row(
+                          children: [
+                            Text("Description"),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 100,
+                          child: Flexible(
+                            child: Text(
+                              "${movies["rating"]}",
                             ),
                           ),
-                          const Spacer(),
-                          SizedBox(
-                            width: width * 0.2,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 4.0),
-                                  child: Text(
-                                    "${movies["rating"]}",
-                                  ),
-                                ),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.save_alt_sharp))
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    gap,
-                    const Row(
-                      children: [
-                        Text("Description"),
+                        ),
                       ],
                     ),
-                    SizedBox(
-                      height: 100,
-                      child: Flexible(
-                        child: Text(
-                          "${movies["rating"]}",
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
           );
@@ -347,212 +360,6 @@ class _VideoplayerState extends State<Videoplayer> {
               ),
             )
           ]),
-    );
-  }
-}
-
-class ProductPage extends StatelessWidget {
-  const ProductPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final mockService = MovieBoxCloneApi();
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
-    return FutureBuilder(
-      future: mockService.getmovie(),
-      builder: (context, AsyncSnapshot snapshot) {
-        final movies = snapshot.data;
-
-        if (snapshot.connectionState == ConnectionState.done) {
-          return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      constraints: const BoxConstraints.expand(
-                        width: 30,
-                        height: 35,
-                      ),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          colorFilter: const ColorFilter.srgbToLinearGamma(),
-                          image: AssetImage(movies['title_img']),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(movies["title"]),
-                    ),
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.download,
-                          size: 20,
-                        ),
-                        Icon(Icons.add),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              body: SafeArea(
-                child: ListView(
-                  children: [
-                    CaroselCard(
-                      title: movies["title"],
-                      imgUrl: movies['title_img'],
-                      ads: false,
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    SizedBox(
-                      height: height / 7,
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: width * 0.6,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  movies["title"],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    movies["description"],
-                                    overflow: TextOverflow.clip,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            width: width * 0.2,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0, vertical: 4.0),
-                                  child: Text(
-                                    "${movies["rating"]}",
-                                  ),
-                                ),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.save_alt_sharp))
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    const Text("Resource Detector"),
-                    SizedBox(
-                      height: 400,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GridView.builder(
-                            itemCount: movies['downloads'].length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                            ),
-                            itemBuilder: (context, index) {
-                              final downloadinfo = movies['downloads'];
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: DloadCard(
-                                  title: downloadinfo[index]["title"],
-                                  duration: downloadinfo[index]["duration"],
-                                  size: downloadinfo[index]["size"],
-                                  source: downloadinfo[index]["source"],
-                                ),
-                              );
-                            }),
-                      ),
-                    )
-                  ],
-                ),
-              ));
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
-    );
-  }
-}
-
-class DloadCard extends StatelessWidget {
-  const DloadCard(
-      {super.key,
-      required this.title,
-      required this.size,
-      required this.source,
-      required this.duration});
-  final String title;
-  final double size;
-  final String source;
-  final int duration;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(8.0),
-        ),
-      ),
-      // padding: const EdgeInsets.all(.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(title),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("${size}Mb"),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(
-                secondsToHoursMinutes(duration.toDouble()),
-              ),
-            ],
-          ),
-          TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.download,
-                size: 12,
-              ),
-              label: const Text(
-                "Download",
-                style: TextStyle(),
-              ))
-        ],
-      ),
     );
   }
 }

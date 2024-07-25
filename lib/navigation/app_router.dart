@@ -28,22 +28,17 @@ class AppRouter {
               currentTab: tab,
             );
           },
-          routes: [
-            GoRoute(
-              name: 'product',
-              path: 'product',
-              pageBuilder: (context, state) => const MaterialPage<void>(
-                child: ProductPage(),
-              ),
-            ),
-            GoRoute(
-              name: 'player',
-              path: 'player',
-              pageBuilder: (context, state) => const MaterialPage<void>(
-                child: Videoplayer(),
-              ),
-            ),
-          ])
+          // routes: [
+          
+          //   GoRoute(
+          //     name: 'player',
+          //     path: 'player',
+          //     pageBuilder: (context, state) => const MaterialPage<void>(
+          //       child: Videoplayer(),
+          //     ),
+          //   ),
+          // ]
+          )
     ],
     // redirect: (state) {
     //   final loggedIn = appStateManager.isLoggedIn;

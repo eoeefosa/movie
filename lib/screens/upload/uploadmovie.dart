@@ -183,6 +183,7 @@ class _UploadMovieState extends State<UploadMovie> {
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final TextEditingController movieTitleController = TextEditingController();
+    final TextEditingController detailsController = TextEditingController();
     final TextEditingController ratingController = TextEditingController();
     final TextEditingController movieDescriptionController =
         TextEditingController();
@@ -299,7 +300,8 @@ class _UploadMovieState extends State<UploadMovie> {
                         "Movie",
                         "TV series",
                         "Trending",
-                        "Top Picks"
+                        "Top Picks",
+                        "Trending Carousel"
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -327,12 +329,30 @@ class _UploadMovieState extends State<UploadMovie> {
                   },
                   // onSaved: (value) => movieTitle = value!,
                 ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: ratingController,
+                  decoration: const InputDecoration(
+                    labelText: 'Movie rating',
+                    border: OutlineInputBorder(
+                        // borderSide: Border.al
+                        ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the movie rating';
+                    }
+                    return null;
+                  },
+                  // onSaved: (value) => movieTitle = value!,
+                ),
                 const SizedBox(
                   height: 8.0,
                 ),
                 TextFormField(
                   maxLines: 2,
-                  controller: ratingController,
+                  controller: detailsController,
                   decoration: const InputDecoration(
                     labelText: 'Movie detail',
                     hintText:
@@ -433,6 +453,7 @@ class _UploadMovieState extends State<UploadMovie> {
                             await context.read<ProfileManager>().addMovie(
                                   movieTitleController.text,
                                   selectedState!,
+                                  ratingController.text,
                                   uploadedImageUrl,
                                   movieDescriptionController.text,
                                   downloadlinkController.text,
