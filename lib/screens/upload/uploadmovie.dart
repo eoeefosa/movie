@@ -461,7 +461,7 @@ class _UploadMovieState extends State<UploadMovie> {
                                 );
                             showsnackBar('upload successfull');
                             if (!context.mounted) return;
-                            context.go("/home/2");
+                            // context.go("/home/2");
                           } catch (e) {
                             showsnackBar('Failed to sign in $e');
                           }

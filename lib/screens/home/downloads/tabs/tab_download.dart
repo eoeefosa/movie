@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:movieboxclone/models/appState/downloadtask.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class Downloads extends StatelessWidget {
   const Downloads({super.key});
@@ -31,27 +34,46 @@ class TabDownload extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final downloadProvider = Provider.of<DownloadProvider>(context);
+    final size = MediaQuery.of(context).size;
     return FutureBuilder(
         future: _getDownloads(),
         builder: (context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             final List<FileSystemEntity> downloads = snapshot.data ?? [];
-            return ListView(
+            return Column(
               children: [
                 Text("Downloaded (${downloads.length})"),
-                ...List.generate(
-                  downloads.length,
-                  (index) {
-                    final file = downloads[index] as File;
-                    return DownloadCard(
-                      title: file.path.split('/').last,
-                      size: file.lengthSync() / (1024 * 1024),
-                      movieimg: file.path,
-                      folder: file.parent.path,
-                      duration: _getVideoDuration(
-                          file), // Implement this method to get video duration
-                    );
-                  },
+                SizedBox(
+                  height: size.height * .7,
+                  child: ListView(
+                    children: [
+                      ...List.generate(
+                        downloads.length,
+                        (index) {
+                          final file = downloads[index] as File;
+                          final downloadTask = downloadProvider.downloads
+                              .firstWhere(
+                                  (task) =>
+                                      task.filename ==
+                                      file.path.split('/').last,
+                                  orElse: () => DownloadTaskInfo(
+                                      id: '',
+                                      url: '',
+                                      filename: file.path.split('/').last));
+                          return DownloadCard(
+                            title: file.path.split('/').last,
+                            size: file.lengthSync() / (1024 * 1024),
+                            movieimg: file.path,
+                            folder: file.parent.path,
+                            duration: _getVideoDuration(
+                                file), // Implement this method to get video duration
+                            downloadTask: downloadTask,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -78,6 +100,7 @@ class DownloadCard extends StatelessWidget {
     required this.movieimg,
     required this.folder,
     required this.duration,
+    required this.downloadTask,
   });
 
   final String title;
@@ -85,10 +108,14 @@ class DownloadCard extends StatelessWidget {
   final String movieimg;
   final String folder;
   final double duration;
+  final DownloadTaskInfo downloadTask;
 
   @override
   Widget build(BuildContext context) {
     final screensize = MediaQuery.of(context).size;
+    final downloadProvider =
+        Provider.of<DownloadProvider>(context, listen: false);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -134,6 +161,36 @@ class DownloadCard extends StatelessWidget {
               children: [
                 Text(title),
                 Text("${size.toStringAsFixed(2)} MB"),
+                LinearProgressIndicator(
+                  value: downloadTask.progress / 100,
+                ),
+                Row(
+                  children: [
+                    if (downloadTask.status == DownloadTaskStatus.running)
+                      IconButton(
+                        icon: const Icon(Icons.pause),
+                        onPressed: () =>
+                            downloadProvider.pauseDownload(downloadTask.id),
+                      ),
+                    if (downloadTask.status == DownloadTaskStatus.paused)
+                      IconButton(
+                        icon: const Icon(Icons.play_arrow),
+                        onPressed: () =>
+                            downloadProvider.resumeDownload(downloadTask.id),
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        downloadProvider.removeDownload(downloadTask.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Download for ${downloadTask.filename} removed.')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
                 Row(
                   children: [
                     const Icon(
