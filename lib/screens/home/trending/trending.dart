@@ -33,8 +33,9 @@ class _TrendingState extends State<Trending> {
     final topPicksSnapshot = await firestore.collection('Top Picks').get();
     final trendingContent =
         topPicksSnapshot.docs.map((doc) => doc.data()).toList();
+    final trendingid = topPicksSnapshot.docs.map((doc) => doc.id).toList();
 
-    return [trendingCarosel, trendingContent];
+    return [trendingCarosel, trendingContent, trendingid];
   }
 
   Future<void> _refreshTrendingData() async {
@@ -51,6 +52,7 @@ class _TrendingState extends State<Trending> {
         if (snapshot.connectionState == ConnectionState.done) {
           final List trendingCarosel = snapshot.data[0] ?? [];
           final List trendingContent = snapshot.data[1] ?? [];
+          final List trendingid = snapshot.data[2] ?? [];
 
           return RefreshIndicator(
             onRefresh: _refreshTrendingData,
@@ -91,9 +93,7 @@ class _TrendingState extends State<Trending> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8.0, vertical: 4.0),
                       child: Text(
-                        trendingContent.isNotEmpty
-                            ? trendingContent[0]["Category"]
-                            : 'Category',
+                        trendingContent.isNotEmpty ? 'Top Picks' : 'Top Picks',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
@@ -105,15 +105,19 @@ class _TrendingState extends State<Trending> {
                           const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3, childAspectRatio: 3 / 5),
                       itemBuilder: (context, index) {
-                        final movies = trendingContent[index];
+                        final movieDoc = trendingContent[index];
+                        final movie = movieDoc as Map<String, dynamic>;
+                        final movieId = trendingid[index];
+
                         return TopPickCard(
-                          title: movies["title"] ?? 'Untitled',
-                          type: movies["type"],
-                          imgUrl:
-                              movies["movieImgUrl"] ?? 'assets/images/ypf.png',
-                          rating: movies['rating'] ?? 7.5,
-                          youtubeid: movies["rating"],
-                          movieid: movies["id"],
+                          title: movie["title"] ?? 'Untitled',
+                          type: movie["type"],
+                          imgUrl: movie["movieImgUrl"] ??
+                              "https://images6.alphacoders.com/683/thumb-1920-683023.jpg",
+                          rating: movie['rating'] ?? 7.5,
+                          youtubeid: movie["youtubetrailer"],
+                          movieid:
+                              movieId, // Using the document ID as the movie ID
                         );
                       },
                     ),
@@ -229,7 +233,7 @@ class TopPickCard extends StatelessWidget {
   final String type;
   final String youtubeid;
   final String imgUrl;
-  final double rating;
+  final String rating;
   final String movieid;
 
   @override
@@ -290,7 +294,7 @@ class TopPickCard extends StatelessWidget {
                   bottom: 4,
                   right: 0,
                   child: Text(
-                    "$rating",
+                    rating,
                     style: MovieBoxTheme.darkTextTheme.bodySmall,
                   ),
                 )

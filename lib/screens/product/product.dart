@@ -1,25 +1,21 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+import 'package:movieboxclone/models/appState/downloadtask.dart';
+import 'package:movieboxclone/styles/snack_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
-import '../../api/mockapiservice.dart';
-import '../../styles/snack_bar.dart';
-import '../../utils/constants.dart';
-import '../home/trending/trending.dart';
 import 'video_list.dart';
 
 class Videoplayer extends StatefulWidget {
-  const Videoplayer(
-      {super.key,
-      required this.movieid,
-      required this.youtubeid,
-      required this.type});
+  const Videoplayer({
+    super.key,
+    required this.movieid,
+    required this.youtubeid,
+    required this.type,
+  });
   final String movieid;
   final String youtubeid;
   final String type;
@@ -30,55 +26,29 @@ class Videoplayer extends StatefulWidget {
 
 class _VideoplayerState extends State<Videoplayer> {
   late YoutubePlayerController _controller;
-  late TextEditingController _idController;
-  late TextEditingController _seekToController;
+  // late TextEditingController _idController;
+  // late TextEditingController _seekToController;
   late Future _movieFuture;
 
   late PlayerState _playerState;
   late YoutubeMetaData _videoMetaData;
-  final double _volume = 100;
-  final bool _muted = false;
   bool _isPlayerReady = false;
-
-  final List<String> _ids = [
-    'nPt8bK2gbaU',
-    'gQDByCdjUXw',
-    'iLnmTe5Q2Qw',
-    '_WoCV4c6XOE',
-    'KmzdUe0RSJo',
-    '6jZDSSZZxjQ',
-    'p2lYr3vM_1w',
-    '7QUtEmBT_-w',
-    '34_PXCzGw1M',
-  ];
 
   @override
   void initState() {
-    super.initState();
+    print(widget.type);
     _controller = YoutubePlayerController(
       initialVideoId: widget.youtubeid,
       flags: const YoutubePlayerFlags(
-          mute: false,
-          autoPlay: false,
-          disableDragSeek: false,
-          loop: false,
-          isLive: false,
-          forceHD: false,
-          enableCaption: true),
-    )..addListener(listener);
-    _idController = TextEditingController();
-    _seekToController = TextEditingController();
-    _videoMetaData = const YoutubeMetaData();
-    _playerState = PlayerState.unknown;
-  }
+        mute: false,
+        autoPlay: false,
+        disableDragSeek: true,
+        loop: false,
+        enableCaption: false,
+      ),
+    );
 
-  void listener() {
-    if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
-      setState(() {
-        _playerState = _controller.value.playerState;
-        _videoMetaData = _controller.metadata;
-      });
-    }
+    super.initState();
   }
 
   @override
@@ -91,8 +61,8 @@ class _VideoplayerState extends State<Videoplayer> {
   @override
   void dispose() {
     _controller.dispose();
-    _idController.dispose();
-    _seekToController.dispose();
+    // _idController.dispose();
+    // _seekToController.dispose();
     super.dispose();
   }
 
@@ -110,11 +80,25 @@ class _VideoplayerState extends State<Videoplayer> {
             .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return Scaffold(
+                appBar: AppBar(),
+                body: const Center(
+                  child: CircularProgressIndicator(),
+                ));
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (!snapshot.hasData) {
-            return const Text('No data available');
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(
+                child: Text('Error: ${snapshot.error}'),
+              ),
+            );
+          } else if (!snapshot.hasData || !snapshot.data!.exists) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: const Center(
+                child: Text('No data available'),
+              ),
+            );
           }
 
           final movies = snapshot.data!;
@@ -146,35 +130,16 @@ class _VideoplayerState extends State<Videoplayer> {
                     maxLines: 1,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    log('Settings Tapped!');
-                  },
-                  icon: const Icon(
-                    Icons.settings,
-                    color: Colors.white,
-                    size: 25.0,
-                  ),
-                ),
               ],
               onReady: () {
                 _isPlayerReady = true;
               },
               onEnded: (data) {
-                _controller
-                    .load(_ids[(_ids.indexOf(data.videoId) + 1) % _ids.length]);
-                showsnackBar('Next Video Started!');
+                _controller.reload();
               },
             ),
             builder: (context, player) => Scaffold(
               appBar: AppBar(
-                // leading: Padding(
-                //   padding: const EdgeInsets.only(left: 12.0),
-                //   child: Image.asset(
-                //     'assets/images/ypf.png',
-                //     fit: BoxFit.fitWidth,
-                //   ),
-                // ),
                 title: Text(
                   movies["title"],
                   style: const TextStyle(color: Colors.white),
@@ -191,8 +156,15 @@ class _VideoplayerState extends State<Videoplayer> {
               ),
               bottomNavigationBar: ElevatedButton(
                 child: const Text("Download"),
-                // style: El,
-                onPressed: () {},
+                onPressed: () {
+                  // context.go('/home/1');]
+                  final downloadUrl = movies["downloadlink"];
+                  final filename = movies["title"];
+                  Provider.of<DownloadProvider>(context, listen: false)
+                      .addDownload(downloadUrl, filename);
+                  hideSnackBar();
+                  showsnackBar("${movies["title"]} started downloading");
+                },
               ),
               body: ListView(
                 children: [
@@ -226,7 +198,7 @@ class _VideoplayerState extends State<Videoplayer> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      movies["title"],
+                                      movies["title"] ?? 7.5,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
@@ -271,10 +243,8 @@ class _VideoplayerState extends State<Videoplayer> {
                         ),
                         SizedBox(
                           height: 100,
-                          child: Flexible(
-                            child: Text(
-                              "${movies["rating"]}",
-                            ),
+                          child: Text(
+                            "${movies["rating"]}",
                           ),
                         ),
                       ],
@@ -285,81 +255,5 @@ class _VideoplayerState extends State<Videoplayer> {
             ),
           );
         });
-  }
-
-  Color _getStateColor(PlayerState state) {
-    switch (state) {
-      case PlayerState.unknown:
-        return Colors.grey[700]!;
-      case PlayerState.unStarted:
-        return Colors.pink;
-      case PlayerState.ended:
-        return Colors.red;
-      case PlayerState.playing:
-        return Colors.blueAccent;
-      case PlayerState.paused:
-        return Colors.orange;
-      case PlayerState.buffering:
-        return Colors.yellow;
-      case PlayerState.cued:
-        return Colors.blue[900]!;
-      default:
-        return Colors.blue;
-    }
-  }
-
-  Widget _loadCueButton(String action) {
-    return Expanded(
-        child: MaterialButton(
-      onPressed: _isPlayerReady
-          ? () {
-              if (_idController.text.isNotEmpty) {
-                var id = YoutubePlayer.convertUrlToId(
-                      _idController.text,
-                    ) ??
-                    '';
-                if (action == 'LOAD') _controller.load(id);
-                if (action == 'CUE') _controller.cue(id);
-                FocusScope.of(context).requestFocus(FocusNode());
-              } else {
-                showsnackBar('Source can\'t be empty!');
-              }
-            }
-          : null,
-      disabledColor: Colors.grey,
-      disabledTextColor: Colors.black,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14.0),
-        child: Text(
-          action,
-          style: const TextStyle(
-            fontSize: 18.0,
-            color: Colors.white,
-            fontWeight: FontWeight.w300,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    ));
-  }
-
-  Widget _text(String title, String value) {
-    return RichText(
-      text: TextSpan(
-          text: '$title : ',
-          style: const TextStyle(
-            color: Colors.blueAccent,
-            fontWeight: FontWeight.bold,
-          ),
-          children: [
-            TextSpan(
-              text: value,
-              style: const TextStyle(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.w300,
-              ),
-            )
-          ]),
-    );
   }
 }

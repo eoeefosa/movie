@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:movieboxclone/models/appState/profile_manager.dart';
 import 'package:movieboxclone/screens/upload/uploadmovie.dart';
 import 'package:provider/provider.dart';
 
 import '../../styles/snack_bar.dart';
-import '../whatsapp/page.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -38,6 +36,14 @@ class _LoginState extends State<Login> {
       // ScaffoldMessenger.of(context)
       //     .showSnackBar(const SnackBar(content: Text('Logging in...')));
     }
+  }
+
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
@@ -80,8 +86,16 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      onPressed: _togglePasswordVisibility,
+                    ),
+                  ),
+                  obscureText: _obscureText,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Please enter your password';
@@ -91,7 +105,6 @@ class _LoginState extends State<Login> {
                     }
                     return null;
                   },
-                  // onSaved: (value) => _password = value!,
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(

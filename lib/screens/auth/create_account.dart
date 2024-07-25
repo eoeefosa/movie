@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/appState/profile_manager.dart';
 import '../../styles/snack_bar.dart';
-import '../whatsapp/page.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key});

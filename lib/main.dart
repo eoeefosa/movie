@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:movieboxclone/models/appState/app_state_manager.dart';
 import 'package:movieboxclone/models/appState/movie_controller.dart';
 import 'package:movieboxclone/models/appState/profile_manager.dart';
@@ -10,22 +11,36 @@ import 'package:movieboxclone/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'models/appState/downloadtask.dart';
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//
-// }
-Future<void> main() async {
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FlutterDownloader.initialize(debug: true);
+
+  FlutterDownloader.registerCallback(downloadCallback);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
   ));
   final appstateManager = AppStateManager();
   await appstateManager.initializeApp();
   runApp(MovieBoxClone(appStateManager: appstateManager));
+}
+
+void downloadCallback(String id, int status, int progress) {
+  final provider = navigatorKey.currentContext != null
+      ? Provider.of<DownloadProvider>(navigatorKey.currentContext!, listen: false)
+      : null;
+  if (provider != null) {
+    provider.updateDownload(
+      id,
+      DownloadTaskStatus.values[status],
+      progress,
+    );
+  }
 }
 
 class MovieBoxClone extends StatefulWidget {
@@ -37,18 +52,17 @@ class MovieBoxClone extends StatefulWidget {
 }
 
 class _MovieBoxCloneState extends State<MovieBoxClone> {
-  // Other state managers
-  //  late final _groceryManager = GroceryManager();
-  late final _profileManager = ProfileManager();
-  late final _appRouter = AppRouter(
+  late final ProfileManager _profileManager = ProfileManager();
+  late final AppRouter _appRouter = AppRouter(
     widget.appStateManager,
     _profileManager,
-    // _groceryManager,
   );
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => DownloadProvider()),
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
         ChangeNotifierProvider(create: (context) => _profileManager),
       ],
@@ -68,6 +82,7 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
             title: 'MovieBox Clone',
             routerConfig: router,
             scaffoldMessengerKey: scaffoldMessengerKey,
+            
           );
         },
       ),

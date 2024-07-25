@@ -38,10 +38,11 @@ class TVSeries extends StatelessWidget {
             return TopPickCard(
               title: movie["title"] ?? 'Untitled',
               type: movie["type"],
-              imgUrl: movie["movieImgUrl"] ?? 'assets/images/ypf.png',
+              imgUrl: movie["movieImgUrl"] ??
+                  "https://images6.alphacoders.com/683/thumb-1920-683023.jpg",
               rating: movie['rating'] ?? 7.5,
               youtubeid: movie["youtubetrailer"],
-              movieid: movieId,  // Using the document ID as the movie ID
+              movieid: movieId, // Using the document ID as the movie ID
             );
           },
         );
@@ -74,7 +75,7 @@ class TopPickCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(imgUrl),  // Changed to Image.asset for consistency
+          Image.asset(imgUrl), // Changed to Image.asset for consistency
           Text(title),
           Text(type),
           Text('Rating: $rating'),
