@@ -1,6 +1,6 @@
-name: movieboxclone
-description: "A new Flutter project."
-publish_to: "none"
+name: torihd
+description: A new Flutter project.
+publish_to: none
 version: 0.1.0
 
 environment:
@@ -36,7 +36,7 @@ dependencies:
   video_player: ^2.9.1
   video_thumbnail: ^0.5.3
   youtube_player_flutter: ^8.1.0
-  # package_info_plus: ^8.0.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +45,24 @@ dev_dependencies:
   json_serializable: ^6.8.0
   build_runner: ^2.4.11
   test: ^1.25.2
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo1.jpg"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/logo1.jpg"
+    background_color: "#FFFFFF"
+    theme_color: "#000000"
+  windows:
+    generate: true
+    image_path: "assets/logo1.jpg"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/logo1.jpg"
 
 dependency_overrides:
   webview_flutter_android: 3.16.1
@@ -59,9 +77,3 @@ flutter:
     - assets/images/food_cupcake.jpg
     - assets/images/food_salmon.jpg
     - assets/images/ypf.png
-    # 2Geda asset
-    - assets/2geda/
-    - assets/2geda/images/
-    - assets/2geda/adverts/
-    - assets/2geda/icons/
-    - images/

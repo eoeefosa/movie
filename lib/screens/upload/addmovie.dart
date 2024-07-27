@@ -2,7 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movieboxclone/styles/snack_bar.dart';
+import 'package:torihd/styles/snack_bar.dart';
 
 class Upload extends StatefulWidget {
   const Upload({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/screens/auth/create_account.dart';
-import 'package:movieboxclone/screens/auth/login.dart';
+import 'package:torihd/screens/auth/create_account.dart';
+import 'package:torihd/screens/auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 

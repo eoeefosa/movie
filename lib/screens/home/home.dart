@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:movieboxclone/models/appState/app_state_manager.dart';
-import 'package:movieboxclone/screens/home/dashboard.dart';
-import 'package:movieboxclone/screens/home/downloads/downloads.dart';
-import 'package:movieboxclone/screens/home/me.dart';
+import 'package:torihd/models/appState/app_state_manager.dart';
+import 'package:torihd/screens/home/dashboard.dart';
+import 'package:torihd/screens/home/downloads/downloads.dart';
+import 'package:torihd/screens/home/me.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {

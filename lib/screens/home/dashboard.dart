@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/api/mockapiservice.dart';
-import 'package:movieboxclone/screens/home/trending/Movie.dart';
-import 'package:movieboxclone/screens/home/trending/trending.dart';
-import 'package:movieboxclone/screens/home/trending/tv_series.dart';
+import 'package:torihd/api/mockapiservice.dart';
+import 'package:torihd/screens/home/trending/Movie.dart';
+import 'package:torihd/screens/home/trending/trending.dart';
+import 'package:torihd/screens/home/trending/tv_series.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});

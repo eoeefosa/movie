@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/screens/home/downloads/tabs/tab_download.dart';
+import 'package:torihd/screens/home/downloads/tabs/tab_download.dart';
 
 class Downloads extends StatelessWidget {
   const Downloads({super.key});

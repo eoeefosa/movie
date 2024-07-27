@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/models/appState/app_cache.dart';
+import 'package:torihd/models/appState/app_cache.dart';
 
 class MovieboxTab {
   static const int home = 0;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:movieboxclone/movieboxtheme.dart';
-import 'package:movieboxclone/screens/product/product.dart';
+import 'package:torihd/movieboxtheme.dart';
+import 'package:torihd/screens/product/product.dart';
 
 class Trending extends StatefulWidget {
   const Trending({super.key});

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/screens/home/trending/trending.dart';
+import 'package:torihd/screens/home/trending/trending.dart';
 
 import '../../../api/mockapiservice.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movieboxclone/models/appState/profile_manager.dart';
-import 'package:movieboxclone/screens/upload/uploadmovie.dart';
+import 'package:torihd/models/appState/profile_manager.dart';
+import 'package:torihd/screens/upload/uploadmovie.dart';
 import 'package:provider/provider.dart';
 
 import '../../styles/snack_bar.dart';

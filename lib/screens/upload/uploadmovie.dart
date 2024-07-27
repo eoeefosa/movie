@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
-import 'package:movieboxclone/api/mockapiservice.dart';
-import 'package:movieboxclone/screens/upload/previewmovie.dart';
-import 'package:movieboxclone/styles/snack_bar.dart';
+import 'package:torihd/api/mockapiservice.dart';
+import 'package:torihd/screens/upload/previewmovie.dart';
+import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 

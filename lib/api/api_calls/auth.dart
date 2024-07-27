@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:movieboxclone/models/usermodel.dart';
-import 'package:movieboxclone/styles/snack_bar.dart';
+import 'package:torihd/models/usermodel.dart';
+import 'package:torihd/styles/snack_bar.dart';
 
 class Auth{
 final FirebaseAuth _firebaseAuth= FirebaseAuth.instance;

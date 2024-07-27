@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:movieboxclone/screens/product/video_list.dart';
+import 'package:torihd/screens/product/video_list.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../styles/snack_bar.dart';
