@@ -48,21 +48,29 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
+  adaptive_icon_background: "assets/logo1.jpg"
+  adaptive_icon_foreground: "assets/logo1.jpg"
   ios: true
+  remove_alpha_ios: true
   image_path: "assets/logo1.jpg"
-  min_sdk_android: 21
-  web:
-    generate: true
-    image_path: "assets/logo1.jpg"
-    background_color: "#FFFFFF"
-    theme_color: "#000000"
-  windows:
-    generate: true
-    image_path: "assets/logo1.jpg"
-    icon_size: 48
-  macos:
-    generate: true
-    image_path: "assets/logo1.jpg"
+
+# flutter_launcher_icons:
+#   android: true
+#   ios: true
+#   image_path: "assets/logo1.jpg"
+#   min_sdk_android: 21
+#   web:
+#     generate: true
+#     image_path: "assets/logo1.jpg"
+#     background_color: "#FFFFFF"
+#     theme_color: "#000000"
+#   windows:
+#     generate: true
+#     image_path: "assets/logo1.jpg"
+#     icon_size: 48
+#   macos:
+#     generate: true
+#     image_path: "assets/logo1.jpg"
 
 dependency_overrides:
   webview_flutter_android: 3.16.1
