@@ -203,12 +203,12 @@ class _VideoplayerState extends State<Videoplayer> {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Flexible(
-                                      child: Text(
-                                        movies["description"],
-                                        overflow: TextOverflow.clip,
-                                      ),
-                                    )
+                                    // Flexible(
+                                    //   child: Text(
+                                    //     movies["details"],
+                                    //     overflow: TextOverflow.clip,
+                                    //   ),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -244,7 +244,7 @@ class _VideoplayerState extends State<Videoplayer> {
                         SizedBox(
                           height: 100,
                           child: Text(
-                            "${movies["rating"]}",
+                            movies["description"],
                           ),
                         ),
                       ],

@@ -5,6 +5,7 @@ import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/models/appState/profile_manager.dart';
 import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/navigation/app_router.dart';
+import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,7 +31,8 @@ void main() async {
 
 void downloadCallback(String id, int status, int progress) {
   final provider = navigatorKey.currentContext != null
-      ? Provider.of<DownloadProvider>(navigatorKey.currentContext!, listen: false)
+      ? Provider.of<DownloadProvider>(navigatorKey.currentContext!,
+          listen: false)
       : null;
   if (provider != null) {
     provider.updateDownload(
@@ -61,6 +63,7 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DownloadProvider()),
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
         ChangeNotifierProvider(create: (context) => _profileManager),
       ],
@@ -80,7 +83,6 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
             title: 'MovieBox Clone',
             routerConfig: router,
             scaffoldMessengerKey: scaffoldMessengerKey,
-            
           );
         },
       ),

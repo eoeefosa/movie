@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:torihd/api/mockapiservice.dart';
 import 'package:torihd/screens/home/trending/Movie.dart';
 import 'package:torihd/screens/home/trending/trending.dart';
 import 'package:torihd/screens/home/trending/tv_series.dart';
+
+import '../../provider/movieprovider.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key});
@@ -10,6 +13,7 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return FutureBuilder(
         future: mockService.getCategories(),
         builder: (context, AsyncSnapshot snapshot) {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:provider/provider.dart';
+import 'package:torihd/models/movie.dart';
+import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/screens/product/product.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
@@ -14,8 +17,61 @@ class MoviesScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Movies"),
       ),
-      body: const MoviesGrid(),
+      body: const MovieswithProvider(),
     );
+  }
+}
+
+class MovieswithProvider extends StatefulWidget {
+  const MovieswithProvider({super.key});
+
+  @override
+  _MovieswithProviderState createState() => _MovieswithProviderState();
+}
+
+class _MovieswithProviderState extends State<MovieswithProvider> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch movies after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MovieProvider>(context, listen: false).fetchmovie();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MovieProvider>(builder: (context, movieProvider, child) {
+      if (movieProvider.movieisloading) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (movieProvider.movies.isEmpty) {
+        return const Center(
+          child: Text("No Movies available"),
+        );
+      } else {
+        final List<Movie> movies = movieProvider.movies;
+        return StaggeredGridView.countBuilder(
+          crossAxisCount: 2,
+          itemCount: movies.length,
+          itemBuilder: (context, index) {
+            final movie = movies[index];
+
+            return MovieCard(
+              title: movie.title,
+              type: movie.type,
+              // type: "movies",
+              imgUrl: movie.movieImgurl,
+              rating: movie.rating,
+              youtubeid: movie.youtubetrailer,
+              movieid: movie.id,
+            );
+          },
+          staggeredTileBuilder: (int index) => const StaggeredTile.fit(1),
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
+        );
+      }
+    });
   }
 }
 

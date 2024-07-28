@@ -53,20 +53,23 @@ class Movie {
   }
 
   factory Movie.fromMap(Map<String, dynamic> map) {
+    print(map);
     return Movie(
-      title: map['title'] as String,
-      downloadlink: map['downloadlink'] as String,
+      title: map['title'] ?? '',
+      downloadlink: map['downloadlink'] ?? '',
       type: map['type'] as String,
-      movieImgurl: map['movieImgurl'] as String,
-      rating: map['rating'] as String,
-      id: map['id'] as String,
-      youtubetrailer: map['youtubetrailer'] as String,
+      movieImgurl: map['movieImgurl'] ??
+          "https://firebasestorage.googleapis.com/v0/b/torihd-1ed20.appspot.com/o/image12024-07-25%2020%3A00%3A41.684202?alt=media&token=ac8fadb2-6632-45c5-ae77-d921ec459ca1",
+      rating: map['rating'] ?? '',
+      id: map['id'] ?? '',
+      youtubetrailer: map['youtubetrailer'] ?? '',
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Movie.fromJson(String source) => Movie.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Movie.fromJson(String source) =>
+      Movie.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -76,25 +79,24 @@ class Movie {
   @override
   bool operator ==(covariant Movie other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.title == title &&
-      other.downloadlink == downloadlink &&
-      other.type == type &&
-      other.movieImgurl == movieImgurl &&
-      other.rating == rating &&
-      other.id == id &&
-      other.youtubetrailer == youtubetrailer;
+
+    return other.title == title &&
+        other.downloadlink == downloadlink &&
+        other.type == type &&
+        other.movieImgurl == movieImgurl &&
+        other.rating == rating &&
+        other.id == id &&
+        other.youtubetrailer == youtubetrailer;
   }
 
   @override
   int get hashCode {
     return title.hashCode ^
-      downloadlink.hashCode ^
-      type.hashCode ^
-      movieImgurl.hashCode ^
-      rating.hashCode ^
-      id.hashCode ^
-      youtubetrailer.hashCode;
+        downloadlink.hashCode ^
+        type.hashCode ^
+        movieImgurl.hashCode ^
+        rating.hashCode ^
+        id.hashCode ^
+        youtubetrailer.hashCode;
   }
 }
