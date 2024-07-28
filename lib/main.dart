@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
-import 'package:torihd/models/appState/movie_controller.dart';
 import 'package:torihd/models/appState/profile_manager.dart';
 import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/navigation/app_router.dart';
