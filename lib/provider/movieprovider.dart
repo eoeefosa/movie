@@ -45,6 +45,8 @@ class MovieProvider extends ChangeNotifier {
     notifyListeners();
     final trendingCarouselList = await api.fetchTrendingCarousel();
     trendingCarousel = trendingCarouselList;
+    trendingCarouselList.addAll(movies);
+    trendingCarouselList.addAll(tvSeries);
     _trendingCarouselloading = false;
     notifyListeners();
   }
@@ -63,6 +65,8 @@ class MovieProvider extends ChangeNotifier {
     notifyListeners();
     final toppickslist = await api.topPick();
     toppick = toppickslist;
+    toppick.addAll(movies);
+    toppick.addAll(tvSeries);
     _topPickloading = false;
     notifyListeners();
   }

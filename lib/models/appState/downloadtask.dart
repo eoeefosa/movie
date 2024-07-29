@@ -26,6 +26,7 @@ class DownloadTaskInfo {
 class DownloadProvider with ChangeNotifier {
   bool filesdownloading = false;
   final List<DownloadTaskInfo> _downloads = [];
+  final List<File?> downloadedfiles = [];
   double? _progress;
   get progress => _progress;
 
@@ -42,27 +43,35 @@ class DownloadProvider with ChangeNotifier {
 
     // final download =
     //     DownloadTaskInfo(id: taskId!, url: url, filename: filename);
-    final File? file = await FileDownloader.downloadFile(
-        url: url.trim(),
-        onProgress: (fileName, progress) {
-          print(progress);
-          showsnackBar("$progress $fileName");
-          _progress = progress;
-          notifyListeners();
-        },
-        onDownloadCompleted: (path) {
-          hideSnackBar();
-          showsnackBar(path);
-          _progress = null;
-        },
-        onDownloadError: (String error) {
-          print('DOWNLOAD ERROR: $error');
-          hideSnackBar();
-          showsnackBar('DOWNLOAD ERROR: $error');
-        });
+    try {
+      final File? file = await FileDownloader.downloadFile(
+          url: url.trim(),
+          onProgress: (fileName, progress) {
+            print(progress);
+            showsnackBar("$progress $fileName");
+            _progress = progress;
+            notifyListeners();
+          },
+          onDownloadCompleted: (path) {
+            hideSnackBar();
+            showsnackBar(path);
+            _progress = null;
+          },
+          onDownloadError: (String error) {
+            print('DOWNLOAD ERROR: $error');
+            hideSnackBar();
+            showsnackBar('DOWNLOAD ERROR: $error');
+          });
 
-    // _downloads.add(download);
-    notifyListeners();
+      downloadedfiles.add(file);
+
+      notifyListeners();
+    } catch (e) {
+      // Handle any other exceptions
+      debugPrint(e.toString());
+
+      // _downloads.add(download);
+    }
   }
 
   void updateDownload(String id, DownloadTaskStatus status, int progress) {

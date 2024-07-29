@@ -41,31 +41,33 @@ class TabDownload extends StatelessWidget {
         future: _getDownloads(),
         builder: (context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            final List<FileSystemEntity> downloads = snapshot.data ?? [];
             return Consumer<DownloadProvider>(
                 builder: (context, movieProvider, child) {
               if (movieProvider.filesdownloading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (movieProvider.downloads.isEmpty) {
+              } else if (movieProvider.downloadedfiles.isEmpty) {
                 return const Center(
                   child: Text("No downloads available"),
                 );
               } else {
                 return Column(
                   children: [
-                    Text("Downloading (${movieProvider.downloads.length})"),
+                    Text(
+                        "Downloading (${movieProvider.downloadedfiles.length})"),
                     SizedBox(
                       height: size.height * .3,
                       child: ListView.builder(
                         itemBuilder: (context, index) {
-                          final taskInfo = movieProvider.downloads[index];
-                          return DownloadTaskCard(taskInfo: taskInfo);
+                          final taskInfo = movieProvider.downloadedfiles[index];
+
+                          return;
                         },
-                        itemCount: movieProvider.downloads.length,
+                        itemCount: movieProvider.downloadedfiles.length,
                         physics: const BouncingScrollPhysics(),
                       ),
                     ),
-                    Text("Downloaded (${downloads.length})"),
+                    Text(
+                        "Downloaded (${movieProvider.downloadedfiles.length})"),
                     SizedBox(
                       height: size.height * .4,
                       child:
