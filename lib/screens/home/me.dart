@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/appState/profile_manager.dart';
-import '../download/download.dart';
 import '../upload/uploadmovie.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -220,20 +219,7 @@ class SignedIn extends StatelessWidget {
                 },
                 child: const Text("Upload Movie"))
             : Container(),
-        userProfile.isAdmin
-            ? TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const FileDownloader();
-                      },
-                    ),
-                  );
-                },
-                child: const Text("Image Picker"))
-            : Container(),
+        
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/screens/home/dashboard.dart';
-import 'package:torihd/screens/home/downloads/downloads.dart';
+import 'package:torihd/screens/downloads/downloads.dart';
 import 'package:torihd/screens/home/me.dart';
 import 'package:provider/provider.dart';
 

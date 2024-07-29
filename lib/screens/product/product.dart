@@ -7,7 +7,6 @@ import 'package:torihd/models/appState/downloadtask.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'video_list.dart';
 
 class Videoplayer extends StatefulWidget {
   const Videoplayer({
