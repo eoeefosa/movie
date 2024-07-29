@@ -13,7 +13,6 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder(
         future: mockService.getCategories(),
         builder: (context, AsyncSnapshot snapshot) {
@@ -46,15 +45,15 @@ class Dashboard extends StatelessWidget {
                           .toList(),
                     ),
                   ),
-                  body: SizedBox(
+                  body: const SizedBox(
                     height: 500,
                     child: Column(
                       children: [
                         // TODO: ALLOW SLIDE SCROLLING OF APPBAR
                         Expanded(
                           child: TabBarView(children: [
-                            const Trending(),
-                            const MoviesScreen(),
+                            Trending(),
+                            MoviesScreen(),
                             TVSeries(),
                             // const Center(child: Text('Following context')),
                             // const Center(child: Text('Following context')),

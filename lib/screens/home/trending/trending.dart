@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:provider/provider.dart';
+import 'package:torihd/models/movie.dart';
 import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/screens/product/product.dart';
+
+import '../../../provider/movieprovider.dart';
 
 class Trending extends StatefulWidget {
   const Trending({super.key});
@@ -12,126 +16,133 @@ class Trending extends StatefulWidget {
 }
 
 class _TrendingState extends State<Trending> {
-  late Future<List<dynamic>> _trendingData;
-
   @override
   void initState() {
     super.initState();
-    _trendingData = fetchTrendingData();
+    // Fetch movies after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MovieProvider>(context, listen: false).fetchmovie();
+      Provider.of<MovieProvider>(context, listen: false).fetchTopPick();
+    });
   }
 
-  Future<List<dynamic>> fetchTrendingData() async {
-    final firestore = FirebaseFirestore.instance;
+  // Future<List<dynamic>> fetchTrendingData() async {
+  //   final firestore = FirebaseFirestore.instance;
 
-    // Fetch Trending Carousel data
-    final carouselSnapshot =
-        await firestore.collection('Trending Carousel').get();
-    final trendingCarosel =
-        carouselSnapshot.docs.map((doc) => doc.data()).toList();
+  //   // Fetch Trending Carousel data
+  //   final carouselSnapshot =
+  //       await firestore.collection('Trending Carousel').get();
+  //   final trendingCarosel =
+  //       carouselSnapshot.docs.map((doc) => doc.data()).toList();
 
-    // Fetch Top Picks data
-    final topPicksSnapshot = await firestore.collection('Top Picks').get();
-    final trendingContent =
-        topPicksSnapshot.docs.map((doc) => doc.data()).toList();
-    final trendingid = topPicksSnapshot.docs.map((doc) => doc.id).toList();
+  //   // Fetch Top Picks data
+  //   final topPicksSnapshot = await firestore.collection('Top Picks').get();
+  //   final trendingContent =
+  //       topPicksSnapshot.docs.map((doc) => doc.data()).toList();
+  //   final trendingid = topPicksSnapshot.docs.map((doc) => doc.id).toList();
 
-    return [trendingCarosel, trendingContent, trendingid];
-  }
+  //   return [trendingCarosel, trendingContent, trendingid];
+  // }
 
   Future<void> _refreshTrendingData() async {
     setState(() {
-      _trendingData = fetchTrendingData();
+      // _trendingData = fetchTrendingData();
+      Provider.of<MovieProvider>(context, listen: false)
+          .fetchTrendingCarousel();
+      Provider.of<MovieProvider>(context, listen: false).fetchTopPick();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _trendingData,
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          final List trendingCarosel = snapshot.data[0] ?? [];
-          final List trendingContent = snapshot.data[1] ?? [];
-          final List trendingid = snapshot.data[2] ?? [];
-
-          return RefreshIndicator(
-            onRefresh: _refreshTrendingData,
-            child: ListView(
-              scrollDirection: Axis.vertical,
-              children: [
-                const SizedBox(
-                  height: 20,
+    return RefreshIndicator(
+      onRefresh: _refreshTrendingData,
+      child: ListView(
+        scrollDirection: Axis.vertical,
+        children: [
+          const SizedBox(
+            height: 20,
+          ),
+          Consumer<MovieProvider>(builder: (context, movieProvider, child) {
+            if (movieProvider.trendingCarouselloading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (movieProvider.trendingCarousel.isEmpty) {
+              return const Center(
+                child: Text("No Movies available"),
+              );
+            } else {
+              List<Movie> trendingcarousellist = movieProvider.trendingCarousel;
+              return CarouselSlider(
+                items: trendingcarousellist
+                    .map((item) => CaroselCard(
+                        title: item.title,
+                        imgUrl: item.movieImgurl,
+                        ads: false))
+                    .toList(),
+                options: CarouselOptions(
+                  aspectRatio: 16 / 6,
+                  viewportFraction: 0.85,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 3),
+                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.1,
+                  scrollDirection: Axis.horizontal,
                 ),
-                CarouselSlider(
-                  items: trendingCarosel
-                      .map((item) => CaroselCard(
-                          title: item["title"],
-                          imgUrl:
-                              item["movieImgUrl"] ?? 'assets/images/ypf.png',
-                          ads: false))
-                      .toList(),
-                  options: CarouselOptions(
-                    aspectRatio: 16 / 6,
-                    viewportFraction: 0.85,
-                    initialPage: 0,
-                    enableInfiniteScroll: true,
-                    reverse: false,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 3),
-                    autoPlayAnimationDuration:
-                        const Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.fastOutSlowIn,
-                    enlargeCenterPage: true,
-                    enlargeFactor: 0.1,
-                    scrollDirection: Axis.horizontal,
+              );
+            }
+          }),
+          Consumer<MovieProvider>(builder: (context, movieProvider, child) {
+            if (movieProvider.topPickloading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (movieProvider.toppick.isEmpty) {
+              return const Center(
+                child: Text("No Movies available"),
+              );
+            } else {
+              List<Movie> topPicks = movieProvider.toppick;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Text(
+                      topPicks.isEmpty ? 'Top Picks' : 'Top Picks',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 4.0),
-                      child: Text(
-                        trendingContent.isNotEmpty ? 'Top Picks' : 'Top Picks',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      itemCount: trendingContent.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, childAspectRatio: 3 / 5),
-                      itemBuilder: (context, index) {
-                        final movieDoc = trendingContent[index];
-                        final movie = movieDoc as Map<String, dynamic>;
-                        final movieId = trendingid[index];
+                  GridView.builder(
+                    shrinkWrap: true,
+                    itemCount: topPicks.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3, childAspectRatio: 3 / 5),
+                    itemBuilder: (context, index) {
+                      final topPick = topPicks[index];
 
-                        return TopPickCard(
-                          title: movie["title"] ?? 'Untitled',
-                          type: movie["type"],
-                          imgUrl: movie["movieImgUrl"] ??
-                              "https://images6.alphacoders.com/683/thumb-1920-683023.jpg",
-                          rating: movie['rating'] ?? 7.5,
-                          youtubeid: movie["youtubetrailer"],
-                          movieid:
-                              movieId, // Using the document ID as the movie ID
-                        );
-                      },
-                    ),
-                  ],
-                )
-              ],
-            ),
-          );
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
+                      return TopPickCard(
+                        title: topPick.title,
+                        type: topPick.type,
+                        imgUrl: topPick.movieImgurl,
+                        rating: topPick.rating,
+                        youtubeid: topPick.youtubetrailer,
+                        movieid:
+                            topPick.id, // Using the document ID as the movie ID
+                      );
+                    },
+                  ),
+                ],
+              );
+            }
+          })
+        ],
+      ),
     );
   }
 }

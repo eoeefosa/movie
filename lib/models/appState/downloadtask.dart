@@ -19,6 +19,7 @@ class DownloadTaskInfo {
 }
 
 class DownloadProvider with ChangeNotifier {
+  bool filesdownloading = false;
   List<DownloadTaskInfo> _downloads = [];
 
   List<DownloadTaskInfo> get downloads => _downloads;
@@ -32,7 +33,9 @@ class DownloadProvider with ChangeNotifier {
       openFileFromNotification: true,
     );
 
-    final download = DownloadTaskInfo(id: taskId!, url: url, filename: filename);
+    final download =
+        DownloadTaskInfo(id: taskId!, url: url, filename: filename);
+        
     _downloads.add(download);
     notifyListeners();
   }

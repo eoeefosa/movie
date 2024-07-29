@@ -21,168 +21,16 @@ class UploadMovie extends StatefulWidget {
 }
 
 class _UploadMovieState extends State<UploadMovie> {
-  List<XFile>? _mediaFileList;
   String? _retrieveDataError;
   String? selectedState = "Movie";
 
-  void _setImageFileListFromFile(XFile? value) {
-    _mediaFileList = value == null ? null : <XFile>[value];
-  }
-
-  Future<void> _onImageButtonPressed(
-    ImageSource source, {
-    required BuildContext context,
-    bool isMultiImage = false,
-  }) async {
-    if (context.mounted) {
-      if (isMultiImage) {
-        try {
-          final List<XFile> pickedFileList = await _picker.pickMultiImage(
-            limit: 10,
-          );
-          setState(() {
-            _mediaFileList = pickedFileList;
-          });
-        } catch (e) {
-          setState(() {
-            _pickImageError = e;
-          });
-        }
-      } else {
-        try {
-          final XFile? pickedFile = await _picker.pickImage(source: source);
-          setState(() {
-            _setImageFileListFromFile(pickedFile);
-          });
-        } catch (e) {
-          setState(() {
-            ((e) {
-              _pickImageError = e;
-            });
-          });
-        }
-      }
-    }
-  }
-
-  Widget _previewImages() {
-    final Text? retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-
-    if (_mediaFileList != null) {
-      return Semantics(
-        label: "Torhi hd",
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (BuildContext context, int index) {
-            final String? mime = lookupMimeType(_mediaFileList![index].path);
-            return Semantics(
-              label: 'Torhi image',
-              child: kIsWeb
-                  ? Image.network(_mediaFileList![index].path)
-                  : Row(
-                      children: [
-                        Image.file(
-                          File(_mediaFileList![index].path),
-                          errorBuilder: (BuildContext context, Object error,
-                              StackTrace? stackTrace) {
-                            return const Center(
-                              child: Text('This image type is not supported'),
-                            );
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _onImageButtonPressed(
-                              ImageSource.gallery,
-                              context: context,
-                              isMultiImage: false,
-                            );
-                          },
-                          child: const Center(
-                            child: Text(
-                              'Tap to Change image',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-            );
-          },
-          itemCount: _mediaFileList!.length,
-        ),
-      );
-    } else if (_pickImageError != null) {
-      return Text(
-        'Pick image error: $_pickImageError',
-        textAlign: TextAlign.center,
-      );
-    } else {
-      return TextButton(
-        onPressed: () {
-          _onImageButtonPressed(
-            ImageSource.gallery,
-            context: context,
-            isMultiImage: false,
-          );
-        },
-        child: const Center(
-          child: Text(
-            'Tap to Select a Movie Image',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-  }
-
   final TextEditingController stateController = TextEditingController();
   final MovieBoxCloneApi mockapi = MovieBoxCloneApi();
-
-  Text? _getRetrieveErrorWidget() {
-    if (_retrieveDataError != null) {
-      final Text result = Text(_retrieveDataError!);
-      _retrieveDataError = null;
-      return result;
-    }
-    return null;
-  }
-
-  Future<void> retrieveLostData() async {
-    final LostDataResponse response = await _picker.retrieveLostData();
-    if (response.isEmpty) {
-      return;
-    }
-    if (response.file != null) {
-      setState(() {
-        if (response.files == null) {
-          _setImageFileListFromFile(response.file);
-        } else {
-          _mediaFileList = response.files;
-        }
-      });
-    } else {
-      _retrieveDataError = response.exception!.code;
-    }
-  }
-
-  final ImagePicker _picker = ImagePicker();
-
-  dynamic _pickImageError;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  // }
-
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final TextEditingController movieTitleController = TextEditingController();
+    final TextEditingController movieImageUrl = TextEditingController();
     final TextEditingController detailsController = TextEditingController();
     final TextEditingController ratingController = TextEditingController();
     final TextEditingController movieDescriptionController =
@@ -226,63 +74,22 @@ class _UploadMovieState extends State<UploadMovie> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    // borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.grey),
+                TextFormField(
+                  controller: movieImageUrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Movie Image Url',
+                    border: OutlineInputBorder(
+                        // borderSide: Border.al
+                        ),
                   ),
-                  height: 200,
-                  width: 200,
-                  child: FutureBuilder(
-                    future: retrieveLostData(),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<void> snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                        case ConnectionState.waiting:
-                          return TextButton(
-                            onPressed: () {
-                              _onImageButtonPressed(
-                                ImageSource.gallery,
-                                context: context,
-                                isMultiImage: false,
-                              );
-                            },
-                            child: const Center(
-                              child: Text(
-                                'Tap to Select a Movie Image',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          );
-                        case ConnectionState.done:
-                          return _previewImages();
-                        case ConnectionState.active:
-                          if (snapshot.hasError) {
-                            return Text(
-                              'Pick image error: ${snapshot.error}',
-                              textAlign: TextAlign.center,
-                            );
-                          } else {
-                            return TextButton(
-                              onPressed: () {
-                                _onImageButtonPressed(
-                                  ImageSource.gallery,
-                                  context: context,
-                                  isMultiImage: false,
-                                );
-                              },
-                              child: const Center(
-                                child: Text(
-                                  'Tap to Select a Movie Image',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            );
-                          }
-                      }
-                    },
-                  ),
+                  keyboardType: TextInputType.url,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the movie image url';
+                    }
+                    return null;
+                  },
+                  // onSaved: (value) => movieTitle = value!,
                 ),
                 const SizedBox(height: 8.0),
                 Row(
@@ -299,9 +106,6 @@ class _UploadMovieState extends State<UploadMovie> {
                       items: <String>[
                         "Movie",
                         "TV series",
-                        "Trending",
-                        "Top Picks",
-                        "Trending Carousel"
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -438,13 +242,8 @@ class _UploadMovieState extends State<UploadMovie> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        if (_mediaFileList != null &&
-                            _mediaFileList!.isNotEmpty &&
-                            formKey.currentState!.validate()) {
+                        if (formKey.currentState!.validate()) {
                           try {
-                            String filePath = _mediaFileList!.first.path;
-                            var uploadedImageUrl =
-                                await mockapi.uploadFile(File(filePath));
                             if (!context.mounted) return;
                             String? videoId = YoutubePlayer.convertUrlToId(
                               youtubeTrailerlinkController.text,
@@ -454,7 +253,7 @@ class _UploadMovieState extends State<UploadMovie> {
                                   movieTitleController.text,
                                   selectedState!,
                                   ratingController.text,
-                                  uploadedImageUrl,
+                                  movieImageUrl.text,
                                   movieDescriptionController.text,
                                   downloadlinkController.text,
                                   videoId ?? youtubeTrailerlinkController.text,
@@ -472,8 +271,11 @@ class _UploadMovieState extends State<UploadMovie> {
                     ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          if (_mediaFileList != null &&
-                              _mediaFileList!.isNotEmpty) {
+                          if (movieImageUrl.text != '') {
+                            if (!context.mounted) return;
+                            String? videoId = YoutubePlayer.convertUrlToId(
+                              youtubeTrailerlinkController.text,
+                            );
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -482,17 +284,18 @@ class _UploadMovieState extends State<UploadMovie> {
                                   movieDescription:
                                       movieDescriptionController.text,
                                   downloadLink: downloadlinkController.text,
-                                  youtubeTrailerLink:
-                                      youtubeTrailerlinkController.text,
-                                  category: stateController.text,
-                                  imagePath: _mediaFileList!.first.path,
+                                  youtubeTrailerLink: videoId!,
+                                  category: selectedState!,
+                                  imagePath: movieImageUrl.text,
+                                  rating: ratingController.text,
                                 ),
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Please select a movie image.'),
+                                content:
+                                    Text('Please select a movie image url.'),
                               ),
                             );
                           }

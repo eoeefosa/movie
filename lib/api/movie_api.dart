@@ -36,7 +36,7 @@ class MovieApi {
     }
   }
 
-  Future fetchTvseries() async {
+  Future<List<Movie>> fetchTvseries() async {
     try {
       final movies = await firestore.collection('TV Series').get();
       final moviesdt = movies.docs.map((doc) {

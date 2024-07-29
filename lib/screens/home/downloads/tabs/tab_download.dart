@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:torihd/components/download_taskinfo.dart';
 import 'package:torihd/models/appState/downloadtask.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -41,42 +42,122 @@ class TabDownload extends StatelessWidget {
         builder: (context, AsyncSnapshot<List<FileSystemEntity>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             final List<FileSystemEntity> downloads = snapshot.data ?? [];
-            return Column(
-              children: [
-                Text("Downloaded (${downloads.length})"),
-                SizedBox(
-                  height: size.height * .7,
-                  child: ListView(
-                    children: [
-                      ...List.generate(
-                        downloads.length,
-                        (index) {
-                          final file = downloads[index] as File;
-                          final downloadTask = downloadProvider.downloads
-                              .firstWhere(
-                                  (task) =>
-                                      task.filename ==
-                                      file.path.split('/').last,
-                                  orElse: () => DownloadTaskInfo(
-                                      id: '',
-                                      url: '',
-                                      filename: file.path.split('/').last));
-                          return DownloadCard(
-                            title: file.path.split('/').last,
-                            size: file.lengthSync() / (1024 * 1024),
-                            movieimg: file.path,
-                            folder: file.parent.path,
-                            duration: _getVideoDuration(
-                                file), // Implement this method to get video duration
-                            downloadTask: downloadTask,
+            return Consumer<DownloadProvider>(
+                builder: (context, movieProvider, child) {
+              if (movieProvider.filesdownloading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (movieProvider.downloads.isEmpty) {
+                return const Center(
+                  child: Text("No downloads available"),
+                );
+              } else {
+                return Column(
+                  children: [
+                    Text("Downloading (${movieProvider.downloads.length})"),
+                    SizedBox(
+                      height: size.height * .3,
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          final taskInfo = movieProvider.downloads[index];
+                          return DownloadTaskCard(taskInfo: taskInfo);
+                        },
+                        itemCount: movieProvider.downloads.length,
+                        physics: const BouncingScrollPhysics(),
+                      ),
+                    ),
+                    Text("Downloaded (${downloads.length})"),
+                    SizedBox(
+                      height: size.height * .4,
+                      child:
+                          // ListView(
+                          //   children: [
+                          //     ...List.generate(
+                          //       downloads.length,
+                          //       (index) {
+                          //         final file = downloads[index] as File;
+                          //         final downloadTask = downloadProvider.downloads
+                          //             .firstWhere(
+                          //                 (task) =>
+                          //                     task.filename ==
+                          //                     file.path.split('/').last,
+                          //                 orElse: () => DownloadTaskInfo(
+                          //                     id: '',
+                          //                     url: '',
+                          //                     filename: file.path.split('/').last));
+                          //         return DownloadCard(
+                          //           title: file.path.split('/').last,
+                          //           size: file.lengthSync() / (1024 * 1024),
+                          //           movieimg: file.path,
+                          //           folder: file.parent.path,
+                          //           duration: _getVideoDuration(
+                          //               file), // Implement this method to get video duration
+                          //           downloadTask: downloadTask,
+                          //         );
+                          //       },
+                          //     ),
+                          //   ],
+                          // ),
+                          Consumer<DownloadProvider>(
+                        builder: (context, downloadProvider, child) {
+                          final downloads = downloadProvider.downloads;
+
+                          return ListView.builder(
+                            itemCount: downloads.length,
+                            itemBuilder: (context, index) {
+                              final download = downloads[index];
+                              return ListTile(
+                                title: Text(download.filename),
+                                subtitle:
+                                    Text('Progress: ${download.progress}%'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (download.status ==
+                                        DownloadTaskStatus.running)
+                                      IconButton(
+                                        icon: const Icon(Icons.pause),
+                                        onPressed: () {
+                                          downloadProvider
+                                              .pauseDownload(download.id);
+                                        },
+                                      ),
+                                    if (download.status ==
+                                        DownloadTaskStatus.paused)
+                                      IconButton(
+                                        icon: const Icon(Icons.play_arrow),
+                                        onPressed: () {
+                                          downloadProvider
+                                              .resumeDownload(download.id);
+                                        },
+                                      ),
+                                    if (download.status ==
+                                        DownloadTaskStatus.failed)
+                                      IconButton(
+                                        icon: const Icon(Icons.refresh),
+                                        onPressed: () {
+                                          downloadProvider.addDownload(
+                                              download.url, download.filename);
+                                        },
+                                      ),
+                                    IconButton(
+                                      icon: const Icon(Icons.cancel),
+                                      onPressed: () {
+                                        downloadProvider
+                                            .removeDownload(download.id);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            );
+                    ),
+                  ],
+                );
+              }
+            });
           } else {
             return const Center(
               child: CircularProgressIndicator(),

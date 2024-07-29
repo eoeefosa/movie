@@ -80,7 +80,7 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
             theme: theme,
-            title: 'MovieBox Clone',
+            title: 'ToriHd',
             routerConfig: router,
             scaffoldMessengerKey: scaffoldMessengerKey,
           );

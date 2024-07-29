@@ -144,15 +144,15 @@ class _VideoplayerState extends State<Videoplayer> {
                   movies["title"],
                   style: const TextStyle(color: Colors.white),
                 ),
-                actions: [
-                  IconButton(
-                      onPressed: () => Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => const VideoList(),
-                          )),
-                      icon: const Icon(Icons.video_library))
-                ],
+                // actions: [
+                //   IconButton(
+                //       onPressed: () => Navigator.push(
+                //           context,
+                //           CupertinoPageRoute(
+                //             builder: (context) => const VideoList(),
+                //           )),
+                //       icon: const Icon(Icons.video_library))
+                // ],
               ),
               bottomNavigationBar: ElevatedButton(
                 child: const Text("Download"),

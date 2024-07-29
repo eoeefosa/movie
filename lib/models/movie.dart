@@ -53,9 +53,8 @@ class Movie {
   }
 
   factory Movie.fromMap(Map<String, dynamic> map) {
-    print(map);
     return Movie(
-      title: map['title'] ?? '',
+      title: map['title'] ?? 'Check Network connection',
       downloadlink: map['downloadlink'] ?? '',
       type: map['type'] as String,
       movieImgurl: map['movieImgurl'] ??

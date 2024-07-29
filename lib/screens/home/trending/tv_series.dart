@@ -1,53 +1,64 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:torihd/screens/home/trending/trending.dart';
 
 import '../../../api/mockapiservice.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TVSeries extends StatelessWidget {
-  TVSeries({super.key});
+import '../../../models/movie.dart';
+import '../../../provider/movieprovider.dart';
+
+class TVSeries extends StatefulWidget {
+  const TVSeries({super.key});
+
+  @override
+  State<TVSeries> createState() => _TVSeriesState();
+}
+
+class _TVSeriesState extends State<TVSeries> {
   final mockService = MovieBoxCloneApi();
+  @override
+  void initState() {
+    super.initState();
+    // Fetch movies after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MovieProvider>(context, listen: false).fetchTvSeries();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('TV Series').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(child: Text('No movies found'));
-        }
-
-        final movies = snapshot.data!.docs;
+    return Consumer<MovieProvider>(builder: (context, movieProvider, child) {
+      if (movieProvider.tvseriesloading) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (movieProvider.tvSeries.isEmpty) {
+        return const Center(
+          child: Text("No TV Series available"),
+        );
+      } else {
+        List<Movie> tvseries = movieProvider.tvSeries;
         return GridView.builder(
           shrinkWrap: true,
-          itemCount: movies.length,
+          itemCount: tvseries.length,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3, childAspectRatio: 3 / 5),
           itemBuilder: (context, index) {
-            final movieDoc = movies[index];
-            final movie = movieDoc.data() as Map<String, dynamic>;
-            final movieId = movieDoc.id;
-
+            final tvserie = tvseries[index];
             return TopPickCard(
-              title: movie["title"] ?? 'Untitled',
-              type: movie["type"],
-              imgUrl: movie["movieImgUrl"] ??
-                  "https://images6.alphacoders.com/683/thumb-1920-683023.jpg",
-              rating: movie['rating'] ?? 7.5,
-              youtubeid: movie["youtubetrailer"],
-              movieid: movieId, // Using the document ID as the movie ID
+              title: tvserie.title,
+              type: tvserie.type,
+              imgUrl: tvserie.movieImgurl,
+              rating: tvserie.rating,
+              youtubeid: tvserie.youtubetrailer,
+              movieid: tvserie.id, // Using the document ID as the movie ID
             );
           },
         );
-      },
-    );
+      }
+    });
   }
 }
 
@@ -65,7 +76,7 @@ class TopPickCard extends StatelessWidget {
   final String title;
   final String type;
   final String imgUrl;
-  final double rating;
+  final String rating;
   final String youtubeid;
   final String movieid;
 

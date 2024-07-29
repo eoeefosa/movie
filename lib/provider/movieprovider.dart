@@ -6,7 +6,7 @@ import '../models/movie.dart';
 class MovieProvider extends ChangeNotifier {
   bool _movieisloading = false;
   bool _trendingloading = false;
-  final bool _topPickloading = false;
+  bool _topPickloading = false;
   bool _tvseriesloading = false;
   bool _trendingCarouselloading = false;
   get movieisloading => _movieisloading;
@@ -59,11 +59,11 @@ class MovieProvider extends ChangeNotifier {
   }
 
   void fetchTopPick() async {
-    _tvseriesloading = true;
+    _topPickloading = true;
     notifyListeners();
     final toppickslist = await api.topPick();
     toppick = toppickslist;
-    _tvseriesloading = false;
+    _topPickloading = false;
     notifyListeners();
   }
 }
