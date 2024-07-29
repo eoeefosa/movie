@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../styles/snack_bar.dart';
 
 class DownloadTaskInfo {
   final String id;
@@ -20,23 +25,36 @@ class DownloadTaskInfo {
 
 class DownloadProvider with ChangeNotifier {
   bool filesdownloading = false;
-  List<DownloadTaskInfo> _downloads = [];
+  final List<DownloadTaskInfo> _downloads = [];
+  double? _progress;
+  get progress => _progress;
 
   List<DownloadTaskInfo> get downloads => _downloads;
 
   void addDownload(String url, String filename) async {
-    final taskId = await FlutterDownloader.enqueue(
-      url: url,
-      savedDir: (await getApplicationDocumentsDirectory()).path,
-      fileName: filename,
-      showNotification: true,
-      openFileFromNotification: true,
-    );
+    // final taskId = await FlutterDownloader.enqueue(
+    //   url: url,
+    //   savedDir: (await getApplicationDocumentsDirectory()).path,
+    //   fileName: filename,
+    //   showNotification: true,
+    //   openFileFromNotification: true,
+    // );
 
-    final download =
-        DownloadTaskInfo(id: taskId!, url: url, filename: filename);
-        
-    _downloads.add(download);
+    // final download =
+    //     DownloadTaskInfo(id: taskId!, url: url, filename: filename);
+    final File? file = await FileDownloader.downloadFile(
+        url: url.trim(),
+        onProgress: (fileName, progress) {
+          _progress = progress;
+          notifyListeners();
+        },
+        onDownloadCompleted: (path) {
+          hideSnackBar();
+          showsnackBar(path);
+          _progress = null;
+        });
+
+    // _downloads.add(download);
     notifyListeners();
   }
 

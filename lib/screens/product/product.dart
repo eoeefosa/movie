@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:go_router/go_router.dart';
 import 'package:torihd/models/appState/downloadtask.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
+import '../../provider/movieprovider.dart';
 
 class Videoplayer extends StatefulWidget {
   const Videoplayer({
@@ -157,6 +160,7 @@ class _VideoplayerState extends State<Videoplayer> {
                 child: const Text("Download"),
                 onPressed: () {
                   // context.go('/home/1');]
+
                   final downloadUrl = movies["downloadlink"];
                   final filename = movies["title"];
                   Provider.of<DownloadProvider>(context, listen: false)
@@ -202,12 +206,17 @@ class _VideoplayerState extends State<Videoplayer> {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    // Flexible(
-                                    //   child: Text(
-                                    //     movies["details"],
-                                    //     overflow: TextOverflow.clip,
-                                    //   ),
-                                    // )
+                                    Consumer<DownloadProvider>(builder:
+                                        (context, movieProvider, child) {
+                                      return movieProvider.progress == null
+                                          ? const Text("not downloading")
+                                          : Flexible(
+                                              child: Text(
+                                                movieProvider.progress,
+                                                overflow: TextOverflow.clip,
+                                              ),
+                                            );
+                                    })
                                   ],
                                 ),
                               ),
