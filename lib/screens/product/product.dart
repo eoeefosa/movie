@@ -212,7 +212,7 @@ class _VideoplayerState extends State<Videoplayer> {
                                           ? const Text("not downloading")
                                           : Flexible(
                                               child: Text(
-                                                movieProvider.progress,
+                                                "${movieProvider.progress}",
                                                 overflow: TextOverflow.clip,
                                               ),
                                             );

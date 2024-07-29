@@ -45,6 +45,8 @@ class DownloadProvider with ChangeNotifier {
     final File? file = await FileDownloader.downloadFile(
         url: url.trim(),
         onProgress: (fileName, progress) {
+          print(progress);
+          showsnackBar("$progress $fileName");
           _progress = progress;
           notifyListeners();
         },
@@ -52,6 +54,11 @@ class DownloadProvider with ChangeNotifier {
           hideSnackBar();
           showsnackBar(path);
           _progress = null;
+        },
+        onDownloadError: (String error) {
+          print('DOWNLOAD ERROR: $error');
+          hideSnackBar();
+          showsnackBar('DOWNLOAD ERROR: $error');
         });
 
     // _downloads.add(download);

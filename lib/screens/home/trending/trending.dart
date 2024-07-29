@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -174,9 +175,9 @@ class CaroselCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         image: DecorationImage(
-          colorFilter: const ColorFilter.srgbToLinearGamma(),
-          image:
-              NetworkImage(imgUrl), // Changed to NetworkImage to fetch from URL
+          // colorFilter: const ColorFilter.srgbToLinearGamma(),
+          image: CachedNetworkImageProvider(
+              imgUrl), // Changed to NetworkImage to fetch from URL
           fit: BoxFit.cover,
         ),
         borderRadius: const BorderRadius.all(
@@ -277,7 +278,7 @@ class TopPickCard extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 colorFilter: const ColorFilter.srgbToLinearGamma(),
-                image: AssetImage(imgUrl),
+                image: CachedNetworkImageProvider(imgUrl),
                 fit: BoxFit.cover,
               ),
               backgroundBlendMode: BlendMode.darken,
