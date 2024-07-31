@@ -21,6 +21,7 @@ class _DownloadsState extends State<Downloads> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _requestPermissionAnLoadFiles();
   }
 
   Future<void> _requestPermissionAnLoadFiles() async {
@@ -44,6 +45,7 @@ class _DownloadsState extends State<Downloads> {
         .where((file) =>
             file.path.endsWith('.mp4') ||
             file.path.endsWith('.mov') ||
+            file.path.endsWith('.mkv') ||
             file.path.endsWith('.avi'))
         .toList();
 
