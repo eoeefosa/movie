@@ -22,6 +22,7 @@ class _DownloadsState extends State<Downloads> {
     // TODO: implement initState
     super.initState();
     _requestPermissionAnLoadFiles();
+      _loadVideoFiles();
   }
 
   Future<void> _requestPermissionAnLoadFiles() async {
