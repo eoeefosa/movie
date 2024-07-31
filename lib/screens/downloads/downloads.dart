@@ -27,7 +27,7 @@ class _DownloadsState extends State<Downloads> {
 
   Future<void> _requestPermissionAnLoadFiles() async {
     if (await Permission.storage.request().isGranted) {
-      _loadVideoFiles();
+      await _loadVideoFiles();
     }
   }
 
