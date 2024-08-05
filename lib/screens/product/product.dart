@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:torihd/models/appState/downloadtask.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:torihd/video_dowloader/screens/splash_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../provider/movieprovider.dart';
@@ -183,7 +184,14 @@ class _VideoplayerState extends State<Videoplayer> {
                             Text(movies["title"]),
                             IconButton(
                               onPressed: () {
-                                print("hello");
+                                // print("hello");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        const SplashScreen(),
+                                  ),
+                                );
                               },
                               icon: const Icon(Icons.favorite),
                             )

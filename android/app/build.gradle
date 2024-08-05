@@ -27,6 +27,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.movieboxclone"
+    // compileSdkVersion localProperties.getProperty('flutter.compileSdkVersion').toInteger()
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

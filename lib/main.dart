@@ -5,6 +5,7 @@ import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/models/appState/profile_manager.dart';
 import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/navigation/app_router.dart';
+import 'package:torihd/provider/getstatusProvider.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,7 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DownloadProvider()),
+        ChangeNotifierProvider(create: (_) => Getstatusprovider()..getStatus()),
         ChangeNotifierProvider(create: (_) => MovieProvider()),
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
         ChangeNotifierProvider(create: (context) => _profileManager),

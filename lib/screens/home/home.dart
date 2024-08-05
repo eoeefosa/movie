@@ -6,6 +6,8 @@ import 'package:torihd/screens/downloads/downloads.dart';
 import 'package:torihd/screens/home/me.dart';
 import 'package:provider/provider.dart';
 
+import '../../provider/movieprovider.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key, required this.currentTab});
 
@@ -35,6 +37,7 @@ class _HomeState extends State<Home> {
         currentIndex: widget.currentTab,
         onTap: (index) {
           Provider.of<AppStateManager>(context, listen: false).goToTab(index);
+          Provider.of<MovieProvider>(context, listen: false).loadFiles();
           context.goNamed('home', pathParameters: {
             'tab': '$index',
           });
