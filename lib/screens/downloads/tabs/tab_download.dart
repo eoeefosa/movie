@@ -71,34 +71,7 @@ class TabDownload extends StatelessWidget {
                     SizedBox(
                       height: size.height * .4,
                       child:
-                          // ListView(
-                          //   children: [
-                          //     ...List.generate(
-                          //       downloads.length,
-                          //       (index) {
-                          //         final file = downloads[index] as File;
-                          //         final downloadTask = downloadProvider.downloads
-                          //             .firstWhere(
-                          //                 (task) =>
-                          //                     task.filename ==
-                          //                     file.path.split('/').last,
-                          //                 orElse: () => DownloadTaskInfo(
-                          //                     id: '',
-                          //                     url: '',
-                          //                     filename: file.path.split('/').last));
-                          //         return DownloadCard(
-                          //           title: file.path.split('/').last,
-                          //           size: file.lengthSync() / (1024 * 1024),
-                          //           movieimg: file.path,
-                          //           folder: file.parent.path,
-                          //           duration: _getVideoDuration(
-                          //               file), // Implement this method to get video duration
-                          //           downloadTask: downloadTask,
-                          //         );
-                          //       },
-                          //     ),
-                          //   ],
-                          // ),
+                         
                           Consumer<DownloadProvider>(
                         builder: (context, downloadProvider, child) {
                           final downloads = downloadProvider.downloads;

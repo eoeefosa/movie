@@ -21,7 +21,7 @@ void main() async {
   );
   await FlutterDownloader.initialize(debug: true);
 
-  FlutterDownloader.registerCallback(downloadCallback);
+  // FlutterDownloader.registerCallback(downloadCallback);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
   ));
@@ -64,7 +64,6 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DownloadProvider()),
-        ChangeNotifierProvider(create: (_) => Getstatusprovider()..getStatus()),
         ChangeNotifierProvider(create: (_) => MovieProvider()),
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
         ChangeNotifierProvider(create: (context) => _profileManager),

@@ -33,21 +33,11 @@ class DownloadProvider with ChangeNotifier {
   List<DownloadTaskInfo> get downloads => _downloads;
 
   void addDownload(String url, String filename) async {
-    // final taskId = await FlutterDownloader.enqueue(
-    //   url: url,
-    //   savedDir: (await getApplicationDocumentsDirectory()).path,
-    //   fileName: filename,
-    //   showNotification: true,
-    //   openFileFromNotification: true,
-    // );
-
-    // final download =
-    //     DownloadTaskInfo(id: taskId!, url: url, filename: filename);
     try {
       final File? file = await FileDownloader.downloadFile(
           url: url.trim(),
           onProgress: (fileName, progress) {
-            print(progress);
+            // print(progress);
             showsnackBar("$progress $fileName");
             _progress = progress;
             notifyListeners();

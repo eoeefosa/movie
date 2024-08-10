@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:torihd/models/appState/downloadtask.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:torihd/video_dowloader/screens/splash_screen.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../provider/movieprovider.dart';
@@ -29,8 +28,6 @@ class Videoplayer extends StatefulWidget {
 
 class _VideoplayerState extends State<Videoplayer> {
   late YoutubePlayerController _controller;
-  // late TextEditingController _idController;
-  // late TextEditingController _seekToController;
   late Future _movieFuture;
 
   late PlayerState _playerState;
@@ -147,15 +144,6 @@ class _VideoplayerState extends State<Videoplayer> {
                   movies["title"],
                   style: const TextStyle(color: Colors.white),
                 ),
-                // actions: [
-                //   IconButton(
-                //       onPressed: () => Navigator.push(
-                //           context,
-                //           CupertinoPageRoute(
-                //             builder: (context) => const VideoList(),
-                //           )),
-                //       icon: const Icon(Icons.video_library))
-                // ],
               ),
               bottomNavigationBar: ElevatedButton(
                 child: const Text("Download"),
@@ -185,13 +173,6 @@ class _VideoplayerState extends State<Videoplayer> {
                             IconButton(
                               onPressed: () {
                                 // print("hello");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        const SplashScreen(),
-                                  ),
-                                );
                               },
                               icon: const Icon(Icons.favorite),
                             )
@@ -242,9 +223,6 @@ class _VideoplayerState extends State<Videoplayer> {
                                         "${movies["rating"]}",
                                       ),
                                     ),
-                                    IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.save_alt_sharp))
                                   ],
                                 ),
                               )

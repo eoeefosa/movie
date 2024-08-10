@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:torihd/api/movie_api.dart';
@@ -44,8 +49,6 @@ class MovieProvider extends ChangeNotifier {
 
   void getDownloads() async {
     loadingdownloads = true;
-    downloads = [];
-    videoData = [];
     notifyListeners();
     try {
       final videoInfo = FlutterVideoInfo();
@@ -93,6 +96,9 @@ class MovieProvider extends ChangeNotifier {
 
   void fetchtrending() async {
     _trendingloading = true;
+    fetchmovie();
+    fetchTvSeries();
+    fetchTopPick();
     notifyListeners();
     final trendingList = await api.fetchTrendingCarousel();
     trending = trendingList;
@@ -102,6 +108,7 @@ class MovieProvider extends ChangeNotifier {
 
   void fetchTrendingCarousel() async {
     _trendingCarouselloading = true;
+    fetchtrending();
     notifyListeners();
     final trendingCarouselList = await api.fetchTrendingCarousel();
     trendingCarousel = trendingCarouselList;

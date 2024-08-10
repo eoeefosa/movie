@@ -1,15 +1,18 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/widget/my_thumbnail.dart';
-import 'package:video_player/video_player.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+
+import '../../main.dart';
 
 class Downloads extends StatefulWidget {
   const Downloads({super.key});
@@ -20,66 +23,32 @@ class Downloads extends StatefulWidget {
 
 class _DownloadsState extends State<Downloads> {
   late List<VideoData> videoData;
-  VideoPlayerController? _videoPlayerController;
-  final List<File> _videoFiles = [];
-  final List<Uint8List?> _videoThumbnails = [];
+  int progress = 0;
+  ReceivePort receivePort = ReceivePort();
+
+  static downloadcallback(String id, int status, progress) {
+    SendPort sendPort = IsolateNameServer.lookupPortByName("dowloadingvideo")!;
+    sendPort.send(progress);
+  }
 
   @override
   void initState() {
+    IsolateNameServer.registerPortWithName(
+        receivePort.sendPort, "dowloadingvideo");
+
+    receivePort.listen((message) {
+      setState(() {
+        progress = message;
+        print(progress);
+      });
+    });
     super.initState();
+
+    FlutterDownloader.registerCallback(downloadcallback);
     // Fetch movies after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MovieProvider>(context, listen: false).loadFiles();
+      final provider = Provider.of<MovieProvider>(context, listen: false);
     });
-  }
-
-  // void requeststoragePermission() async {
-  //   var status = await Permission.videos.status;
-  //   if (status.isGranted) {
-  //     print("Permision is granted");
-  //   } else if (status.isDenied) {
-  //     if (await Permission.videos.request().isGranted) {
-  //       print("Permisson was granted");
-  //     }
-  //   }
-  // }
-
-  void _initializeVideoPlayer(String filePath) {
-    _videoPlayerController?.dispose();
-    _videoPlayerController = VideoPlayerController.file(File(filePath))
-      ..initialize().then((_) {
-        setState(() {});
-        _videoPlayerController!.play();
-      });
-  }
-
-  void _playPauseVideo() {
-    setState(() {
-      _videoPlayerController!.value.isPlaying
-          ? _videoPlayerController!.pause()
-          : _videoPlayerController!.play();
-    });
-  }
-
-  void _stopVideo() {
-    _videoPlayerController!.pause();
-    _videoPlayerController!.seekTo(Duration.zero);
-  }
-
-  void _increaseVolume() {
-    final currentVolume = _videoPlayerController!.value.volume;
-    _videoPlayerController!.setVolume((currentVolume + 0.1).clamp(0.0, 1.0));
-  }
-
-  void _decreaseVolume() {
-    final currentVolume = _videoPlayerController!.value.volume;
-    _videoPlayerController!.setVolume((currentVolume - 0.1).clamp(0.0, 1.0));
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController?.dispose();
-    super.dispose();
   }
 
   @override

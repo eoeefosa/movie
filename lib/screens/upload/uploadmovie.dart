@@ -236,6 +236,23 @@ class _UploadMovieState extends State<UploadMovie> {
                   },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  controller: youtubeTrailerlinkController,
+                  decoration: const InputDecoration(
+                    labelText: 'Source',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
                 const SizedBox(height: 8.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

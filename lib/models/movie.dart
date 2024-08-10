@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class Movie {
@@ -9,16 +8,17 @@ class Movie {
   final String rating;
   final String id;
   final String youtubetrailer;
+  final String source;
 
-  Movie({
-    required this.title,
-    required this.downloadlink,
-    required this.type,
-    required this.movieImgurl,
-    required this.rating,
-    required this.id,
-    required this.youtubetrailer,
-  });
+  Movie(
+      {required this.title,
+      required this.downloadlink,
+      required this.type,
+      required this.movieImgurl,
+      required this.rating,
+      required this.id,
+      required this.youtubetrailer,
+      this.source = "Tori"});
 
   Movie copyWith({
     String? title,
@@ -53,16 +53,31 @@ class Movie {
   }
 
   factory Movie.fromMap(Map<String, dynamic> map) {
-    return Movie(
-      title: map['title'] ?? 'Check Network connection',
-      downloadlink: map['downloadlink'] ?? '',
-      type: map['type'] as String,
-      movieImgurl: map['movieImgurl'] ??
-          "https://firebasestorage.googleapis.com/v0/b/torihd-1ed20.appspot.com/o/image12024-07-25%2020%3A00%3A41.684202?alt=media&token=ac8fadb2-6632-45c5-ae77-d921ec459ca1",
-      rating: map['rating'] ?? '',
-      id: map['id'] ?? '',
-      youtubetrailer: map['youtubetrailer'] ?? '',
-    );
+    try {
+      print(map);
+      return Movie(
+        title: map['title'] ?? 'Check Network connection',
+        downloadlink: map['downloadlink'] ?? '',
+        type: map['type'] as String? ??
+            'Unknown', // Default value if type is null
+        movieImgurl: map["movieImgUrl"] ?? map["movieImgurl"],
+        rating: map['rating'] ?? '',
+        id: map['id'] ?? '',
+        youtubetrailer: map['youtubetrailer'] ?? '',
+      );
+    } catch (e) {
+      // Handle the error, maybe log it or return a default Movie object
+      print('Error parsing Movie from map: $e');
+      return Movie(
+        title: 'Error',
+        downloadlink: '',
+        type: 'Unknown',
+        movieImgurl: '',
+        rating: '',
+        id: '',
+        youtubetrailer: '',
+      );
+    }
   }
 
   String toJson() => json.encode(toMap());

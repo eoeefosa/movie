@@ -46,12 +46,8 @@ class _TrendingState extends State<Trending> {
 
   Future<void> _refreshTrendingData() async {
     setState(() {
-      // _trendingData = fetchTrendingData();
-      Provider.of<MovieProvider>(context, listen: false).fetchmovie();
-      Provider.of<MovieProvider>(context, listen: false).fetchTvSeries();
       Provider.of<MovieProvider>(context, listen: false)
           .fetchTrendingCarousel();
-      Provider.of<MovieProvider>(context, listen: false).fetchTopPick();
     });
   }
 

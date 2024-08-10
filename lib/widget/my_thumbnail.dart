@@ -7,8 +7,6 @@ import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:video_player/video_player.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../video_dowloader/utils/custom_colors.dart';
-
 class MyThumbnail extends StatefulWidget {
   final String path;
   final VideoData data;
@@ -33,10 +31,16 @@ class _MyThumbnailState extends State<MyThumbnail> {
     super.initState();
     var file = File(widget.path);
     _controller = VideoPlayerController.file(file)
-      ..addListener(() {})
-      ..setLooping(false)
       ..initialize().then((_) {
-        setState(() {});
+        // Seek to 10% of the video duration or 5 minutes, whichever is smaller
+        final duration = _controller!.value.duration;
+        final targetPosition = duration.inSeconds * 0.1 < 300
+            ? Duration(seconds: (duration.inSeconds * 0.1).toInt())
+            : const Duration(minutes: 5);
+
+        _controller!.seekTo(targetPosition).then((_) {
+          setState(() {});
+        });
       });
   }
 
@@ -44,6 +48,14 @@ class _MyThumbnailState extends State<MyThumbnail> {
   void dispose() {
     _controller?.dispose();
     super.dispose();
+  }
+
+  // Helper method to format the video duration as mm:ss
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
   @override
@@ -60,7 +72,8 @@ class _MyThumbnailState extends State<MyThumbnail> {
       child: Container(
         margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color:
+              Theme.of(context).colorScheme.surface, // Use theme surface color
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: const [
             BoxShadow(
@@ -75,13 +88,39 @@ class _MyThumbnailState extends State<MyThumbnail> {
             SizedBox(
               width: 110,
               height: 95,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: (_controller != null && _controller!.value.isInitialized)
-                    ? VideoPlayer(_controller!)
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Stack(
+                    children: [
+                      // Video thumbnail or loading indicator
+                      (_controller != null && _controller!.value.isInitialized)
+                          ? VideoPlayer(_controller!)
+                          : const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                      // Video duration overlay
+                      if (_controller != null &&
+                          _controller!.value.isInitialized)
+                        Positioned(
+                          bottom: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4.0),
+                            color: Colors.black54,
+                            child: Text(
+                              _formatDuration(_controller!.value.duration),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -94,7 +133,7 @@ class _MyThumbnailState extends State<MyThumbnail> {
                     widget.data.title ?? 'Unknown Title',
                     style: TextStyle(
                       fontSize: 18,
-                      color: CustomColors.white,
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -104,7 +143,7 @@ class _MyThumbnailState extends State<MyThumbnail> {
                     FileSize.getSize(widget.data.filesize as int),
                     style: TextStyle(
                       fontSize: 16,
-                      color: CustomColors.white,
+                      color: Theme.of(context).textTheme.bodyMedium!.color,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
