@@ -78,7 +78,6 @@ class _MovieswithProviderState extends State<MovieswithProvider> {
                 child: MovieCard(
                   title: movie.title,
                   type: movie.type,
-                  // type: "movies",
                   imgUrl: movie.movieImgurl,
                   rating: movie.rating,
                   youtubeid: movie.youtubetrailer,
@@ -90,7 +89,14 @@ class _MovieswithProviderState extends State<MovieswithProvider> {
                 ),
               );
             },
-            staggeredTileBuilder: (int index) => const StaggeredTile.fit(1),
+            staggeredTileBuilder: (int index) {
+              // Make the tile at the 3rd position span both columns
+              // if (index == 2) {
+              //   return const StaggeredTile.fit(2); // Full width
+              // } else {
+              return const StaggeredTile.fit(1); // Half width
+              // }
+            },
             mainAxisSpacing: 4.0,
             crossAxisSpacing: 4.0,
           ),

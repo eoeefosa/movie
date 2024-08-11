@@ -98,13 +98,7 @@ class _TrendingState extends State<Trending> {
               );
             }
           }),
-          if (adsControllerAvailable) ...[
-            const Expanded(
-              child: Center(
-                child: BannerAdWidget(),
-              ),
-            ),
-          ],
+        
           Consumer<MovieProvider>(builder: (context, movieProvider, child) {
             if (movieProvider.topPickloading) {
               return Center(
@@ -154,7 +148,15 @@ class _TrendingState extends State<Trending> {
                 ],
               );
             }
-          })
+          }),
+        
+          if (adsControllerAvailable) ...[
+            const Expanded(
+              child: Center(
+                child: BannerAdWidget(),
+              ),
+            ),
+          ],
         ],
       ),
     );
