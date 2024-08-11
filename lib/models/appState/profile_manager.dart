@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:torihd/api/movie_api.dart';
 
 import '../../api/api_calls/auth.dart';
+import '../movie.dart';
 import '../other/movie_model.dart';
 import '../usermodel.dart';
 
@@ -13,24 +15,10 @@ class ProfileManager extends ChangeNotifier {
   User? user;
   User? get currentUser => _auth.currentUser;
 
-  Future<void> addMovie(
-    String title,
-    String type,
-    String rating,
-    String movieImgurl,
-    String description,
-    String downloadlink,
-    String youtubetrailerlink,
-  ) async {
+  Future<void> addMovie(Movie movie) async {
     try {
-      await _firestore.collection(type).add({
-        "title": title,
-        "movieImgUrl": movieImgurl,
-        "description": description,
-        "rating": rating,
-        "type": type,
-        "downloadlink": downloadlink,
-        "youtubetrailer": youtubetrailerlink,
+      await _firestore.collection(movie.type).add({
+        ...movie.toMap(),
         'timestamp': FieldValue.serverTimestamp(),
       });
       notifyListeners();
@@ -40,22 +28,12 @@ class ProfileManager extends ChangeNotifier {
     }
   }
 
-  Future<void> updateMovie(
-    String docId,
-    String title,
-    String type,
-    String description,
-    String downloadlink,
-    String youtubetrailerlink,
-  ) async {
+  Future<void> updateMovie(Movie movie) async {
+    MovieApi api = MovieApi();
     try {
-      await _firestore.collection('movies').doc(docId).update({
-        "title": title,
-        "description": type,
-        "type": description,
-        "downloadlink": downloadlink,
-        "youtubetrailer": youtubetrailerlink,
-        'timestamp': FieldValue.serverTimestamp(),
+      await api.updateMovieById(movie.id, movie.type, {
+        ...movie.toMap(),
+        'edited timestamp': FieldValue.serverTimestamp(),
       });
       notifyListeners();
     } catch (e) {
@@ -143,10 +121,10 @@ class ProfileManager extends ChangeNotifier {
   // }
 
   final List<String> _favoriteMovies = [
-    'Inception',
-    'The Dark Knight',
-    'Interstellar',
-    'Tenet'
+    // 'Inception',
+    // 'The Dark Knight',
+    // 'Interstellar',
+    // 'Tenet'
   ];
 
   String get username => _username;
@@ -160,6 +138,7 @@ class ProfileManager extends ChangeNotifier {
       : user!.email == 'eoeefosa@gmail.com' ||
           user!.email == 'Torihd247@gmail.com' ||
           user!.email == 'torihd247@gmail.com';
+
   bool get isLogin => _isLogin;
 
   bool _darkMode = true;

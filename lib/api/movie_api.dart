@@ -97,8 +97,6 @@ class MovieApi {
     }
   }
 
-
-
   Future<List<Movie>> topPick() async {
     try {
       final movies = await firestore.collection('Top Picks').get();
@@ -128,6 +126,29 @@ class MovieApi {
 
       debugPrint(trace.toString());
       throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  // Update a movie by ID
+  Future<void> updateMovieById(
+      String id, String type,Map<String, dynamic> updatedData) async {
+    try {
+      await firestore.collection('Movie').doc(id).update(updatedData);
+      debugPrint('Movie updated successfully');
+    } on FirebaseException catch (e) {
+      debugPrint('Failed to update movie: $e');
+      throw Exception('Failed to update movie: ${e.message}');
+    }
+  }
+
+  // Delete a movie by ID
+  Future<void> deleteMovieById(String id, String type) async {
+    try {
+      await firestore.collection(type).doc(id).delete();
+      debugPrint('Movie deleted successfully');
+    } on FirebaseException catch (e) {
+      debugPrint('Failed to delete movie: $e');
+      throw Exception('Failed to delete movie: ${e.message}');
     }
   }
 }

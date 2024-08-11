@@ -9,6 +9,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:torihd/api/movie_api.dart';
+import 'package:torihd/styles/snack_bar.dart';
 
 import '../models/movie.dart';
 
@@ -20,6 +21,7 @@ class MovieProvider extends ChangeNotifier {
   bool _topPickloading = false;
   bool _tvseriesloading = false;
   bool _trendingCarouselloading = false;
+  bool _deleteisloading = false;
   get movieisloading => _movieisloading;
   get trendingloading => _trendingloading;
   get topPickloading => _topPickloading;
@@ -96,11 +98,9 @@ class MovieProvider extends ChangeNotifier {
 
   void fetchtrending() async {
     _trendingloading = true;
-    fetchmovie();
-    fetchTvSeries();
-    fetchTopPick();
+
     notifyListeners();
-    final trendingList = await api.fetchTrendingCarousel();
+    final trendingList = await api.fetchmovies();
     trending = trendingList;
     _trendingloading = false;
     notifyListeners();
@@ -108,7 +108,6 @@ class MovieProvider extends ChangeNotifier {
 
   void fetchTrendingCarousel() async {
     _trendingCarouselloading = true;
-    fetchtrending();
     notifyListeners();
     final trendingCarouselList = await api.fetchTrendingCarousel();
     trendingCarousel = trendingCarouselList;
@@ -135,6 +134,15 @@ class MovieProvider extends ChangeNotifier {
     toppick.addAll(movies);
     toppick.addAll(tvSeries);
     _topPickloading = false;
+    notifyListeners();
+  }
+
+  void deletMovie(String id, String title, String type) async {
+    _deleteisloading = true;
+    notifyListeners();
+    final delete = await api.deleteMovieById(id, type);
+    fetchmovie();
+    showsnackBar("$title deleted succefully");
     notifyListeners();
   }
 }

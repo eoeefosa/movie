@@ -9,6 +9,7 @@ import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../../models/movie.dart';
 import '../../provider/movieprovider.dart';
 
 class Videoplayer extends StatefulWidget {
@@ -166,18 +167,18 @@ class _VideoplayerState extends State<Videoplayer> {
                       children: [
                         player,
                         gap,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(movies["title"]),
-                            IconButton(
-                              onPressed: () {
-                                // print("hello");
-                              },
-                              icon: const Icon(Icons.favorite),
-                            )
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(movies["title"]),
+                        //     IconButton(
+                        //       onPressed: () {
+                        //         // print("hello");
+                        //       },
+                        //       icon: const Icon(Icons.favorite),
+                        //     )
+                        //   ],
+                        // ),
                         gap,
                         SizedBox(
                           height: height / 7,
@@ -198,7 +199,7 @@ class _VideoplayerState extends State<Videoplayer> {
                                     Consumer<DownloadProvider>(builder:
                                         (context, movieProvider, child) {
                                       return movieProvider.progress == null
-                                          ? const Text("not downloading")
+                                          ? Text(movies["detail"])
                                           : Flexible(
                                               child: Text(
                                                 "${movieProvider.progress}",

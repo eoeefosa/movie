@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
-import 'package:torihd/api/mockapiservice.dart';
+import 'package:torihd/models/movie.dart';
 import 'package:torihd/screens/upload/previewmovie.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,28 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../models/appState/profile_manager.dart';
 
 class UploadMovie extends StatefulWidget {
-  const UploadMovie({super.key});
+  const UploadMovie({
+    super.key,
+    this.imageUrl,
+    this.title,
+    this.type,
+    this.rating,
+    this.detail,
+    this.description,
+    this.downloadlink,
+    this.youtubelink,
+    this.source,
+  });
+
+  final String? imageUrl;
+  final String? title;
+  final String? type;
+  final String? rating;
+  final String? detail;
+  final String? description;
+  final String? downloadlink;
+  final String? youtubelink;
+  final String? source;
 
   @override
   State<UploadMovie> createState() => _UploadMovieState();
@@ -25,20 +46,46 @@ class _UploadMovieState extends State<UploadMovie> {
   String? selectedState = "Movie";
 
   final TextEditingController stateController = TextEditingController();
-  final MovieBoxCloneApi mockapi = MovieBoxCloneApi();
+
+  static String convertIdToUrl(String? id,
+      {bool trimWhitespaces = true,
+      String format = "https://www.youtube.com/watch?v="}) {
+    if (id == null) {
+      return '';
+    }
+    if (trimWhitespaces) id = id.trim();
+
+    // Check if the ID is valid (11 characters long and contains valid characters)
+    if (id.length == 11 && RegExp(r"^[\w\-]+$").hasMatch(id)) {
+      return format + id;
+    }
+
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final TextEditingController movieTitleController = TextEditingController();
+    movieTitleController.text = widget.title ?? '';
     final TextEditingController movieImageUrl = TextEditingController();
+    movieImageUrl.text = widget.imageUrl ?? '';
     final TextEditingController detailsController = TextEditingController();
+    detailsController.text = widget.detail ?? '';
     final TextEditingController ratingController = TextEditingController();
+    ratingController.text = widget.rating ?? '';
     final TextEditingController movieDescriptionController =
         TextEditingController();
+    movieDescriptionController.text = widget.description ?? '';
     final TextEditingController downloadlinkController =
         TextEditingController();
+    downloadlinkController.text = widget.downloadlink ?? '';
     final TextEditingController youtubeTrailerlinkController =
         TextEditingController();
+    final TextEditingController sourceController = TextEditingController();
+    youtubeTrailerlinkController.text = widget.youtubelink ?? '';
+    final newlink = convertIdToUrl(youtubeTrailerlinkController.text);
+    youtubeTrailerlinkController.text = newlink;
 
     void submit() {
       if (formKey.currentState!.validate()) {
@@ -53,7 +100,9 @@ class _UploadMovieState extends State<UploadMovie> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Image upload"),
+        title: widget.title == null
+            ? const Text("Movie upload")
+            : const Text("Edit Movie"),
         actions: [
           IconButton(
             onPressed: () {
@@ -238,7 +287,7 @@ class _UploadMovieState extends State<UploadMovie> {
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
-                  controller: youtubeTrailerlinkController,
+                  controller: sourceController,
                   decoration: const InputDecoration(
                     labelText: 'Source',
                     border: OutlineInputBorder(),
@@ -262,20 +311,34 @@ class _UploadMovieState extends State<UploadMovie> {
                         if (formKey.currentState!.validate()) {
                           try {
                             if (!context.mounted) return;
-                            String? videoId = YoutubePlayer.convertUrlToId(
-                              youtubeTrailerlinkController.text,
-                            );
+                            String? videoId = widget.title == null
+                                ? YoutubePlayer.convertUrlToId(
+                                    youtubeTrailerlinkController.text,
+                                  )
+                                : youtubeTrailerlinkController.text == newlink
+                                    ? widget.youtubelink
+                                    : YoutubePlayer.convertUrlToId(
+                                        youtubeTrailerlinkController.text,
+                                      );
 
-                            await context.read<ProfileManager>().addMovie(
-                                  movieTitleController.text,
-                                  selectedState!,
-                                  ratingController.text,
-                                  movieImageUrl.text,
-                                  movieDescriptionController.text,
-                                  downloadlinkController.text,
-                                  videoId ?? youtubeTrailerlinkController.text,
-                                );
+                            final uploadmovie = Movie(
+                              movieImgurl: movieImageUrl.text,
+                              type: selectedState!,
+                              title: movieTitleController.text,
+                              rating: ratingController.text,
+                              detail: detailsController.text,
+                              description: movieDescriptionController.text,
+                              downloadlink: downloadlinkController.text,
+                              id: "",
+                              youtubetrailer: videoId ?? '',
+                              source: sourceController.text,
+                            );
+                            await context
+                                .read<ProfileManager>()
+                                .addMovie(uploadmovie);
                             showsnackBar('upload successfull');
+
+                            Navigator.pop(context);
                             if (!context.mounted) return;
                             // context.go("/home/2");
                           } catch (e) {
@@ -283,7 +346,9 @@ class _UploadMovieState extends State<UploadMovie> {
                           }
                         }
                       },
-                      child: const Text('Upload movie'),
+                      child: widget.title == null
+                          ? const Text('Upload movie')
+                          : const Text('Update movie'),
                     ),
                     ElevatedButton(
                       onPressed: () {

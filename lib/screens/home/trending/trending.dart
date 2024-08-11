@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
+import 'package:torihd/ads/ad_controller.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/screens/product/product.dart';
 
+import '../../../ads/banner_ad_widget.dart';
+import '../../../models/appState/profile_manager.dart';
 import '../../../provider/movieprovider.dart';
+import '../../upload/uploadmovie.dart';
 
 class Trending extends StatefulWidget {
   const Trending({super.key});
@@ -21,38 +24,24 @@ class _TrendingState extends State<Trending> {
   void initState() {
     super.initState();
     // Fetch movies after the first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _refreshTrendingData();
-    });
-  }
-
-  // Future<List<dynamic>> fetchTrendingData() async {
-  //   final firestore = FirebaseFirestore.instance;
-
-  //   // Fetch Trending Carousel data
-  //   final carouselSnapshot =
-  //       await firestore.collection('Trending Carousel').get();
-  //   final trendingCarosel =
-  //       carouselSnapshot.docs.map((doc) => doc.data()).toList();
-
-  //   // Fetch Top Picks data
-  //   final topPicksSnapshot = await firestore.collection('Top Picks').get();
-  //   final trendingContent =
-  //       topPicksSnapshot.docs.map((doc) => doc.data()).toList();
-  //   final trendingid = topPicksSnapshot.docs.map((doc) => doc.id).toList();
-
-  //   return [trendingCarosel, trendingContent, trendingid];
-  // }
-
-  Future<void> _refreshTrendingData() async {
-    setState(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MovieProvider>(context, listen: false).fetchmovie();
+      Provider.of<MovieProvider>(context, listen: false).fetchTvSeries();
       Provider.of<MovieProvider>(context, listen: false)
           .fetchTrendingCarousel();
     });
+
+    final adsController = context.read<AdsController?>();
+    adsController?.preloadAd();
+  }
+
+  Future<void> _refreshTrendingData() async {
+    Provider.of<MovieProvider>(context, listen: false).fetchTrendingCarousel();
   }
 
   @override
   Widget build(BuildContext context) {
+    final adsControllerAvailable = context.watch<AdsController?>() != null;
     return RefreshIndicator(
       onRefresh: _refreshTrendingData,
       child: ListView(
@@ -62,20 +51,35 @@ class _TrendingState extends State<Trending> {
             height: 20,
           ),
           Consumer<MovieProvider>(builder: (context, movieProvider, child) {
-            if (movieProvider.trendingCarouselloading) {
+            if (movieProvider.movieisloading || movieProvider.tvseriesloading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (movieProvider.trendingCarousel.isEmpty) {
-              return const Center(
-                child: Text("No Movies available"),
-              );
+              // } else if (movieProvider.trendingCarousel.isEmpty) {
+              //   return const Center(
+              //     child: Text("No Movies available"),
+              //   );
             } else {
-              List<Movie> trendingcarousellist = movieProvider.trendingCarousel;
+              List<Movie> trendingcarousellist =
+                  movieProvider.trendingCarousel +
+                      movieProvider.movies +
+                      movieProvider.tvSeries;
               return CarouselSlider(
                 items: trendingcarousellist
-                    .map((item) => CaroselCard(
-                        title: item.title,
-                        imgUrl: item.movieImgurl,
-                        ads: false))
+                    .map((item) => InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) => Videoplayer(
+                                movieid: item.id,
+                                type: item.type,
+                                youtubeid: item.youtubetrailer,
+                              ),
+                            ),
+                          ),
+                          child: CaroselCard(
+                              title: item.title,
+                              imgUrl: item.movieImgurl,
+                              ads: false),
+                        ))
                     .toList(),
                 options: CarouselOptions(
                   aspectRatio: 16 / 6,
@@ -94,15 +98,27 @@ class _TrendingState extends State<Trending> {
               );
             }
           }),
+          if (adsControllerAvailable) ...[
+            const Expanded(
+              child: Center(
+                child: BannerAdWidget(),
+              ),
+            ),
+          ],
           Consumer<MovieProvider>(builder: (context, movieProvider, child) {
             if (movieProvider.topPickloading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (movieProvider.toppick.isEmpty) {
-              return const Center(
-                child: Text("No Movies available"),
+              return Center(
+                child: Container(),
+              );
+            } else if (movieProvider.movies.isEmpty &&
+                movieProvider.tvSeries.isEmpty) {
+              return Center(
+                child: Container(),
               );
             } else {
-              List<Movie> topPicks = movieProvider.toppick;
+              List<Movie> topPicks = movieProvider.trendingCarousel +
+                  movieProvider.movies +
+                  movieProvider.tvSeries;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -130,8 +146,8 @@ class _TrendingState extends State<Trending> {
                         imgUrl: topPick.movieImgurl,
                         rating: topPick.rating,
                         youtubeid: topPick.youtubetrailer,
-                        movieid:
-                            topPick.id, // Using the document ID as the movie ID
+                        movieid: topPick.id,
+                        movie: topPick, // Using the document ID as the movie ID
                       );
                     },
                   ),
@@ -185,7 +201,10 @@ class CaroselCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Colors.grey.shade100),
           ),
           !ads
               ? Positioned(
@@ -214,7 +233,10 @@ class CaroselCard extends StatelessWidget {
                         ),
                         Text(
                           "Free Download",
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(color: Colors.grey.shade100),
                         ),
                       ],
                     ),
@@ -227,7 +249,7 @@ class CaroselCard extends StatelessWidget {
   }
 }
 
-class TopPickCard extends StatelessWidget {
+class TopPickCard extends StatefulWidget {
   const TopPickCard({
     super.key,
     required this.title,
@@ -236,6 +258,7 @@ class TopPickCard extends StatelessWidget {
     required this.rating,
     required this.youtubeid,
     required this.movieid,
+    required this.movie,
   });
 
   final String title;
@@ -244,6 +267,81 @@ class TopPickCard extends StatelessWidget {
   final String imgUrl;
   final String rating;
   final String movieid;
+  final Movie movie;
+
+  @override
+  State<TopPickCard> createState() => _TopPickCardState();
+}
+
+class _TopPickCardState extends State<TopPickCard> {
+  void _showAlertDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    color: Colors.red.shade300, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                title,
+                style: TextStyle(
+                    color: Colors.grey.shade700, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Provider.of<MovieProvider>(context, listen: false)
+                    .deletMovie(widget.movieid, widget.title, widget.type);
+                Navigator.of(context).pop();
+
+                // Add your delete
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _onSelectedMenuOption(BuildContext context, String option) {
+    print(option);
+    switch (option) {
+      case 'delete':
+        _showAlertDialog(context, 'Delete Movie',
+            'Are you sure you want to delete  ${widget.title}');
+// Perform delete action
+        break;
+      case 'edit':
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (BuildContext context) => UploadMovie(
+              imageUrl: widget.imgUrl,
+              type: widget.type,
+              title: widget.title,
+              rating: widget.rating,
+              description: widget.movie.description,
+              detail: widget.movie.detail,
+              downloadlink: widget.movie.downloadlink,
+              source: widget.movie.source,
+              youtubelink: widget.youtubeid,
+            ),
+          ),
+        );
+// Perform edit action
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,9 +358,9 @@ class TopPickCard extends StatelessWidget {
             context,
             MaterialPageRoute<void>(
               builder: (BuildContext context) => Videoplayer(
-                movieid: movieid,
-                type: type,
-                youtubeid: youtubeid,
+                movieid: widget.movieid,
+                type: widget.type,
+                youtubeid: widget.youtubeid,
               ),
             ),
           ),
@@ -275,11 +373,11 @@ class TopPickCard extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 colorFilter: const ColorFilter.srgbToLinearGamma(),
-                image: CachedNetworkImageProvider(imgUrl),
+                image: CachedNetworkImageProvider(widget.imgUrl),
                 fit: BoxFit.cover,
               ),
-              backgroundBlendMode: BlendMode.darken,
-              color: Colors.black45,
+              // backgroundBlendMode: BlendMode.darken,
+              // color: Colors.black.withOpacity(),
               borderRadius: const BorderRadius.all(
                 Radius.circular(8.0),
               ),
@@ -287,6 +385,69 @@ class TopPickCard extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
+                Consumer<ProfileManager>(
+                    builder: (context, profileProvider, child) {
+                  return profileProvider.isAdmin
+                      ? Positioned(
+                          top: 4,
+                          right: 0,
+                          child: PopupMenuButton<String>(
+                            // surfaceTintColor: Colors.yellow,
+                            elevation: 2,
+                            icon: const RotatedBox(
+                                quarterTurns: 1, child: Icon(Icons.more_horiz)),
+                            onSelected: (String result) {
+                              _onSelectedMenuOption(context, result);
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                value: 'delete',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Delete movie',
+                                    style:
+                                        TextStyle(color: Colors.red.shade700),
+                                  ),
+                                  icon: Icon(Icons.delete,
+                                      color: Colors.red.shade700),
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Edit movie',
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700),
+                                  ),
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'trend',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Make Trending',
+                                    style: TextStyle(
+                                        color: Colors.yellow.shade700),
+                                  ),
+                                  icon: Icon(
+                                    Icons.star,
+                                    color: Colors.yellow.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ))
+                      : Container();
+                }),
                 const Positioned(
                   bottom: 4,
                   left: 0,
@@ -303,7 +464,7 @@ class TopPickCard extends StatelessWidget {
                   bottom: 4,
                   right: 0,
                   child: Text(
-                    rating,
+                    widget.rating,
                     style: MovieBoxTheme.darkTextTheme.bodySmall,
                   ),
                 )
@@ -314,7 +475,7 @@ class TopPickCard extends StatelessWidget {
         SizedBox(
           width: cardWidth,
           child: Text(
-            title,
+            widget.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
@@ -323,7 +484,7 @@ class TopPickCard extends StatelessWidget {
         SizedBox(
           width: cardWidth,
           child: Text(
-            type,
+            widget.type,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
