@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:torihd/models/appState/profile_manager.dart';
+import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
 import 'package:provider/provider.dart';
 

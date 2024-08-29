@@ -1,13 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/screens/home/trending/trending.dart';
 
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../../models/movie.dart';
 import '../../../provider/movieprovider.dart';
+import '../widgets/toppicks.dart';
 
 class TVSeries extends StatefulWidget {
   const TVSeries({super.key});

@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/screens/home/home.dart';
-import 'package:torihd/screens/product/product.dart';
 
-import '../models/appState/profile_manager.dart';
+import '../provider/profile_manager.dart';
 
 class AppRouter {
   final AppStateManager appStateManager;

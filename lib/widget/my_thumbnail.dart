@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:video_player/video_player.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class MyThumbnail extends StatefulWidget {
   final String path;

@@ -19,7 +19,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   static List<Widget> pages = <Widget>[
-    Dashboard(),
+    const Dashboard(),
     const Downloads(),
     const ProfilePage()
   ];
@@ -44,8 +44,6 @@ class _HomeState extends State<Home> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          // BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'ShortTv'),
-          // TODO: use state to swap this out in for a download with notification
           BottomNavigationBarItem(
               icon: Icon(Icons.download), label: "Downloads"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Me'),

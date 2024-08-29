@@ -83,10 +83,21 @@ class MovieBoxTheme {
         backgroundColor: Colors.white,
       ),
       cardColor: Colors.blue,
+      // cardTheme:
+      //     const CardTheme(color: Colors.green, surfaceTintColor: Colors.green),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         foregroundColor: Colors.white,
         backgroundColor: Colors.black,
       ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.greenAccent.shade700,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8),
+                ),
+              ),
+              textStyle: const TextStyle(color: Colors.white))),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           unselectedLabelStyle: TextStyle(color: Colors.black),
           showUnselectedLabels: true,
@@ -106,6 +117,17 @@ class MovieBoxTheme {
       //     style:
       //         ButtonStyle(padding: MaterialStatePropertyAll(EdgeInsets.zero))),
       cardColor: Colors.blueGrey[900],
+      elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+        ),
+        backgroundColor: Colors.greenAccent.shade700,
+        textStyle: const TextStyle(color: Colors.white),
+        iconColor: Colors.grey.shade200,
+      )),
       appBarTheme: AppBarTheme(
         foregroundColor: Colors.white,
         backgroundColor: Colors.grey[900],
@@ -116,11 +138,12 @@ class MovieBoxTheme {
         backgroundColor: Colors.green,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          selectedItemColor: Colors.green,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          unselectedLabelStyle: TextStyle(color: Colors.white),
-          unselectedItemColor: Colors.white),
+        selectedItemColor: Colors.green,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        unselectedLabelStyle: TextStyle(color: Colors.white),
+        unselectedItemColor: Colors.white,
+      ),
       textTheme: darkTextTheme,
     );
   }

@@ -1,18 +1,13 @@
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/widget/my_thumbnail.dart';
 
-import '../../main.dart';
 
 class Downloads extends StatefulWidget {
   const Downloads({super.key});

@@ -106,7 +106,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
         size = adaptiveSize;
       }
     } else {
-      size = AdSize.mediumRectangle;
+      size = AdSize.fullBanner;
     }
     if (!mounted) return;
 

@@ -4,7 +4,7 @@ import 'package:torihd/screens/auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../models/appState/profile_manager.dart';
+import '../../provider/profile_manager.dart';
 import '../upload/uploadmovie.dart';
 
 class ProfilePage extends StatelessWidget {

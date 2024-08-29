@@ -21,7 +21,7 @@ class AdsController {
         ? 'ca-app-pub-8674216574091372/9505721553'
         : '';
     _preloadedBannerAd =
-        PreloadedBannerAd(size: AdSize.mediumRectangle, adUnitId: adUnitId);
+        PreloadedBannerAd(size: AdSize.fullBanner, adUnitId: adUnitId);
     // Future<void>.delayed(const Duration(seconds: 1))
     //     .then((value) => _preloadedBannerAd!.load());
     _preloadedBannerAd!.load();

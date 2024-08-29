@@ -1,16 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/ads/ad_controller.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/movieboxtheme.dart';
-import 'package:torihd/screens/product/product.dart';
+import 'package:torihd/screens/home/trending/Movie.dart';
+import 'package:torihd/screens/home/widgets/autoslidinggrid.dart';
+import 'package:torihd/screens/moviescreen/moviescreen.dart';
 
 import '../../../ads/banner_ad_widget.dart';
-import '../../../models/appState/profile_manager.dart';
+import '../../../provider/profile_manager.dart';
 import '../../../provider/movieprovider.dart';
 import '../../upload/uploadmovie.dart';
+import '../widgets/moviecard.dart';
+import '../widgets/toppicks.dart';
 
 class Trending extends StatefulWidget {
   const Trending({super.key});
@@ -37,11 +43,12 @@ class _TrendingState extends State<Trending> {
 
   Future<void> _refreshTrendingData() async {
     Provider.of<MovieProvider>(context, listen: false).fetchTrendingCarousel();
+    final adsController = context.read<AdsController?>();
+    adsController?.preloadAd();
   }
 
   @override
   Widget build(BuildContext context) {
-    final adsControllerAvailable = context.watch<AdsController?>() != null;
     return RefreshIndicator(
       onRefresh: _refreshTrendingData,
       child: ListView(
@@ -98,7 +105,6 @@ class _TrendingState extends State<Trending> {
               );
             }
           }),
-        
           Consumer<MovieProvider>(builder: (context, movieProvider, child) {
             if (movieProvider.topPickloading) {
               return Center(
@@ -120,53 +126,89 @@ class _TrendingState extends State<Trending> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 4.0),
                     child: Text(
+                      topPicks.isEmpty ? 'Trending' : 'Trending',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                  SizedBox(
+                      height: 300,
+                      child: AutoSlidingGridView(
+                        movieProvider: movieProvider,
+                      )),
+                  SizedBox(
+                    height: 100,
+                    child: _buildAdvertsWidget(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 4.0),
+                    child: Text(
                       topPicks.isEmpty ? 'Top Picks' : 'Top Picks',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: topPicks.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3, childAspectRatio: 3 / 5),
-                    itemBuilder: (context, index) {
-                      final topPick = topPicks[index];
+                  StaggeredGrid.count(
+                    crossAxisCount: 6,
+                    axisDirection: AxisDirection.down,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    children: [
+                      ...List.generate(
+                        topPicks.length + (topPicks.length / 3).floor(),
+                        (index) {
+                          if (index != 0 && index % 4 == 3) {
+                            // Insert an ad after every 3rd topPick
+                            return StaggeredGridTile.count(
+                              crossAxisCellCount: 6,
+                              mainAxisCellCount: 1,
+                              child: _buildAdvertsWidget(),
+                            );
+                          } else {
+                            // Calculate the actual topPick index, accounting for the ads
+                            int topPickIndex = index - (index / 4).floor();
 
-                      return TopPickCard(
-                        title: topPick.title,
-                        type: topPick.type,
-                        imgUrl: topPick.movieImgurl,
-                        rating: topPick.rating,
-                        youtubeid: topPick.youtubetrailer,
-                        movieid: topPick.id,
-                        movie: topPick, // Using the document ID as the movie ID
-                      );
-                    },
+                            final topPick = topPicks[topPickIndex];
+
+                            return StaggeredGridTile.count(
+                              crossAxisCellCount: 2,
+                              mainAxisCellCount: 3,
+                              child: TopPickCard(
+                                title: topPick.title,
+                                type: topPick.type,
+                                imgUrl: topPick.movieImgurl,
+                                rating: topPick.rating,
+                                youtubeid: topPick.youtubetrailer,
+                                movieid: topPick.id,
+                                movie:
+                                    topPick, // Using the document ID as the movie ID
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ],
               );
             }
           }),
-        
-          if (adsControllerAvailable) ...[
-            const Expanded(
-              child: Center(
-                child: BannerAdWidget(),
-              ),
-            ),
-          ],
         ],
       ),
     );
   }
-}
 
-//  "title": "DC League of Super-Pets",
-//           "type": "United States Action",
-//           "img": "assets/images/food_burger.jpg",
-//           "rating": 7.1,
+  _buildAdvertsWidget() {
+    final adsControllerAvailable = context.watch<AdsController?>() != null;
+
+    if (adsControllerAvailable) {
+      return const Expanded(
+        child: Center(
+          child: BannerAdWidget(),
+        ),
+      );
+    }
+  }
+}
 
 class CaroselCard extends StatelessWidget {
   const CaroselCard({
@@ -182,10 +224,11 @@ class CaroselCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Container(
       padding: const EdgeInsets.all(4),
-      constraints: const BoxConstraints.expand(
-        width: 300,
+      constraints: BoxConstraints.expand(
+        width: size.width * .85,
         height: 100,
       ),
       decoration: BoxDecoration(
@@ -247,252 +290,6 @@ class CaroselCard extends StatelessWidget {
               : Container()
         ],
       ),
-    );
-  }
-}
-
-class TopPickCard extends StatefulWidget {
-  const TopPickCard({
-    super.key,
-    required this.title,
-    required this.type,
-    required this.imgUrl,
-    required this.rating,
-    required this.youtubeid,
-    required this.movieid,
-    required this.movie,
-  });
-
-  final String title;
-  final String type;
-  final String youtubeid;
-  final String imgUrl;
-  final String rating;
-  final String movieid;
-  final Movie movie;
-
-  @override
-  State<TopPickCard> createState() => _TopPickCardState();
-}
-
-class _TopPickCardState extends State<TopPickCard> {
-  void _showAlertDialog(BuildContext context, String title, String content) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                    color: Colors.red.shade300, fontWeight: FontWeight.bold),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(
-                title,
-                style: TextStyle(
-                    color: Colors.grey.shade700, fontWeight: FontWeight.bold),
-              ),
-              onPressed: () {
-                Provider.of<MovieProvider>(context, listen: false)
-                    .deletMovie(widget.movieid, widget.title, widget.type);
-                Navigator.of(context).pop();
-
-                // Add your delete
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _onSelectedMenuOption(BuildContext context, String option) {
-    print(option);
-    switch (option) {
-      case 'delete':
-        _showAlertDialog(context, 'Delete Movie',
-            'Are you sure you want to delete  ${widget.title}');
-// Perform delete action
-        break;
-      case 'edit':
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(
-            builder: (BuildContext context) => UploadMovie(
-              imageUrl: widget.imgUrl,
-              type: widget.type,
-              title: widget.title,
-              rating: widget.rating,
-              description: widget.movie.description,
-              detail: widget.movie.detail,
-              downloadlink: widget.movie.downloadlink,
-              source: widget.movie.source,
-              youtubelink: widget.youtubeid,
-            ),
-          ),
-        );
-// Perform edit action
-        break;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    // Calculate the width and height based on the screen width
-    double cardWidth = screenWidth * 0.3;
-    double cardHeight = cardWidth * 1.3;
-
-    return Column(
-      children: [
-        InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => Videoplayer(
-                movieid: widget.movieid,
-                type: widget.type,
-                youtubeid: widget.youtubeid,
-              ),
-            ),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            constraints: BoxConstraints.expand(
-              width: cardWidth,
-              height: cardHeight,
-            ),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                colorFilter: const ColorFilter.srgbToLinearGamma(),
-                image: CachedNetworkImageProvider(widget.imgUrl),
-                fit: BoxFit.cover,
-              ),
-              // backgroundBlendMode: BlendMode.darken,
-              // color: Colors.black.withOpacity(),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Consumer<ProfileManager>(
-                    builder: (context, profileProvider, child) {
-                  return profileProvider.isAdmin
-                      ? Positioned(
-                          top: 4,
-                          right: 0,
-                          child: PopupMenuButton<String>(
-                            // surfaceTintColor: Colors.yellow,
-                            elevation: 2,
-                            icon: const RotatedBox(
-                                quarterTurns: 1, child: Icon(Icons.more_horiz)),
-                            onSelected: (String result) {
-                              _onSelectedMenuOption(context, result);
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                value: 'delete',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Delete movie',
-                                    style:
-                                        TextStyle(color: Colors.red.shade700),
-                                  ),
-                                  icon: Icon(Icons.delete,
-                                      color: Colors.red.shade700),
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'edit',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Edit movie',
-                                    style:
-                                        TextStyle(color: Colors.grey.shade700),
-                                  ),
-                                  icon: Icon(
-                                    Icons.edit,
-                                    color: Colors.grey.shade700,
-                                  ),
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'trend',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Make Trending',
-                                    style: TextStyle(
-                                        color: Colors.yellow.shade700),
-                                  ),
-                                  icon: Icon(
-                                    Icons.star,
-                                    color: Colors.yellow.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ))
-                      : Container();
-                }),
-                const Positioned(
-                  bottom: 4,
-                  left: 0,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 4.0, right: 2.0),
-                    child: Icon(
-                      Icons.download,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 4,
-                  right: 0,
-                  child: Text(
-                    widget.rating,
-                    style: MovieBoxTheme.darkTextTheme.bodySmall,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          width: cardWidth,
-          child: Text(
-            widget.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        ),
-        SizedBox(
-          width: cardWidth,
-          child: Text(
-            widget.type,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        )
-      ],
     );
   }
 }

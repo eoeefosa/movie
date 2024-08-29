@@ -3,9 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
-import 'package:path_provider/path_provider.dart';
 
-import '../../styles/snack_bar.dart';
+import '../styles/snack_bar.dart';
 
 class DownloadTaskInfo {
   final String id;
@@ -48,7 +47,6 @@ class DownloadProvider with ChangeNotifier {
             _progress = null;
           },
           onDownloadError: (String error) {
-            print('DOWNLOAD ERROR: $error');
             hideSnackBar();
             showsnackBar('DOWNLOAD ERROR: $error');
           });

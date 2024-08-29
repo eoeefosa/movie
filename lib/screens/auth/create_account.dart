@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/appState/profile_manager.dart';
+import '../../provider/profile_manager.dart';
 import '../../styles/snack_bar.dart';
 
 class CreateAccount extends StatefulWidget {

@@ -1,17 +1,12 @@
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/screens/upload/previewmovie.dart';
 import 'package:torihd/styles/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../../models/appState/profile_manager.dart';
+import '../../provider/profile_manager.dart';
 
 class UploadMovie extends StatefulWidget {
   const UploadMovie({

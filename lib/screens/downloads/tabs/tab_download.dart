@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:torihd/components/download_taskinfo.dart';
-import 'package:torihd/models/appState/downloadtask.dart';
+import 'package:torihd/provider/downloadtask.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';

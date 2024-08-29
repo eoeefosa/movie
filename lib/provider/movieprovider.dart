@@ -1,11 +1,6 @@
-import 'dart:async';
-import 'dart:developer' as developer;
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:torihd/api/movie_api.dart';
@@ -27,6 +22,10 @@ class MovieProvider extends ChangeNotifier {
   get topPickloading => _topPickloading;
   get tvseriesloading => _tvseriesloading;
   get trendingCarouselloading => _trendingCarouselloading;
+
+  bool movieinfoisloading = false;
+  Movie? currentmovieinfo;
+
   List<Movie> movies = [];
   List<Movie> trending = [];
   List<Movie> tvSeries = [];
@@ -36,6 +35,19 @@ class MovieProvider extends ChangeNotifier {
 
   List<VideoData> videoData = [];
   List<FileSystemEntity?> downloads = [];
+
+  void getmovieinfo(String type, String id) async {
+    movieinfoisloading = true;
+    notifyListeners();
+    final Movie? movieinfo = await api.fetchavideo(type, id);
+    currentmovieinfo = movieinfo;
+    movieinfoisloading = false;
+    notifyListeners();
+  }
+
+  void movieinfodispose() {
+    currentmovieinfo = null;
+  }
 
   void loadFiles() async {
     if (await Permission.storage.request().isGranted ||

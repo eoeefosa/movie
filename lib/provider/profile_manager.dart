@@ -1,16 +1,19 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:torihd/api/movie_api.dart';
 
-import '../../api/api_calls/auth.dart';
-import '../movie.dart';
-import '../other/movie_model.dart';
-import '../usermodel.dart';
+import '../api/api_calls/auth.dart';
+import '../models/movie.dart';
+import '../models/other/movie_model.dart';
 
 class ProfileManager extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+
 
   User? user;
   User? get currentUser => _auth.currentUser;
@@ -23,7 +26,6 @@ class ProfileManager extends ChangeNotifier {
       });
       notifyListeners();
     } catch (e) {
-      print(e);
       rethrow;
     }
   }
@@ -37,30 +39,12 @@ class ProfileManager extends ChangeNotifier {
       });
       notifyListeners();
     } catch (e) {
-      print(e);
       rethrow;
     }
   }
 
-  Future<List<MovieModel>> getMovies() async {
-    try {
-      QuerySnapshot snapshot = await _firestore.collection('movies').get();
-      return snapshot.docs
-          .map((doc) =>
-              MovieModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
-          .toList();
-    } catch (e) {
-      print(e);
-      rethrow;
-    }
-  }
 
-  Stream<QuerySnapshot> fetchMovies() {
-    return _firestore
-        .collection('movies')
-        .orderBy('timestamp', descending: true)
-        .snapshots();
-  }
+
 
   Future<void> signIn(String email, String password) async {
     try {
@@ -69,7 +53,6 @@ class ProfileManager extends ChangeNotifier {
       user = result.user;
       notifyListeners();
     } catch (e) {
-      print(e);
       rethrow;
     }
   }
@@ -104,21 +87,6 @@ class ProfileManager extends ChangeNotifier {
   bool isloading = false;
   final authapi = Auth();
 
-  // void signIn(String email, String password) async {
-  //   isloading = true;
-  //   final Usermodel? result = await authapi.signUpuser(email, password);
-  //   if (result != null) {
-  //     _username = result.username ?? '';
-  //     _email = result.email ?? '';
-  //     _profileImageUrl = result.profileImageUrl ?? '';
-  //   }
-  //   isloading = false;
-  //   notifyListeners();
-  // }
-
-  // void signUp(String email, String password) async {
-  //   isloading = true;
-  // }
 
   final List<String> _favoriteMovies = [
     // 'Inception',
@@ -141,7 +109,7 @@ class ProfileManager extends ChangeNotifier {
 
   bool get isLogin => _isLogin;
 
-  bool _darkMode = true;
+  bool _darkMode = false;
   bool _didSelectUser = false;
 
   void toggleDarkmode() {
