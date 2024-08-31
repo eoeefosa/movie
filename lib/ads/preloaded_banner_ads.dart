@@ -1,12 +1,11 @@
 import 'dart:async';
-
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:logging/logging.dart';
 
 class PreloadedBannerAd {
   static final _log = Logger("PreloadedBannerAd");
 
-  /// something like [AdSize.meduimRectangle].
+  /// Ad size like [AdSize.mediumRectangle].
   final AdSize size;
   final AdRequest _adRequest;
   BannerAd? _bannerAd;
@@ -21,35 +20,47 @@ class PreloadedBannerAd {
 
   Future<BannerAd> get ready => _adCompleter.future;
 
-  Future<void> load() {
-    _bannerAd = BannerAd(
-      size: size,
-      adUnitId: adUnitId,
-      request: _adRequest,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          _log.info(() => 'Ad loaded: ${_bannerAd.hashCode}');
-          _adCompleter.complete(_bannerAd);
-        },
-        onAdFailedToLoad: (ad, error) {
-          _log.warning('Banner faildToLoad: $error');
-          _adCompleter.completeError(error);
-          ad.dispose();
-        },
-        onAdImpression: (ad) {
-          _log.info('Ad impression registered');
-        },
-        onAdClicked: (ad) {
-          _log.info('Ad click registered');
-        },
-      ),
-    );
+  Future<void> load() async {
+    try {
+      _bannerAd = BannerAd(
+        size: size,
+        adUnitId: adUnitId,
+        request: _adRequest,
+        listener: BannerAdListener(
+          onAdLoaded: (ad) {
+            _log.info(() => 'Ad loaded successfully: ${ad.adUnitId}');
+            if (!_adCompleter.isCompleted) {
+              _adCompleter.complete(ad as BannerAd);
+            }
+          },
+          onAdFailedToLoad: (ad, error) {
+            _log.warning('Ad failed to load: $error');
+            if (!_adCompleter.isCompleted) {
+              _adCompleter.completeError(error);
+            }
+            ad.dispose();
+          },
+          onAdImpression: (ad) {
+            _log.info('Ad impression registered.');
+          },
+          onAdClicked: (ad) {
+            _log.info('Ad click registered.');
+          },
+        ),
+      );
 
-    return _bannerAd!.load();
+      await _bannerAd!.load();
+    } catch (e, stackTrace) {
+      _log.severe('Error occurred while loading ad: $e', e, stackTrace);
+      if (!_adCompleter.isCompleted) {
+        _adCompleter.completeError(e);
+      }
+    }
   }
 
   void dispose() {
-    _log.info('preloaded banner ad being disposed');
+    _log.info('Disposing preloaded banner ad.');
     _bannerAd?.dispose();
+    _bannerAd = null; // Clear reference after disposing
   }
 }

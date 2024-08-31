@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:torihd/screens/home/trending/Movie.dart';
 import 'package:torihd/screens/home/trending/trending.dart';
 import 'package:torihd/screens/home/trending/tv_series.dart';
-
+import 'package:torihd/screens/search/searchpage.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({super.key});
@@ -13,30 +14,40 @@ class Dashboard extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          actions: const [],
-          title: TextField(
-            // onChanged: _filterItems,
-            decoration: InputDecoration(
-              labelText: 'Search',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              prefixIcon: const Icon(Icons.search),
-            ),
-          ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => const SearchScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.search))
+          ],
+          title: const Text("Tori Hd"),
+          centerTitle: true,
           elevation: 0,
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return TabBar(
+                  tabAlignment: TabAlignment.center,
+
                   isScrollable: constraints.maxWidth <
                       600, // Scrollable for small screens
                   tabs: [
                     "Trending",
                     "Movie",
                     "TV/Series",
-                  ].map((String label) => Tab(text: label)).toList(),
+                  ]
+                      .map((String label) => Tab(
+                            text: label,
+                            iconMargin: const EdgeInsets.all(4.0),
+                          ))
+                      .toList(),
                 );
               },
             ),

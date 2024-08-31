@@ -67,8 +67,9 @@ class DefaultFirebaseOptions {
     projectId: 'torihd-1ed20',
     databaseURL: 'https://torihd-1ed20-default-rtdb.firebaseio.com',
     storageBucket: 'torihd-1ed20.appspot.com',
-    iosClientId: '113549816013-kv1thh3ni6jcng5rprp72faogm01pedk.apps.googleusercontent.com',
-    iosBundleId: 'com.example.movieboxclone',
+    iosClientId:
+        '113549816013-kv1thh3ni6jcng5rprp72faogm01pedk.apps.googleusercontent.com',
+    iosBundleId: 'com.example.tori',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -78,8 +79,9 @@ class DefaultFirebaseOptions {
     projectId: 'torihd-1ed20',
     databaseURL: 'https://torihd-1ed20-default-rtdb.firebaseio.com',
     storageBucket: 'torihd-1ed20.appspot.com',
-    iosClientId: '113549816013-kv1thh3ni6jcng5rprp72faogm01pedk.apps.googleusercontent.com',
-    iosBundleId: 'com.example.movieboxclone',
+    iosClientId:
+        '113549816013-kv1thh3ni6jcng5rprp72faogm01pedk.apps.googleusercontent.com',
+    iosBundleId: 'com.example.tori',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

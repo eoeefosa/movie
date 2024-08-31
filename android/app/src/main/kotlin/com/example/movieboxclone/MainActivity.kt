@@ -1,4 +1,4 @@
-package com.example.movieboxclone
+package com.example.tori
 
 import io.flutter.embedding.android.FlutterActivity
 

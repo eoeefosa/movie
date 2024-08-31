@@ -4,10 +4,10 @@ import 'package:torihd/models/movie.dart';
 
 class MovieApi {
   final firestore = FirebaseFirestore.instance;
+
   Future<Movie?> fetchavideo(String type, String id) async {
     try {
-      final result =
-          await FirebaseFirestore.instance.collection(type).doc(id).get();
+      final result = await firestore.collection(type).doc(id).get();
 
       if (result.exists && result.data() != null) {
         // Convert the fetched data to a Movie instance
@@ -119,7 +119,6 @@ class MovieApi {
       // Handle any other exceptions
       debugPrint(e.toString());
       final trace = StackTrace.current;
-
       debugPrint(trace.toString());
       throw Exception('An unexpected error occurred: $e');
     }
@@ -151,7 +150,6 @@ class MovieApi {
       // Handle any other exceptions
       debugPrint(e.toString());
       final trace = StackTrace.current;
-
       debugPrint(trace.toString());
       throw Exception('An unexpected error occurred: $e');
     }
@@ -161,7 +159,7 @@ class MovieApi {
   Future<void> updateMovieById(
       String id, String type, Map<String, dynamic> updatedData) async {
     try {
-      await firestore.collection('Movie').doc(id).update(updatedData);
+      await firestore.collection(type).doc(id).update(updatedData);
       debugPrint('Movie updated successfully');
     } on FirebaseException catch (e) {
       debugPrint('Failed to update movie: $e');
@@ -177,6 +175,30 @@ class MovieApi {
     } on FirebaseException catch (e) {
       debugPrint('Failed to delete movie: $e');
       throw Exception('Failed to delete movie: ${e.message}');
+    }
+  }
+
+  // Search movies by title or description
+  Future<List<Movie>> searchMovies(String query) async {
+    try {
+      final moviesCollection = firestore.collection('Movie');
+      final queryLower = query.toLowerCase();
+
+      final snapshot = await moviesCollection
+          .where('title', isGreaterThanOrEqualTo: queryLower)
+          .where('title', isLessThanOrEqualTo: '$queryLower\uf8ff')
+          .get();
+
+      final List<Movie> searchResults = snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Movie.fromMap(data);
+      }).toList();
+
+      return searchResults;
+    } on FirebaseException catch (e) {
+      debugPrint('Failed to search movies: $e');
+      throw Exception('Failed to search movies: ${e.message}');
     }
   }
 }

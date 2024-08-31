@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
         _log.info(() => 'We have everything we need. Showeing the ad '
             '${_bannerAd.hashCode} now');
         return SizedBox(
-          width: _bannerAd!.size.width.toDouble(),
-          height: _bannerAd!.size.height.toDouble(),
+          width: _bannerAd!.size.width.toDouble().w,
+          height: _bannerAd!.size.height.toDouble().h,
           child: AdWidget(ad: _bannerAd!),
         );
       }
@@ -115,7 +116,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     _bannerAd = BannerAd(
       size: size,
       adUnitId: Theme.of(context).platform == TargetPlatform.android
-          ? 'ca-app-pub-8674216574091372/9505721553'
+          // ? 'ca-app-pub-8674216574091372/9505721553'
+          ? 'ca-app-pub-1107087522848284/1294711540'
           : '',
       listener: BannerAdListener(
         onAdLoaded: (ad) {

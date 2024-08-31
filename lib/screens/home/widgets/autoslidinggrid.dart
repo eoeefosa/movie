@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shimmer/shimmer.dart'; // Import shimmer package
 import '../../../models/movie.dart';
 import '../../../provider/movieprovider.dart';
 import '../../moviescreen/moviescreen.dart';
-import 'moviecard.dart';
 
 class AutoSlidingGridView extends StatefulWidget {
   final MovieProvider movieProvider;
@@ -41,9 +42,14 @@ class _AutoSlidingGridViewState extends State<AutoSlidingGridView> {
           nextScrollOffset =
               currentScroll + 400; // Scroll by 400 pixels. Adjust as needed.
         } else {
-          // Restart scroll from the beginning without snapping back abruptly
           nextScrollOffset = 0;
-          _scrollController.jumpTo(0);
+          // Smoothly scroll back to the start
+          _scrollController.animateTo(
+            nextScrollOffset,
+            duration: _scrollDuration,
+            curve: Curves.easeInOut,
+          );
+          return; // Exit early to avoid scrolling twice
         }
 
         _scrollController.animateTo(
@@ -65,45 +71,78 @@ class _AutoSlidingGridViewState extends State<AutoSlidingGridView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
-      child: GridView.builder(
-        controller: _scrollController,
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 400,
-          mainAxisSpacing: 10,
-          childAspectRatio: 5 / 3,
-        ),
-        scrollDirection: Axis.horizontal,
-        itemCount: widget.movieProvider.movies.length,
-        itemBuilder: (context, index) {
-          final Movie currentmovie = widget.movieProvider.movies[index];
-          return InkWell(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (BuildContext context) => Videoplayer(
-                  movieid: currentmovie.id,
-                  type: currentmovie.type,
-                  youtubeid: currentmovie.youtubetrailer,
-                ),
+      height: 200.h,
+      width: 400.w,
+      child: widget.movieProvider.movies.isEmpty
+          ? _buildShimmerGrid() // Show shimmer grid when loading
+          : GridView.builder(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 400.w),
+              controller: _scrollController,
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.movieProvider.movies.length,
+              itemBuilder: (context, index) {
+                final Movie currentmovie = widget.movieProvider.movies[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => Videoplayer(
+                          movieid: currentmovie.id,
+                          type: currentmovie.type,
+                          youtubeid: currentmovie.youtubetrailer,
+                        ),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(10)),
+                      child: CachedNetworkImage(
+                        imageUrl: currentmovie.movieImgurl,
+                        fit: BoxFit
+                            .contain, // Ensures the image covers the available space
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  // Shimmer effect for grid items
+  Widget _buildShimmerGrid() {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 400),
+      controller: _scrollController,
+      shrinkWrap: true,
+      scrollDirection: Axis.horizontal,
+      itemCount: 6, // Number of shimmer items to show
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(10),
               ),
+              width: 150,
+              height: 200,
             ),
-            child: MovieCard(
-              title: currentmovie.title,
-              imgUrl: currentmovie.movieImgurl,
-              rating: currentmovie.rating,
-              movieid: currentmovie.id,
-              type: currentmovie.type,
-              youtubeid: currentmovie.youtubetrailer,
-              detail: currentmovie.detail,
-              description: currentmovie.description,
-              downloadlink: currentmovie.downloadlink,
-              source: currentmovie.source,
-            ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

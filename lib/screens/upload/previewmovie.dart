@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../../provider/downloadtask.dart';
+import '../../provider/downloadprovider.dart';
 import '../../styles/snack_bar.dart';
 
 class MoviePreviewScreen extends StatefulWidget {
@@ -124,8 +123,8 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
                   // context.go('/home/1');]
                   final downloadUrl = widget.downloadLink;
                   final filename = widget.movieTitle;
-                  Provider.of<DownloadProvider>(context, listen: false)
-                      .addDownload(downloadUrl, filename);
+                  // Provider.of<DownloadProvider>(context, listen: false)
+                  //     .addDownload(downloadUrl, filename);
                   hideSnackBar();
                   showsnackBar("${widget.movieTitle} started downloading");
                 },

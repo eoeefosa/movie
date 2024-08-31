@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
@@ -17,9 +18,11 @@ class MovieProvider extends ChangeNotifier {
   bool _tvseriesloading = false;
   bool _trendingCarouselloading = false;
   bool _deleteisloading = false;
+
   get movieisloading => _movieisloading;
   get trendingloading => _trendingloading;
   get topPickloading => _topPickloading;
+  get deleteisloading => _deleteisloading;
   get tvseriesloading => _tvseriesloading;
   get trendingCarouselloading => _trendingCarouselloading;
 
@@ -36,6 +39,12 @@ class MovieProvider extends ChangeNotifier {
   List<VideoData> videoData = [];
   List<FileSystemEntity?> downloads = [];
 
+  // Search-related state
+  String _searchQuery = '';
+  List<Movie> _searchResults = [];
+
+  List<Movie> get searchResults => _searchResults;
+
   void getmovieinfo(String type, String id) async {
     movieinfoisloading = true;
     notifyListeners();
@@ -43,10 +52,6 @@ class MovieProvider extends ChangeNotifier {
     currentmovieinfo = movieinfo;
     movieinfoisloading = false;
     notifyListeners();
-  }
-
-  void movieinfodispose() {
-    currentmovieinfo = null;
   }
 
   void loadFiles() async {
@@ -94,6 +99,7 @@ class MovieProvider extends ChangeNotifier {
       loadingdownloads = false;
     } catch (e) {
       print(e);
+      rethrow;
     }
     notifyListeners();
   }
@@ -104,13 +110,13 @@ class MovieProvider extends ChangeNotifier {
     final moviesList = await api.fetchmovies();
     print(moviesList);
     movies = moviesList;
+    _searchResults = movies; // Initialize search results
     _movieisloading = false;
     notifyListeners();
   }
 
   void fetchtrending() async {
     _trendingloading = true;
-
     notifyListeners();
     final trendingList = await api.fetchmovies();
     trending = trendingList;
@@ -152,9 +158,20 @@ class MovieProvider extends ChangeNotifier {
   void deletMovie(String id, String title, String type) async {
     _deleteisloading = true;
     notifyListeners();
-    final delete = await api.deleteMovieById(id, type);
+    await api.deleteMovieById(id, type);
+
     fetchmovie();
     showsnackBar("$title deleted succefully");
+    notifyListeners();
+  }
+
+  // Search method
+  void searchMovies(String query) {
+    _searchQuery = query.toLowerCase();
+    _searchResults = movies.where((movie) {
+      return movie.title.toLowerCase().contains(_searchQuery) ||
+          movie.description.toLowerCase().contains(_searchQuery);
+    }).toList();
     notifyListeners();
   }
 }

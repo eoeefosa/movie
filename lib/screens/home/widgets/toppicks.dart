@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:torihd/movieboxtheme.dart';
+import 'package:torihd/toritheme.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
@@ -108,8 +109,8 @@ class _TopPickCardState extends State<TopPickCard> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Calculate the width and height based on the screen width
-    double cardWidth = screenWidth * 0.3;
-    double cardHeight = cardWidth * 1.3;
+    double cardWidth = 120.w;
+    double cardHeight = 160.h;
 
     return Column(
       children: [
@@ -225,7 +226,7 @@ class _TopPickCardState extends State<TopPickCard> {
                   right: 0,
                   child: Text(
                     widget.rating,
-                    style: MovieBoxTheme.darkTextTheme.bodySmall,
+                    style: ToriTheme.darkTextTheme.bodySmall,
                   ),
                 )
               ],

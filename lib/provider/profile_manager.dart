@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +5,10 @@ import 'package:torihd/api/movie_api.dart';
 
 import '../api/api_calls/auth.dart';
 import '../models/movie.dart';
-import '../models/other/movie_model.dart';
 
 class ProfileManager extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-
 
   User? user;
   User? get currentUser => _auth.currentUser;
@@ -42,9 +37,6 @@ class ProfileManager extends ChangeNotifier {
       rethrow;
     }
   }
-
-
-
 
   Future<void> signIn(String email, String password) async {
     try {
@@ -87,7 +79,6 @@ class ProfileManager extends ChangeNotifier {
   bool isloading = false;
   final authapi = Auth();
 
-
   final List<String> _favoriteMovies = [
     // 'Inception',
     // 'The Dark Knight',
@@ -110,7 +101,11 @@ class ProfileManager extends ChangeNotifier {
   bool get isLogin => _isLogin;
 
   bool _darkMode = false;
-  bool _didSelectUser = false;
+  final bool _didSelectUser = false;
+
+  void getdarkmode() {
+    
+  }
 
   void toggleDarkmode() {
     _darkMode = !darkMode;
@@ -119,11 +114,6 @@ class ProfileManager extends ChangeNotifier {
 
   set darkMode(bool darkMode) {
     _darkMode = darkMode;
-    notifyListeners();
-  }
-
-  void tapOnProfile(bool selected) {
-    _didSelectUser = selected;
     notifyListeners();
   }
 

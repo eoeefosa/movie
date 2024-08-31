@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:torihd/screens/auth/create_account.dart';
 import 'package:torihd/screens/auth/login.dart';
 import 'package:provider/provider.dart';
@@ -166,25 +167,67 @@ class SignedIn extends StatelessWidget {
                     backgroundColor: Colors.grey,
                   ),
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
                           builder: (context) {
-                            return const Login();
+                            return const Login(); // Replace with your destination widget
                           },
-                        ));
-                      },
-                      child: const Text("Login")),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).brightness ==
+                              Brightness.dark
+                          ? Colors.blueGrey[800] // Dark mode background color
+                          : Colors.blue.shade300, // Light mode background color
+                      foregroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white // Dark mode text color
+                              : Colors.white, // Light mode text color
+                      elevation: 0, // Adjust elevation for shadow
+                      shape: const RoundedRectangleBorder(
+
+                          // borderRadius:
+                          //     BorderRadius.circular(10.w), // Rounded corners
+                          ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 7.h), // Padding inside button
+                    ),
+                    child: const Text("Login"),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return const CreateAccount();
+                            return const CreateAccount(); // Replace with your destination widget
                           },
                         ),
                       );
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).brightness ==
+                              Brightness.dark
+                          ? Colors.blueGrey[800] // Dark mode background color
+                          : Colors.blue.shade300, // Light mode background color
+                      foregroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white // Dark mode text color
+                              : Colors.white, // Light mode text color
+                      elevation: 0, // Adjust elevation for shadow
+                      shape: const RoundedRectangleBorder(
+
+                          // borderRadius:
+                          //     BorderRadius.circular(10.w), // Rounded corners
+                          ),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.w,
+                          vertical: 7.h), // Padding inside button
+                    ),
                     child: const Text("Create Account"),
                   )
                 ],
@@ -219,7 +262,6 @@ class SignedIn extends StatelessWidget {
                 },
                 child: const Text("Upload Movie"))
             : Container(),
-        
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

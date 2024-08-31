@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/provider/profile_manager.dart';
-import 'package:torihd/movieboxtheme.dart';
 import 'package:torihd/navigation/app_router.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/styles/snack_bar.dart';
@@ -15,56 +15,77 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'ads/ad_controller.dart';
 import 'firebase_options.dart';
-import 'provider/downloadtask.dart';
+import 'provider/downloadprovider.dart';
+import 'toritheme.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FlutterDownloader.initialize(debug: true);
 
+  // Initialize FlutterDownloader
+
+  // Register callback for downloads
+  // FlutterDownloader.registerCallback(downloadCallback);
+
+  // Initialize AdsController if platform is supported
   AdsController? adsController;
-
   if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-    /// Prepare the google_mobile_ads plugin so that the first ad loads
-    /// faster. This can be done later or with a delay if startup
-    /// experience suffers.
     adsController = AdsController(instance: MobileAds.instance);
-    adsController.initialize();
+    try {
+      await adsController.initialize();
+    } catch (e) {
+      if (kDebugMode) {
+        print("Failed to initialize AdsController: $e");
+      }
+    }
   }
 
-  // FlutterDownloader.registerCallback(downloadCallback);
+  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.blueAccent,
   ));
+
+  // Initialize AppStateManager
   final appstateManager = AppStateManager();
   await appstateManager.initializeApp();
-  runApp(MovieBoxClone(
+
+  runApp(Tori(
     appStateManager: appstateManager,
     adsController: adsController,
   ));
 }
 
-class MovieBoxClone extends StatefulWidget {
+class Tori extends StatefulWidget {
   final AppStateManager appStateManager;
-  const MovieBoxClone({
+  final AdsController? adsController;
+
+  const Tori({
     super.key,
     required this.appStateManager,
     this.adsController,
   });
-  final AdsController? adsController;
 
   @override
-  State<MovieBoxClone> createState() => _MovieBoxCloneState();
+  State<Tori> createState() => _ToriState();
 }
 
-class _MovieBoxCloneState extends State<MovieBoxClone> {
+class _ToriState extends State<Tori> {
   late final ProfileManager _profileManager = ProfileManager();
   late final AppRouter _appRouter = AppRouter(
     widget.appStateManager,
     _profileManager,
   );
+
+  @override
+  void dispose() {
+    // Dispose AdsController if initialized
+    widget.adsController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,20 +99,23 @@ class _MovieBoxCloneState extends State<MovieBoxClone> {
       ],
       child: Consumer<ProfileManager>(
         builder: (context, profileManager, child) {
-          ThemeData theme;
-          if (profileManager.darkMode) {
-            theme = MovieBoxTheme.dark();
-          } else {
-            theme = MovieBoxTheme.light();
-          }
-
+          final theme =
+              profileManager.darkMode ? ToriTheme.dark() : ToriTheme.light();
           final router = _appRouter.router;
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            theme: theme,
-            title: 'ToriHd',
-            routerConfig: router,
-            scaffoldMessengerKey: scaffoldMessengerKey,
+
+          return ScreenUtilInit(
+            designSize: const Size(400, 900),
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (_, child) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                theme: theme,
+                title: 'ToriHd',
+                routerConfig: router,
+                scaffoldMessengerKey: scaffoldMessengerKey,
+              );
+            },
           );
         },
       ),

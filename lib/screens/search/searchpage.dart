@@ -1,106 +1,117 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:torihd/provider/movieprovider.dart';
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+import '../moviescreen/moviescreen.dart';
+
+class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SearchScreenState extends State<SearchScreen> {
+  late TextEditingController _searchController;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _searchController = TextEditingController();
+
+    // Initialize fetching movies for search functionality
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MovieProvider>(context, listen: false).fetchmovie();
+    });
   }
 
-  String name = "";
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final movieProvider = Provider.of<MovieProvider>(context);
+    final searchResults = movieProvider.searchResults;
+
     return Scaffold(
-        appBar: AppBar(
-            title: Card(
-          child: TextField(
-            decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search), hintText: 'Search...'),
-            onChanged: (val) {
-              setState(() {
-                name = val;
-              });
+      appBar: AppBar(
+        title: const Text('Search Movies'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              _searchController.clear();
+              movieProvider.searchMovies(''); // Clear search results
             },
           ),
-        )),
-        body: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('users').snapshots(),
-          builder: (context, snapshots) {
-            return (snapshots.connectionState == ConnectionState.waiting)
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemCount: snapshots.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      var data = snapshots.data!.docs[index].data()
-                          as Map<String, dynamic>;
-
-                      if (name.isEmpty) {
-                        return ListTile(
-                          title: Text(
-                            data['name'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            data['email'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(data['image']),
-                          ),
-                        );
-                      }
-                      if (data['name']
-                          .toString()
-                          .toLowerCase()
-                          .startsWith(name.toLowerCase())) {
-                        return ListTile(
-                          title: Text(
-                            data['name'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            data['email'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          leading: CircleAvatar(
-                            backgroundImage: NetworkImage(data['image']),
-                          ),
-                        );
-                      }
-                      return Container();
-                    });
-          },
-        ));
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            // Search Input Field
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search for a movie...',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    // Perform search when the search icon is pressed
+                    movieProvider.searchMovies(_searchController.text);
+                  },
+                ),
+              ),
+              onChanged: (value) {
+                // Perform search when the text is changed
+                movieProvider.searchMovies(value);
+              },
+            ),
+            const SizedBox(height: 10),
+            // Search Results List
+            Expanded(
+              child: movieProvider.movieisloading
+                  ? const Center(child: CircularProgressIndicator())
+                  : searchResults.isEmpty
+                      ? const Center(child: Text('No results found.'))
+                      : ListView.builder(
+                          itemCount: searchResults.length,
+                          itemBuilder: (context, index) {
+                            final movie = searchResults[index];
+                            return ListTile(
+                              leading: Image.network(
+                                movie.movieImgurl,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                              title: Text(movie.title),
+                              subtitle: Text(movie.description),
+                              onTap: () {
+                                // Navigate to movie detail screen
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Videoplayer(
+                                      movieid: movie.id,
+                                      type: movie.type,
+                                      youtubeid: movie.youtubetrailer,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

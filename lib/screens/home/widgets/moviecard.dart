@@ -1,7 +1,8 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart'; // Import the Shimmer package
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
@@ -19,6 +20,7 @@ class MovieCard extends StatefulWidget {
     required this.description,
     required this.downloadlink,
     required this.source,
+    this.isLoading = false, // Add isLoading parameter with default value
   });
 
   final String title;
@@ -31,6 +33,7 @@ class MovieCard extends StatefulWidget {
   final String source;
   final String type;
   final String youtubeid;
+  final bool isLoading; // Flag to check if the card is loading
 
   @override
   State<MovieCard> createState() => _MovieCardState();
@@ -66,8 +69,6 @@ class _MovieCardState extends State<MovieCard> {
                 Provider.of<MovieProvider>(context, listen: false)
                     .deletMovie(widget.movieid, widget.title, widget.type);
                 Navigator.of(context).pop();
-
-                // Add your delete
               },
             ),
           ],
@@ -82,7 +83,6 @@ class _MovieCardState extends State<MovieCard> {
       case 'delete':
         _showAlertDialog(context, 'Delete Movie',
             'Are you sure you want to delete  ${widget.title}');
-// Perform delete action
         break;
       case 'edit':
         Navigator.push(
@@ -101,13 +101,59 @@ class _MovieCardState extends State<MovieCard> {
             ),
           ),
         );
-// Perform edit action
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    return widget.isLoading
+        ? _buildShimmerCard() // Show shimmer card when loading
+        : _buildMovieCard(); // Show actual movie card when not loading
+  }
+
+  Widget _buildShimmerCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 200.h,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 14.h,
+                width: 100.w,
+                color: Colors.grey,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0.h),
+              child: Container(
+                height: 11.h,
+                width: 60.w,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMovieCard() {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -118,9 +164,9 @@ class _MovieCardState extends State<MovieCard> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: CachedNetworkImage(
               imageUrl: widget.imgUrl,
-              height: 200,
+              height: 200.h, // Set height to 100
               width: double.infinity,
-              fit: BoxFit.cover,
+              fit: BoxFit.cover, // Ensures the image covers the available space
               placeholder: (context, url) =>
                   const Center(child: CircularProgressIndicator()),
               errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -131,7 +177,7 @@ class _MovieCardState extends State<MovieCard> {
             child: Text(
               widget.title,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
               maxLines: 1,
@@ -139,15 +185,15 @@ class _MovieCardState extends State<MovieCard> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.0.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "Rating: ${widget.rating}",
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                 ),
-                const Icon(Icons.star, color: Colors.amber, size: 16),
+                const Icon(Icons.star, color: Colors.amber, size: 11),
               ],
             ),
           ),
