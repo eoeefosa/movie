@@ -13,7 +13,7 @@ class AutoSlidingGridView extends StatefulWidget {
   const AutoSlidingGridView({required this.movieProvider, super.key});
 
   @override
-  _AutoSlidingGridViewState createState() => _AutoSlidingGridViewState();
+  State<AutoSlidingGridView> createState() => _AutoSlidingGridViewState();
 }
 
 class _AutoSlidingGridViewState extends State<AutoSlidingGridView> {

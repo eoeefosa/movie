@@ -23,7 +23,7 @@ class DownloadProvider extends ChangeNotifier {
   void _initializeNotifications() {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings(
-            'app_icon'); // Add your app icon in android/app/src/main/res/drawable
+            '@mipmap/ic_launcher'); // Add your app icon in android/app/src/main/res/drawable
 
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
@@ -48,13 +48,14 @@ class DownloadProvider extends ChangeNotifier {
 
   // Start a download task
   Future<void> startDownload(String url, String fileName) async {
+    url =
+        "https://ma4re4qwfh.b34zobxzxs73nkfxike1.cfd/res/6055fe40123fab85e251b371f5265d13/1a626ea8cd7b95132db112a46edc8fec/Mark_Antony_(2023)_WEBRip_high_(fzmovies.net)_bbeda1b00668b2aaf4cb158af59f82d4.mp4?fromwebsite";
+
     if (await _requestPermissions()) {
       try {
         // final Directory appDir = await getApplicationDocumentsDirectory();
         final Directory appDir = Directory('/storage/emulated/0/Download/Tori');
         final String filePath = '${appDir.path}/$fileName';
-
-        
 
         if (_downloadTasks.containsKey(url)) {
           // Resume an existing download
@@ -62,22 +63,29 @@ class DownloadProvider extends ChangeNotifier {
         } else {
           // Create a new download task
           final DownloadTask task = DownloadTask(
+            fileName: "$fileName.mp4",
+            // url: url,
             url: url,
             savePath: filePath,
             dio: _dio,
-            onReceiveProgress: (received, total) {
-              _onReceiveProgress(url, received, total);
-            },
+
+            // onReceiveProgress: (received, total) {
+            //   _onReceiveProgress(url, received, total);
+            // },
             onComplete: () {
               _showNotification(fileName, 'Download completed.');
             },
             onError: (error) {
               _showNotification(fileName, 'Download failed.');
             },
+            qualityOptions: [],
+            alprogress: (double progress) {
+              _alprogress(url, progress);
+            },
           );
 
           _downloadTasks[url] = task;
-          task.start();
+          task.downloadwithAl();
         }
 
         notifyListeners();
@@ -122,6 +130,12 @@ class DownloadProvider extends ChangeNotifier {
       _downloadTasks[url]?.progress = progress;
       notifyListeners();
     }
+  }
+
+  void _alprogress(String url, double progress) {
+    _downloadTasks[url]?.progress = progress;
+
+    notifyListeners();
   }
 
   // Show local notification

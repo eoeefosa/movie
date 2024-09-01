@@ -59,7 +59,6 @@ class MovieApi {
       // Handle any other exceptions
       debugPrint(e.toString());
       final trace = StackTrace.current;
-      print(trace.toString());
       throw Exception('An unexpected error occurred: $e');
     }
   }

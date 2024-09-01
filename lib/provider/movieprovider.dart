@@ -71,7 +71,7 @@ class MovieProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final videoInfo = FlutterVideoInfo();
-      final downloadsDir = Directory('/storage/emulated/0/Download');
+      final downloadsDir = Directory('/storage/emulated/0/Download/Tori');
 
       List<FileSystemEntity> videofiles = downloadsDir
           .listSync(recursive: false, followLinks: false)

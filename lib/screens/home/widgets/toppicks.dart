@@ -75,7 +75,6 @@ class _TopPickCardState extends State<TopPickCard> {
   }
 
   void _onSelectedMenuOption(BuildContext context, String option) {
-    print(option);
     switch (option) {
       case 'delete':
         _showAlertDialog(context, 'Delete Movie',
@@ -106,7 +105,6 @@ class _TopPickCardState extends State<TopPickCard> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
 
     // Calculate the width and height based on the screen width
     double cardWidth = 120.w;

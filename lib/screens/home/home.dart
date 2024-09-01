@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:torihd/fd_page/fd_home.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/screens/home/dashboard.dart';
 import 'package:torihd/screens/downloads/downloads.dart';
@@ -20,7 +21,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   static List<Widget> pages = <Widget>[
     const Dashboard(),
-    const Downloads(),
+    // const Downloads(),
+    const FdHome(),
     const ProfilePage()
   ];
 

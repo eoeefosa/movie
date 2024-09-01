@@ -118,10 +118,11 @@ class _TrendingState extends State<Trending> {
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 8.0.w, vertical: 4.0.h),
+                        horizontal: 8.0.w, vertical: 10.0.h),
                     child: Text(
                       'Trending',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: TextStyle(
+                          fontSize: 20.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                   AutoSlidingGridView(
@@ -133,10 +134,13 @@ class _TrendingState extends State<Trending> {
                   // ),
                   Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: 8.0.w, vertical: 4.0.h),
+                        horizontal: 8.0.w, vertical: 10.0.h),
                     child: Text(
                       'Top Picks',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: TextStyle(
+                        fontSize: 20.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   MasonryGridView.count(

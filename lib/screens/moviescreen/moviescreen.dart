@@ -1,9 +1,11 @@
+import 'package:file_sizes/file_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart'; // Import the shimmer package
 import 'package:torihd/ads/banner_ad_widget.dart';
+import 'package:torihd/provider/downloadprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/screens/moviescreen/widgets/detailcard.dart';
@@ -11,6 +13,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../ads/ad_controller.dart';
 import '../../models/movie.dart';
+import '../../provider/widgets/downloadtask.dart';
 import '../home/widgets/moviecard.dart';
 
 class Videoplayer extends StatefulWidget {
@@ -33,6 +36,77 @@ class _VideoplayerState extends State<Videoplayer> {
   late PlayerState _playerState;
   late YoutubeMetaData _videoMetaData;
   bool _isPlayerReady = false;
+
+  void _showQualityOptions(
+      BuildContext context, String downloadlink, String filename) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(mainAxisSize: MainAxisSize.min, children: [
+          SizedBox(
+            height: 10.h,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.h),
+            child: Text(
+              "Choose your preference",
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ),
+          ...[1, 2, 3, 4].map((option) {
+            return ListTile(
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              trailing: ElevatedButton.icon(
+                onPressed: () {
+                  print("download started");
+                  Navigator.pop(context);
+                  // Start download with selected quality
+                  Provider.of<DownloadProvider>(context, listen: false)
+                      .startDownload(downloadlink, filename);
+                },
+                label: const Text("Download"),
+                icon: const Icon(Icons.download),
+              ),
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '480P Kali 289 AD[Telugu]',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '687.8mb',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      Text(
+                        '02:55:45',
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'uploaded by admin',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ],
+              ),
+            );
+          }),
+          const Text("Tori HD"),
+          const Text("© 2024 best place for movie downloads")
+        ]);
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -228,12 +302,10 @@ class _VideoplayerState extends State<Videoplayer> {
               ),
             ),
             onPressed: () {
-              showBottomSheet(
-                  context: context,
-                  builder: (context) => Container(),
-                  enableDrag: false,
-                  constraints: BoxConstraints(
-                      maxHeight: 75.h, maxWidth: double.infinity));
+              _showQualityOptions(
+                  context,
+                  movieProvider.currentmovieinfo?.downloadlink ?? "",
+                  movieProvider.currentmovieinfo?.title ?? "No Name");
             },
           ),
         ),

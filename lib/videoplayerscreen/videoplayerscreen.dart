@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
@@ -12,7 +11,7 @@ class VideoPlayerScreen extends StatefulWidget {
   const VideoPlayerScreen({super.key, required this.path});
 
   @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
+  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
@@ -223,15 +222,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                             onPressed: _togglePlayPause,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.replay_10, color: Colors.white),
+                            icon: const Icon(Icons.replay_10,
+                                color: Colors.white),
                             onPressed: _rewind,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.forward_10, color: Colors.white),
+                            icon: const Icon(Icons.forward_10,
+                                color: Colors.white),
                             onPressed: _forward,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.fullscreen, color: Colors.white),
+                            icon: const Icon(Icons.fullscreen,
+                                color: Colors.white),
                             onPressed: _toggleFullScreen,
                           ),
                         ],
@@ -261,8 +263,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                       opacity: _showPauseButton ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: IconButton(
-                        icon:
-                            const Icon(Icons.pause, size: 100, color: Colors.white),
+                        icon: const Icon(Icons.pause,
+                            size: 100, color: Colors.white),
                         onPressed: _togglePlayPause,
                       ),
                     ),

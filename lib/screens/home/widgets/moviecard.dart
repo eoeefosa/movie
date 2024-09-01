@@ -78,7 +78,6 @@ class _MovieCardState extends State<MovieCard> {
   }
 
   void _onSelectedMenuOption(BuildContext context, String option) {
-    print(option);
     switch (option) {
       case 'delete':
         _showAlertDialog(context, 'Delete Movie',
