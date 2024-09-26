@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
-
+import 'package:permission_handler/permission_handler.dart';
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -18,6 +19,10 @@ class MovieProvider extends ChangeNotifier {
   bool _tvseriesloading = false;
   bool _trendingCarouselloading = false;
   bool _deleteisloading = false;
+
+  List<Movie> topRatedMovies = [];
+  List<Movie> nowPlayingMovies = [];
+  List<Movie> popularMovies = [];
 
   get movieisloading => _movieisloading;
   get trendingloading => _trendingloading;
@@ -69,38 +74,59 @@ class MovieProvider extends ChangeNotifier {
   void getDownloads() async {
     loadingdownloads = true;
     notifyListeners();
-    try {
-      final videoInfo = FlutterVideoInfo();
-      final downloadsDir = Directory('/storage/emulated/0/Download/Tori');
 
-      List<FileSystemEntity> videofiles = downloadsDir
-          .listSync(recursive: false, followLinks: false)
-          .where((file) =>
-              file is File &&
-              (file.path.endsWith('.mp4') ||
-                  file.path.endsWith('.mov') ||
-                  file.path.endsWith('.mkv') ||
-                  file.path.endsWith('.avi')))
-          .toList();
+    // Request storage permissions
+    if (await Permission.storage.request().isGranted) {
+      try {
+        final videoInfo = FlutterVideoInfo();
 
-      for (var file in videofiles) {
-        var info = await videoInfo.getVideoInfo(file.path);
-        if (info != null) {
-          // Handle potential null values in VideoData properties
-          info.title = info.title ?? 'Unknown Title';
-          info.filesize = info.filesize ?? 0;
-          info.path = info.path ?? 'Unknown Path';
-          info.orientation = info.orientation ?? 90;
+        // Get the path of the Download directory
+        String downloadsPath =
+            await ExternalPath.getExternalStoragePublicDirectory(
+                ExternalPath.DIRECTORY_DOWNLOADS);
+        final downloadsDir = Directory('$downloadsPath/Tori');
 
-          videoData.add(info);
+        // Check if the directory exists
+        if (!downloadsDir.existsSync()) {
+          print("Directory not found");
+          return;
         }
+
+        // List video files in the directory
+        List<FileSystemEntity> videofiles = downloadsDir
+            .listSync(recursive: false, followLinks: false)
+            .where((file) =>
+                file is File &&
+                (file.path.endsWith('.mp4') ||
+                    file.path.endsWith('.mov') ||
+                    file.path.endsWith('.mkv') ||
+                    file.path.endsWith('.avi')))
+            .toList();
+
+        for (var file in videofiles) {
+          var info = await videoInfo.getVideoInfo(file.path);
+          if (info != null) {
+            // Handle potential null values in VideoData properties
+            info.title = info.title ?? 'Unknown Title';
+            print(info.title);
+            showsnackBar(info.title.toString());
+            info.filesize = info.filesize ?? 0;
+            info.path = info.path ?? 'Unknown Path';
+            info.orientation = info.orientation ?? 90;
+
+            videoData.add(info);
+          }
+        }
+        downloads = videofiles;
+        loadingdownloads = false;
+      } catch (e) {
+        print(e);
+        rethrow;
       }
-      downloads = videofiles;
-      loadingdownloads = false;
-    } catch (e) {
-      print(e);
-      rethrow;
+    } else {
+      print("Storage permission not granted");
     }
+
     notifyListeners();
   }
 
@@ -108,7 +134,7 @@ class MovieProvider extends ChangeNotifier {
     _movieisloading = true;
     notifyListeners();
     final moviesList = await api.fetchmovies();
-    print(moviesList);
+    // print(moviesList);
     movies = moviesList;
     _searchResults = movies; // Initialize search results
     _movieisloading = false;
@@ -143,6 +169,13 @@ class MovieProvider extends ChangeNotifier {
     _tvseriesloading = false;
     notifyListeners();
   }
+
+  // void getData() async {
+  //   MovieServices movieServices = MovieServices();
+  //   topRatedMovies = await movieServices.fetchTopRatedMovies();
+  //   nowPlayingMovies = await movieServices.fetchNowPlayingMovies();
+  //   popularMovies = await movieServices.fetchPopularMovies();
+  // }
 
   void fetchTopPick() async {
     _topPickloading = true;

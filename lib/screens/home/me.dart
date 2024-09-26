@@ -166,7 +166,7 @@ class SignedIn extends StatelessWidget {
                     radius: 50,
                     backgroundColor: Colors.grey,
                   ),
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -177,28 +177,9 @@ class SignedIn extends StatelessWidget {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).brightness ==
-                              Brightness.dark
-                          ? Colors.blueGrey[800] // Dark mode background color
-                          : Colors.blue.shade300, // Light mode background color
-                      foregroundColor:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white // Dark mode text color
-                              : Colors.white, // Light mode text color
-                      elevation: 0, // Adjust elevation for shadow
-                      shape: const RoundedRectangleBorder(
-
-                          // borderRadius:
-                          //     BorderRadius.circular(10.w), // Rounded corners
-                          ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 7.h), // Padding inside button
-                    ),
                     child: const Text("Login"),
                   ),
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -209,25 +190,6 @@ class SignedIn extends StatelessWidget {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).brightness ==
-                              Brightness.dark
-                          ? Colors.blueGrey[800] // Dark mode background color
-                          : Colors.blue.shade300, // Light mode background color
-                      foregroundColor:
-                          Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white // Dark mode text color
-                              : Colors.white, // Light mode text color
-                      elevation: 0, // Adjust elevation for shadow
-                      shape: const RoundedRectangleBorder(
-
-                          // borderRadius:
-                          //     BorderRadius.circular(10.w), // Rounded corners
-                          ),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w,
-                          vertical: 7.h), // Padding inside button
-                    ),
                     child: const Text("Create Account"),
                   )
                 ],

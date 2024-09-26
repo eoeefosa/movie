@@ -10,6 +10,8 @@ import 'package:torihd/provider/downloadprovider.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/widget/my_thumbnail.dart';
 
+// import '../../provider/downloadprovider_a.dart';
+
 class Downloads extends StatefulWidget {
   const Downloads({super.key});
 
@@ -127,14 +129,14 @@ class _DownloadsState extends State<Downloads> {
             padding: const EdgeInsets.symmetric(vertical: 5),
             itemBuilder: (context, index) {
               final task =
-                  downloadProvider.downloadTasks.values.elementAt(index);
+                  downloadProvider?.downloadTasks.values.elementAt(index);
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Card(
                   elevation: 3,
                   child: ListTile(
                     leading: Icon(
-                      task.hasError ? Icons.error : Icons.download,
+                      task!.hasError ? Icons.error : Icons.download,
                       color: task.hasError ? Colors.red : Colors.blue,
                     ),
                     title: Text(task.fileName),

@@ -26,7 +26,7 @@ class MovieswithProvider extends StatefulWidget {
   const MovieswithProvider({super.key});
 
   @override
-  _MovieswithProviderState createState() => _MovieswithProviderState();
+  State<MovieswithProvider> createState() => _MovieswithProviderState();
 }
 
 class _MovieswithProviderState extends State<MovieswithProvider> {

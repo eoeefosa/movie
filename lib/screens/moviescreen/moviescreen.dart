@@ -1,4 +1,3 @@
-import 'package:file_sizes/file_sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +12,6 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../ads/ad_controller.dart';
 import '../../models/movie.dart';
-import '../../provider/widgets/downloadtask.dart';
 import '../home/widgets/moviecard.dart';
 
 class Videoplayer extends StatefulWidget {
@@ -61,7 +59,7 @@ class _VideoplayerState extends State<Videoplayer> {
                 onPressed: () {
                   print("download started");
                   Navigator.pop(context);
-                  // Start download with selected quality
+                  // // Start download with selected quality
                   Provider.of<DownloadProvider>(context, listen: false)
                       .startDownload(downloadlink, filename);
                 },

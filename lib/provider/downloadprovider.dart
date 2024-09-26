@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:isolate';
+// import 'dart:isolate';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart'; // for getting the download directory
+// import 'package:path_provider/path_provider.dart'; // for getting the download directory
 import 'package:permission_handler/permission_handler.dart';
 
 import 'widgets/downloadtask.dart'; // for managing permissions
@@ -49,11 +49,10 @@ class DownloadProvider extends ChangeNotifier {
   // Start a download task
   Future<void> startDownload(String url, String fileName) async {
     url =
-        "https://ma4re4qwfh.b34zobxzxs73nkfxike1.cfd/res/6055fe40123fab85e251b371f5265d13/1a626ea8cd7b95132db112a46edc8fec/Mark_Antony_(2023)_WEBRip_high_(fzmovies.net)_bbeda1b00668b2aaf4cb158af59f82d4.mp4?fromwebsite";
+        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
 
     if (await _requestPermissions()) {
       try {
-        // final Directory appDir = await getApplicationDocumentsDirectory();
         final Directory appDir = Directory('/storage/emulated/0/Download/Tori');
         final String filePath = '${appDir.path}/$fileName';
 
@@ -64,28 +63,28 @@ class DownloadProvider extends ChangeNotifier {
           // Create a new download task
           final DownloadTask task = DownloadTask(
             fileName: "$fileName.mp4",
-            // url: url,
             url: url,
             savePath: filePath,
             dio: _dio,
-
-            // onReceiveProgress: (received, total) {
-            //   _onReceiveProgress(url, received, total);
-            // },
             onComplete: () {
               _showNotification(fileName, 'Download completed.');
+              _downloadTasks.remove(url); // Remove the task from the map
+              notifyListeners(); // Notify listeners after removing
             },
             onError: (error) {
               _showNotification(fileName, 'Download failed.');
             },
             qualityOptions: [],
-            alprogress: (double progress) {
-              _alprogress(url, progress);
+            onReceiveProgress: (received, total) {
+              _onReceiveProgress(url, received, total);
             },
+            // alprogress: (double progress) {
+            //   _alprogress(url, progress);
+            // },
           );
 
           _downloadTasks[url] = task;
-          task.downloadwithAl();
+          task.start();
         }
 
         notifyListeners();
@@ -132,11 +131,10 @@ class DownloadProvider extends ChangeNotifier {
     }
   }
 
-  void _alprogress(String url, double progress) {
-    _downloadTasks[url]?.progress = progress;
-
-    notifyListeners();
-  }
+  // void _alprogress(String url, double progress) {
+  //   _downloadTasks[url]?.progress = progress;
+  //   notifyListeners();
+  // }
 
   // Show local notification
   Future<void> _showNotification(String title, String body) async {

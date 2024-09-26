@@ -51,8 +51,12 @@ dependencies:
   logging: any
   shimmer: ^3.0.0
   flutter_local_notifications: ^17.2.2
-  al_downloader: ^1.8.2
+  # al_downloader: ^1.8.2
   device_info_plus: ^8.2.2
+  equatable: ^2.0.5
+  open_file_plus: ^3.4.1+1
+  external_path: ^2.0.1
+  http: ^1.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

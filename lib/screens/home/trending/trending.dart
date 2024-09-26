@@ -18,7 +18,7 @@ class Trending extends StatefulWidget {
   const Trending({super.key});
 
   @override
-  _TrendingState createState() => _TrendingState();
+  State<Trending> createState() => _TrendingState();
 }
 
 class _TrendingState extends State<Trending> {

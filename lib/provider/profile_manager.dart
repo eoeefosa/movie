@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:torihd/api/movie_api.dart';
+import 'package:torihd/styles/snack_bar.dart';
 
 import '../api/api_calls/auth.dart';
 import '../models/movie.dart';
@@ -38,12 +39,19 @@ class ProfileManager extends ChangeNotifier {
     }
   }
 
-  Future<void> signIn(String email, String password) async {
+  Future<void> signIn(String emailname, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+          email: emailname, password: password);
       user = result.user;
+      isLogin = true;
       notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showsnackBar('No user linked with this email.');
+      } else if (e.code == 'wrong-password') {
+        showsnackBar('Wrong password provided.');
+      }
     } catch (e) {
       rethrow;
     }
@@ -71,26 +79,23 @@ class ProfileManager extends ChangeNotifier {
   }
 
   // final bool _isAdmin = false;
-  final bool _isLogin = false;
-  final String _username = '';
-  final String _email = '';
-  final String _profileImageUrl =
+  bool isLogin = false;
+  String username = '';
+  String email0 = '';
+  String profileImageUrl =
       'https://th.bing.com/th/id/R.76c882edad7141df823d9a41b8c7820e?rik=NAn9mL%2fpwz%2fLNw&pid=ImgRaw&r=0';
   bool isloading = false;
   final authapi = Auth();
 
-  final List<String> _favoriteMovies = [
+  final List<String> favoriteMovies = [
     // 'Inception',
     // 'The Dark Knight',
     // 'Interstellar',
     // 'Tenet'
   ];
 
-  String get username => _username;
-  String get email => _email;
-  String get profileImageUrl => _profileImageUrl;
-  List<String> get favoriteMovies => _favoriteMovies;
-  bool get didSelectUser => _didSelectUser;
+  String get email => email0;
+  bool _darkMode = false;
   bool get darkMode => _darkMode;
   bool get isAdmin => user == null
       ? false
@@ -98,27 +103,20 @@ class ProfileManager extends ChangeNotifier {
           user!.email == 'Torihd247@gmail.com' ||
           user!.email == 'torihd247@gmail.com';
 
-  bool get isLogin => _isLogin;
-
-  bool _darkMode = false;
-  final bool _didSelectUser = false;
-
-  void getdarkmode() {
-    
-  }
+  void getdarkmode() {}
 
   void toggleDarkmode() {
-    _darkMode = !darkMode;
+    _darkMode = !_darkMode;
     notifyListeners();
   }
 
-  set darkMode(bool darkMode) {
-    _darkMode = darkMode;
+  set darkMode(bool thisdarkMode) {
+    _darkMode = thisdarkMode;
     notifyListeners();
   }
 
   void setdarkMode(bool value) {
-    _darkMode = value;
+    darkMode = value;
     notifyListeners();
   }
 }

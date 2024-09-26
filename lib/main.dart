@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:al_downloader/al_downloader.dart';
+// import 'package:al_downloader/al_downloader.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:torihd/fd_page/provider/fd_provider.dart';
 import 'package:torihd/models/appState/app_state_manager.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/navigation/app_router.dart';
@@ -29,9 +27,9 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  ALDownloader.initialize();
-  ALDownloader.configurePrint(true, frequentEnabled: false);
-  await FlutterDownloader.initialize(debug: true, ignoreSsl: true);
+  // ALDownloader.initialize();
+  // ALDownloader.configurePrint(true, frequentEnabled: false);
+  // await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
 
   AdsController? adsController;
   if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
@@ -94,7 +92,7 @@ class _ToriState extends State<Tori> {
       providers: [
         ChangeNotifierProvider(create: (_) => DownloadProvider()),
         ChangeNotifierProvider(create: (_) => MovieProvider()),
-        ChangeNotifierProvider(create: (_) => FdProvider()),
+        // ChangeNotifierProvider(create: (_) => FdProvider()),
         Provider<AdsController?>.value(value: widget.adsController),
         ChangeNotifierProvider(create: (context) => widget.appStateManager),
         ChangeNotifierProvider(create: (context) => _profileManager),
