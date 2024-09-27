@@ -99,8 +99,7 @@ class _ToriState extends State<Tori> {
       ],
       child: Consumer<ProfileManager>(
         builder: (context, profileManager, child) {
-          final theme =
-              profileManager.darkMode ? ToriTheme.dark() : ToriTheme.light();
+       
           final router = _appRouter.router;
 
           return ScreenUtilInit(
@@ -110,7 +109,15 @@ class _ToriState extends State<Tori> {
             builder: (_, child) {
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
-                theme: theme,
+                theme: ToriTheme.light(),
+                darkTheme: ToriTheme.dark(),
+                themeMode: Provider.of<ProfileManager>(context).themeMode ==
+                        ThemeModeType.light
+                    ? ThemeMode.light
+                    : Provider.of<ProfileManager>(context).themeMode ==
+                            ThemeModeType.dark
+                        ? ThemeMode.dark
+                        : ThemeMode.system,
                 title: 'ToriHd',
                 routerConfig: router,
                 scaffoldMessengerKey: scaffoldMessengerKey,

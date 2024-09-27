@@ -7,12 +7,28 @@ import 'package:torihd/styles/snack_bar.dart';
 import '../api/api_calls/auth.dart';
 import '../models/movie.dart';
 
-class ProfileManager extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+enum ThemeModeType { light, dark, system }
 
-  User? user;
-  User? get currentUser => _auth.currentUser;
+class ProfileManager extends ChangeNotifier {
+  ThemeModeType _themeMode = ThemeModeType.system;
+
+  ThemeModeType get themeMode => _themeMode;
+
+  void setThemeMode(ThemeModeType mode) {
+    _themeMode = mode;
+    notifyListeners();
+  }
+
+  void toggleDarkmode() {
+    if (_themeMode == ThemeModeType.light) {
+      _themeMode = ThemeModeType.dark;
+    } else {
+      _themeMode = ThemeModeType.light;
+    }
+    notifyListeners();
+  }
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addMovie(Movie movie) async {
     try {
@@ -39,11 +55,19 @@ class ProfileManager extends ChangeNotifier {
     }
   }
 
-  Future<void> signIn(String emailname, String password) async {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? _user;
+  User? get currentUser => _user;
+
+  Future<void> signIn(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: emailname, password: password);
-      user = result.user;
+          email: email, password: password);
+
+      // Check if the user is not null and assign to _user
+      _user = result.user;
+      print("Sign-in successful: ${_user?.email}"); // Debug log
       isLogin = true;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -51,31 +75,84 @@ class ProfileManager extends ChangeNotifier {
         showsnackBar('No user linked with this email.');
       } else if (e.code == 'wrong-password') {
         showsnackBar('Wrong password provided.');
+      } else {
+        showsnackBar('Error: ${e.message}');
       }
     } catch (e) {
+      print("Unexpected error: $e"); // Improved error logging
       rethrow;
     }
   }
 
+  // Sign Up method
   Future<void> signUp(String email, String password) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      user = result.user;
+      _user = result.user; // Assign user to the private variable
       notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      _handleAuthError(e);
     } catch (e) {
+      print("Error signing up: $e");
       rethrow;
     }
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
-    user = null;
-    notifyListeners();
+  // Fetch current user
+  Future<void> getUser() async {
+    try {
+      _user = _auth.currentUser; // Get the current user
+      notifyListeners(); // Notify listeners about the state change
+    } catch (e) {
+      print("Error fetching user: $e");
+      rethrow;
+    }
   }
 
+  // Sign Out method
+  Future<void> signOut() async {
+    try {
+      await _auth.signOut();
+      _user = null; // Clear user variable
+      notifyListeners();
+    } catch (e) {
+      print("Error signing out: $e");
+      rethrow;
+    }
+  }
+
+  // Reset Password method
   Future<void> resetPassword(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      print("Password reset email sent.");
+    } on FirebaseAuthException catch (e) {
+      _handleAuthError(e);
+    } catch (e) {
+      print("Error sending password reset email: $e");
+      rethrow;
+    }
+  }
+
+  // Handle Firebase authentication errors
+  void _handleAuthError(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-email':
+        print('The email address is not valid.');
+        break;
+      case 'user-disabled':
+        print('The user corresponding to the given email has been disabled.');
+        break;
+      case 'user-not-found':
+        print('No user corresponding to the given email.');
+        break;
+      case 'wrong-password':
+        print('The password is invalid for the given email.');
+        break;
+      default:
+        print('An undefined Error happened. ${e.message}');
+    }
   }
 
   // final bool _isAdmin = false;
@@ -95,28 +172,10 @@ class ProfileManager extends ChangeNotifier {
   ];
 
   String get email => email0;
-  bool _darkMode = false;
-  bool get darkMode => _darkMode;
-  bool get isAdmin => user == null
+
+  bool get isAdmin => _user == null
       ? false
-      : user!.email == 'eoeefosa@gmail.com' ||
-          user!.email == 'Torihd247@gmail.com' ||
-          user!.email == 'torihd247@gmail.com';
-
-  void getdarkmode() {}
-
-  void toggleDarkmode() {
-    _darkMode = !_darkMode;
-    notifyListeners();
-  }
-
-  set darkMode(bool thisdarkMode) {
-    _darkMode = thisdarkMode;
-    notifyListeners();
-  }
-
-  void setdarkMode(bool value) {
-    darkMode = value;
-    notifyListeners();
-  }
+      : _user!.email == 'rty@gmail.com' ||
+          _user!.email == 'Torihd247@gmail.com' ||
+          _user!.email == 'torihd247@gmail.com';
 }

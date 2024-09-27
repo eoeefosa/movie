@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:torihd/screens/home/trending/trending.dart';
 
 import '../../../models/movie.dart';
 import '../../../provider/movieprovider.dart';

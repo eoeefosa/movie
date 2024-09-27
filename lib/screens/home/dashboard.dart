@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:torihd/screens/home/trending/Movie.dart';
 import 'package:torihd/screens/home/trending/trending.dart';
 import 'package:torihd/screens/home/trending/tv_series.dart';

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:torihd/screens/auth/create_account.dart';
 import 'package:torihd/screens/auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:torihd/screens/home/widgets/threewaytoggle.dart';
+import 'package:torihd/styles/snack_bar.dart';
 
 import '../../provider/profile_manager.dart';
 import '../upload/uploadmovie.dart';
@@ -18,11 +19,19 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                hideSnackBar();
+                showsnackBar(userProfile.currentUser.toString());
+              },
+              icon: const Icon(Icons.ads_click))
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: userProfile.user == null
+          child: userProfile.currentUser == null
               ? SignedIn(userProfile: userProfile)
               : UnSigned(userProfile: userProfile),
         ),
@@ -41,9 +50,10 @@ class UnSigned extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         CachedNetworkImage(
-          imageUrl: userProfile.user!.photoURL == null
-              ? userProfile.profileImageUrl
-              : userProfile.user!.photoURL!,
+          imageUrl: (userProfile.currentUser != null &&
+                  userProfile.currentUser!.photoURL != null)
+              ? userProfile.currentUser!.photoURL!
+              : userProfile.profileImageUrl, // Use default profile image URL
           imageBuilder: (context, imageProvider) => CircleAvatar(
             radius: 50,
             backgroundImage: imageProvider,
@@ -64,7 +74,7 @@ class UnSigned extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text(userProfile.user!.email!),
+        Text(userProfile.currentUser!.email!),
         const SizedBox(height: 24),
         userProfile.isAdmin
             ? TextButton(
@@ -82,18 +92,35 @@ class UnSigned extends StatelessWidget {
               )
             : Container(),
         const SizedBox(height: 24),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
+        //     Switch(
+        //         value: userProfile.darkMode,
+        //         onChanged: (value) {
+        //           Provider.of<ProfileManager>(context, listen: false)
+        //               .setdarkMode(value);
+        //         })
+        //   ],
+        // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
-            Switch(
-                value: userProfile.darkMode,
-                onChanged: (value) {
-                  Provider.of<ProfileManager>(context, listen: false)
-                      .setdarkMode(value);
-                })
+            Text(
+              "Theme Mode",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            ThreeWayToggle(
+              themeMode: Provider.of<ProfileManager>(context).themeMode,
+              onChanged: (ThemeModeType newMode) {
+                Provider.of<ProfileManager>(context, listen: false)
+                    .setThemeMode(newMode);
+              },
+            ),
           ],
         ),
+
         const SizedBox(height: 24),
         const Text(
           'Favorite Movies',
@@ -111,6 +138,15 @@ class UnSigned extends StatelessWidget {
           },
         ),
         const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () {
+            Provider.of<ProfileManager>(context, listen: false).getUser();
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 50),
+            child: Text("get user"),
+          ),
+        ),
         ElevatedButton(
           onPressed: () {
             Provider.of<ProfileManager>(context, listen: false).signOut();
@@ -195,6 +231,31 @@ class SignedIn extends StatelessWidget {
                 ],
               ),
         const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Theme Mode",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            ThreeWayToggle(
+              themeMode: Provider.of<ProfileManager>(context).themeMode,
+              onChanged: (ThemeModeType newMode) {
+                Provider.of<ProfileManager>(context, listen: false)
+                    .setThemeMode(newMode);
+              },
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Provider.of<ProfileManager>(context, listen: false).getUser();
+          },
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 50),
+            child: Text("get user"),
+          ),
+        ),
         userProfile.isLogin
             ? Text(
                 userProfile.username,
@@ -224,18 +285,18 @@ class SignedIn extends StatelessWidget {
                 },
                 child: const Text("Upload Movie"))
             : Container(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
-            Switch(
-                value: userProfile.darkMode,
-                onChanged: (value) {
-                  Provider.of<ProfileManager>(context, listen: false)
-                      .setdarkMode(value);
-                })
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
+        //     Switch(
+        //         value: userProfile.darkMode,
+        //         onChanged: (value) {
+        //           Provider.of<ProfileManager>(context, listen: false)
+        //               .setdarkMode(value);
+        //         })
+        //   ],
+        // ),
         const SizedBox(height: 24),
         const Text(
           'Favorite Movies',

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_sizes/file_sizes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
 import 'package:video_player/video_player.dart';

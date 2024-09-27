@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/screens/upload/previewmovie.dart';
@@ -100,15 +99,20 @@ class _UploadMovieState extends State<UploadMovie> {
             : const Text("Edit Movie"),
         actions: [
           IconButton(
-            onPressed: () {
-              Provider.of<ProfileManager>(context, listen: false)
-                  .toggleDarkmode();
-              // setState(() {});
-            },
-            icon: Provider.of<ProfileManager>(context, listen: false).darkMode
-                ? const Icon(Icons.light_mode)
-                : const Icon(Icons.dark_mode),
-          )
+              onPressed: () {
+                Provider.of<ProfileManager>(context, listen: false)
+                    .toggleDarkmode();
+                // setState(() {});
+              },
+              icon: Icon(
+                Provider.of<ProfileManager>(context).themeMode ==
+                        ThemeModeType.light
+                    ? Icons.light_mode
+                    : Provider.of<ProfileManager>(context).themeMode ==
+                            ThemeModeType.dark
+                        ? Icons.dark_mode
+                        : Icons.brightness_auto, // For system theme mode
+              ))
         ],
       ),
       body: Form(
@@ -285,6 +289,91 @@ class _UploadMovieState extends State<UploadMovie> {
                   controller: sourceController,
                   decoration: const InputDecoration(
                     labelText: 'Source',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Country',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'cast(separated by commas)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Release date',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Language',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter the Youtube Trailer Link';
+                    }
+
+                    return null;
+                  },
+                  // onSaved: (value) => youtubeTrailerLink = value!,
+                ),
+                const SizedBox(height: 8.0),
+                TextFormField(
+                  controller: sourceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tags',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,

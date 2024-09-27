@@ -1,10 +1,9 @@
+import 'dart:async';
 import 'dart:io';
-import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_info/flutter_video_info.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:torihd/api/movie_api.dart';
 import 'package:torihd/styles/snack_bar.dart';
 
@@ -78,56 +77,70 @@ class MovieProvider extends ChangeNotifier {
     // Request storage permissions
     if (await Permission.storage.request().isGranted) {
       try {
-        final videoInfo = FlutterVideoInfo();
-
-        // Get the path of the Download directory
-        String downloadsPath =
-            await ExternalPath.getExternalStoragePublicDirectory(
-                ExternalPath.DIRECTORY_DOWNLOADS);
-        final downloadsDir = Directory('$downloadsPath/Tori');
-
-        // Check if the directory exists
-        if (!downloadsDir.existsSync()) {
-          print("Directory not found");
-          return;
-        }
-
-        // List video files in the directory
-        List<FileSystemEntity> videofiles = downloadsDir
-            .listSync(recursive: false, followLinks: false)
-            .where((file) =>
-                file is File &&
-                (file.path.endsWith('.mp4') ||
-                    file.path.endsWith('.mov') ||
-                    file.path.endsWith('.mkv') ||
-                    file.path.endsWith('.avi')))
-            .toList();
-
-        for (var file in videofiles) {
-          var info = await videoInfo.getVideoInfo(file.path);
-          if (info != null) {
-            // Handle potential null values in VideoData properties
-            info.title = info.title ?? 'Unknown Title';
-            print(info.title);
-            showsnackBar(info.title.toString());
-            info.filesize = info.filesize ?? 0;
-            info.path = info.path ?? 'Unknown Path';
-            info.orientation = info.orientation ?? 90;
-
-            videoData.add(info);
-          }
-        }
-        downloads = videofiles;
-        loadingdownloads = false;
+        // Start a timeout for the entire process
+        await Future.any([
+          _getVideoFiles(), // Call to the method that handles file retrieval
+          Future.delayed(const Duration(milliseconds: 5)).then((_) {
+            throw TimeoutException("Operation timed out");
+          }),
+        ]);
       } catch (e) {
         print(e);
-        rethrow;
+        loadingdownloads = false;
+        notifyListeners();
+        return; // Exit if there's an error or timeout
       }
+
+      loadingdownloads = false;
+      notifyListeners();
     } else {
       print("Storage permission not granted");
+      loadingdownloads = false;
+      notifyListeners();
+    }
+  }
+
+// Method to handle the retrieval of video files
+  Future<void> _getVideoFiles() async {
+    final videoInfo = FlutterVideoInfo();
+
+    // Get the path of the Download directory
+    String downloadsPath = await ExternalPath.getExternalStoragePublicDirectory(
+        ExternalPath.DIRECTORY_DOWNLOADS);
+    final downloadsDir = Directory('$downloadsPath/Tori');
+
+    // Check if the directory exists
+    if (!downloadsDir.existsSync()) {
+      print("Directory not found");
+      return;
     }
 
-    notifyListeners();
+    // List video files in the directory
+    List<FileSystemEntity> videofiles = downloadsDir
+        .listSync(recursive: false, followLinks: false)
+        .where((file) =>
+            file is File &&
+            (file.path.endsWith('.mp4') ||
+                file.path.endsWith('.mov') ||
+                file.path.endsWith('.mkv') ||
+                file.path.endsWith('.avi')))
+        .toList();
+
+    for (var file in videofiles) {
+      var info = await videoInfo.getVideoInfo(file.path);
+      if (info != null) {
+        // Handle potential null values in VideoData properties
+        info.title = info.title ?? 'Unknown Title';
+        print(info.title);
+        showsnackBar(info.title.toString());
+        info.filesize = info.filesize ?? 0;
+        info.path = info.path ?? 'Unknown Path';
+        info.orientation = info.orientation ?? 90;
+
+        videoData.add(info);
+      }
+    }
+    downloads = videofiles;
   }
 
   void fetchmovie() async {

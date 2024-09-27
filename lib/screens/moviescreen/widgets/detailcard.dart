@@ -14,7 +14,7 @@ class DetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProfileManager>(builder: (context, profileManager, child) {
       return Card(
-        color: profileManager.darkMode
+        color: profileManager.themeMode == ThemeModeType.dark
             ? Colors.grey.shade700
             : Colors.grey.shade200,
         shape: const RoundedRectangleBorder(),
@@ -23,7 +23,7 @@ class DetailCard extends StatelessWidget {
           child: Text(
             title,
             style: TextStyle(
-              color: profileManager.darkMode
+              color: profileManager.themeMode == ThemeModeType.dark
                   ? Colors.grey.shade100
                   : Colors.grey.shade900,
             ),

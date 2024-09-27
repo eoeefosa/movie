@@ -40,68 +40,70 @@ class _VideoplayerState extends State<Videoplayer> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(
-            height: 10.h,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.h),
-            child: Text(
-              "Choose your preference",
-              style: Theme.of(context).textTheme.headlineMedium,
+        return SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+              height: 8.h,
             ),
-          ),
-          ...[1, 2, 3, 4].map((option) {
-            return ListTile(
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-              trailing: ElevatedButton.icon(
-                onPressed: () {
-                  print("download started");
-                  Navigator.pop(context);
-                  // // Start download with selected quality
-                  Provider.of<DownloadProvider>(context, listen: false)
-                      .startDownload(downloadlink, filename);
-                },
-                label: const Text("Download"),
-                icon: const Icon(Icons.download),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: Text(
+                "Choose your preference",
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '480P Kali 289 AD[Telugu]',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '687.8mb',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                      SizedBox(
-                        width: 10.w,
-                      ),
-                      Text(
-                        '02:55:45',
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    'uploaded by admin',
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                ],
-              ),
-            );
-          }),
-          const Text("Tori HD"),
-          const Text("© 2024 best place for movie downloads")
-        ]);
+            ),
+            ...[1, 2, 3, 4].map((option) {
+              return ListTile(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                trailing: ElevatedButton.icon(
+                  onPressed: () {
+                    print("download started");
+                    Navigator.pop(context);
+                    // // Start download with selected quality
+                    Provider.of<DownloadProvider>(context, listen: false)
+                        .startDownload(downloadlink, filename);
+                  },
+                  label: const Text("Download"),
+                  icon: const Icon(Icons.download),
+                ),
+                title: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '480P Kali 289 AD[Telugu]',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '687.8mb',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        Text(
+                          '02:55:45',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'uploaded by admin',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const Text("Tori HD"),
+            const Text("© 2024 best place for movie downloads")
+          ]),
+        );
       },
     );
   }
@@ -277,7 +279,7 @@ class _VideoplayerState extends State<Videoplayer> {
             return Text(
               movieProvider.currentmovieinfo?.title ?? "ERROR Getting Movie",
               style: TextStyle(
-                color: profileManager.darkMode
+                color: profileManager.themeMode == ThemeModeType.dark
                     ? Colors.white
                     : Colors.grey.shade900,
               ),
@@ -285,7 +287,7 @@ class _VideoplayerState extends State<Videoplayer> {
           }),
         ),
         bottomNavigationBar: Padding(
-          padding: EdgeInsets.all(8.w),
+          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
           child: ElevatedButton.icon(
             icon: const Icon(
               Icons.download,
@@ -312,148 +314,166 @@ class _VideoplayerState extends State<Videoplayer> {
             player,
             gap,
             _buildAdvertsWidget(), // Insert Ad Widget here
-            gap,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    movieProvider.currentmovieinfo?.title ??
-                        "Error getting movie",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.sp,
-                        color: Colors.green.shade900),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  gap,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          movieProvider.currentmovieinfo?.title ??
+                              "Error getting movie",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24.sp,
+                              color: Colors.green.shade900),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
+                  gap,
+                  Row(
+                    children: [
+                      Text(
+                        "Description",
+                        style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green.shade700),
+                      ),
+                    ],
+                  ),
+                  Text(movieProvider.currentmovieinfo?.description ??
+                      "Error Getting"),
+                  gap,
+                ],
+              ),
             ),
-            gap,
-            Row(
-              children: [
-                Text(
-                  "Description",
-                  style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700),
-                ),
-              ],
-            ),
-            Text(
-                movieProvider.currentmovieinfo?.description ?? "Error Getting"),
-            gap,
             _buildAdvertsWidget(), // Insert Ad Widget here
             gap,
-            SizedBox(
-              height: 250.h,
-              child: Table(
-                columnWidths: const {
-                  0: FlexColumnWidth(),
-                  1: FlexColumnWidth(),
-                },
-                defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                children: [
-                  TableRow(
-                    children: [
-                      const Text("Type"),
-                      Text(
-                        movieProvider.currentmovieinfo?.type ?? "Unknown",
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ],
-                  ),
-                  const TableRow(
-                    children: [
-                      Text("Release Date"),
-                      Text(
-                        // movieProvider.currentmovieinfo?.releaseDate ??
-                        "Unknown",
-                      ),
-                    ],
-                  ),
-                  const TableRow(
-                    children: [
-                      Text("Country"),
-                      Text(
-                        // movieProvider.currentmovieinfo?.country ??
-                        "Unknown",
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      const Text("Language"),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        children: [
-                          "English",
-                          "Swahili",
-                        ].map(
-                          (e) {
-                            return DetailCard(
-                              title: e,
-                            );
-                          },
-                        ).toList(),
-                      ),
-                    ],
-                  ),
-                  const TableRow(
-                    children: [
-                      Text("Genre"),
-                      Text(
-                        // movieProvider.currentmovieinfo?.genre ??
-                        "Unknown",
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      const Text("Cast"),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: 8.0,
-                        runSpacing: 4.0,
-                        children: [
-                          "Sarah Hassan",
-                          "Lenaana Kariba",
-                          "Lenaana Kariba",
-                        ].map(
-                          (e) {
-                            return DetailCard(
-                              title: e,
-                            );
-                          },
-                        ).toList(),
-                      ),
-                    ],
-                  ),
-                  TableRow(
-                    children: [
-                      const Text("Source"),
-                      Text(movieProvider.currentmovieinfo?.source ?? "Unknown"),
-                    ],
-                  ),
-                ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SizedBox(
+                height: 250.h,
+                child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(),
+                    1: FlexColumnWidth(),
+                  },
+                  defaultVerticalAlignment: TableCellVerticalAlignment.top,
+                  children: [
+                    TableRow(
+                      children: [
+                        const Text("Type"),
+                        Text(
+                          movieProvider.currentmovieinfo?.type ?? "Unknown",
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ),
+                    const TableRow(
+                      children: [
+                        Text("Release Date"),
+                        Text(
+                          // movieProvider.currentmovieinfo?.releaseDate ??
+                          "Unknown",
+                        ),
+                      ],
+                    ),
+                    const TableRow(
+                      children: [
+                        Text("Country"),
+                        Text(
+                          // movieProvider.currentmovieinfo?.country ??
+                          "Unknown",
+                        ),
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        const Text("Language"),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          children: [
+                            "English",
+                            "Swahili",
+                          ].map(
+                            (e) {
+                              return DetailCard(
+                                title: e,
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      ],
+                    ),
+                    const TableRow(
+                      children: [
+                        Text("Genre"),
+                        Text(
+                          // movieProvider.currentmovieinfo?.genre ??
+                          "Unknown",
+                        ),
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        const Text("Cast"),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          children: [
+                            "Sarah Hassan",
+                            "Lenaana Kariba",
+                            "Lenaana Kariba",
+                          ].map(
+                            (e) {
+                              return DetailCard(
+                                title: e,
+                              );
+                            },
+                          ).toList(),
+                        ),
+                      ],
+                    ),
+                    TableRow(
+                      children: [
+                        const Text("Source"),
+                        Text(movieProvider.currentmovieinfo?.source ??
+                            "Unknown"),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 20.h),
             gap,
             _buildAdvertsWidget(), // Insert Ad Widget here
             gap,
-            Row(
-              children: [
-                Text(
-                  "Related Movies",
-                  style: TextStyle(
-                      color: Colors.green.shade700,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Related Movies",
+                        style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10.h),
+                ],
+              ),
             ),
-            SizedBox(height: 10.h),
             SizedBox(
               height: 300.h,
               child: GridView.builder(
