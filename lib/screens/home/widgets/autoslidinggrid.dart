@@ -91,7 +91,7 @@ class _AutoSlidingGridViewState extends State<AutoSlidingGridView> {
                       context,
                       MaterialPageRoute<void>(
                         builder: (BuildContext context) => Videoplayer(
-                          movieid: currentmovie.id,
+                          movieid: currentmovie.id!,
                           type: currentmovie.type,
                           youtubeid: currentmovie.youtubetrailer,
                         ),

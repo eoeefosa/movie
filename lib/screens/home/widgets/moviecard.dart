@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart'; // Import the Shimmer package
+import 'package:torihd/models/movie.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
@@ -19,8 +20,9 @@ class MovieCard extends StatefulWidget {
     required this.detail,
     required this.description,
     required this.downloadlink,
-    required this.source,
-    this.isLoading = false, // Add isLoading parameter with default value
+    this.source,
+    this.isLoading = false,
+    required this.movie, // Add isLoading parameter with default value
   });
 
   final String title;
@@ -30,9 +32,10 @@ class MovieCard extends StatefulWidget {
   final String detail;
   final String description;
   final String downloadlink;
-  final String source;
+  final String? source;
   final String type;
   final String youtubeid;
+  final Movie movie;
   final bool isLoading; // Flag to check if the card is loading
 
   @override
@@ -40,6 +43,179 @@ class MovieCard extends StatefulWidget {
 }
 
 class _MovieCardState extends State<MovieCard> {
+  @override
+  Widget build(BuildContext context) {
+    return widget.isLoading
+        ? _buildShimmerCard() // Show shimmer card when loading
+        : _buildMovieCard(); // Show actual movie card when not loading
+  }
+
+  Widget _buildMovieCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: CachedNetworkImage(
+              imageUrl: widget.imgUrl,
+              height: 200.h, // Set height to 100
+              width: double.infinity,
+              fit: BoxFit.cover, // Ensures the image covers the available space
+              placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              widget.title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Rating: ${widget.rating}",
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                ),
+                const Icon(Icons.star, color: Colors.amber, size: 11),
+              ],
+            ),
+          ),
+          Consumer<ProfileManager>(builder: (context, profileProvider, child) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(widget.source ?? "unkown"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      "Admin",
+                      style: TextStyle(
+                        color: Colors.purple.shade900,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    profileProvider.isAdmin
+                        ? PopupMenuButton<String>(
+                            icon: const RotatedBox(
+                                quarterTurns: 1, child: Icon(Icons.more_horiz)),
+                            onSelected: (String result) {
+                              _onSelectedMenuOption(context, result);
+                            },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<String>>[
+                              PopupMenuItem<String>(
+                                value: 'delete',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Delete movie',
+                                    style:
+                                        TextStyle(color: Colors.red.shade700),
+                                  ),
+                                  icon: Icon(Icons.delete,
+                                      color: Colors.red.shade700),
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'edit',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Edit movie',
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700),
+                                  ),
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ),
+                              PopupMenuItem<String>(
+                                value: 'trend',
+                                child: TextButton.icon(
+                                  onPressed: null,
+                                  label: Text(
+                                    'Make Trending',
+                                    style: TextStyle(
+                                        color: Colors.yellow.shade700),
+                                  ),
+                                  icon: Icon(
+                                    Icons.star,
+                                    color: Colors.yellow.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(),
+                  ],
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 200.h,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 14.h,
+                width: 100.w,
+                color: Colors.grey,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0.h),
+              child: Container(
+                height: 11.h,
+                width: 60.w,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8.h),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showAlertDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -97,167 +273,12 @@ class _MovieCardState extends State<MovieCard> {
               downloadlink: widget.downloadlink,
               source: widget.source,
               youtubelink: widget.youtubeid,
+              movie: widget.movie,
+              id: widget.movieid,
             ),
           ),
         );
         break;
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.isLoading
-        ? _buildShimmerCard() // Show shimmer card when loading
-        : _buildMovieCard(); // Show actual movie card when not loading
-  }
-
-  Widget _buildShimmerCard() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 200.h,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 14.h,
-                width: 100.w,
-                color: Colors.grey,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0.h),
-              child: Container(
-                height: 11.h,
-                width: 60.w,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 8.h),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMovieCard() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: CachedNetworkImage(
-              imageUrl: widget.imgUrl,
-              height: 200.h, // Set height to 100
-              width: double.infinity,
-              fit: BoxFit.cover, // Ensures the image covers the available space
-              placeholder: (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              widget.title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Rating: ${widget.rating}",
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                ),
-                const Icon(Icons.star, color: Colors.amber, size: 11),
-              ],
-            ),
-          ),
-          Consumer<ProfileManager>(builder: (context, profileProvider, child) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(widget.source),
-                profileProvider.isAdmin
-                    ? PopupMenuButton<String>(
-                        icon: const RotatedBox(
-                            quarterTurns: 1, child: Icon(Icons.more_horiz)),
-                        onSelected: (String result) {
-                          _onSelectedMenuOption(context, result);
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'delete',
-                            child: TextButton.icon(
-                              onPressed: null,
-                              label: Text(
-                                'Delete movie',
-                                style: TextStyle(color: Colors.red.shade700),
-                              ),
-                              icon: Icon(Icons.delete,
-                                  color: Colors.red.shade700),
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'edit',
-                            child: TextButton.icon(
-                              onPressed: null,
-                              label: Text(
-                                'Edit movie',
-                                style: TextStyle(color: Colors.grey.shade700),
-                              ),
-                              icon: Icon(
-                                Icons.edit,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'trend',
-                            child: TextButton.icon(
-                              onPressed: null,
-                              label: Text(
-                                'Make Trending',
-                                style: TextStyle(color: Colors.yellow.shade700),
-                              ),
-                              icon: Icon(
-                                Icons.star,
-                                color: Colors.yellow.shade700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Container(),
-              ],
-            );
-          }),
-        ],
-      ),
-    );
   }
 }

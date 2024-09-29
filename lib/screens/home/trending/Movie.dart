@@ -72,19 +72,20 @@ class _MovieswithProviderState extends State<MovieswithProvider> {
                     context,
                     MaterialPageRoute<void>(
                       builder: (BuildContext context) => Videoplayer(
-                        movieid: movie.id,
+                        movieid: movie.id!,
                         type: movie.type,
                         youtubeid: movie.youtubetrailer,
                       ),
                     ),
                   ),
                   child: MovieCard(
+                    movie: movie,
                     title: movie.title,
                     type: movie.type,
                     imgUrl: movie.movieImgurl,
                     rating: movie.rating,
                     youtubeid: movie.youtubetrailer,
-                    movieid: movie.id,
+                    movieid: movie.id!,
                     description: movie.description,
                     detail: movie.detail,
                     downloadlink: movie.downloadlink,

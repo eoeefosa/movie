@@ -35,79 +35,6 @@ class _VideoplayerState extends State<Videoplayer> {
   late YoutubeMetaData _videoMetaData;
   bool _isPlayerReady = false;
 
-  void _showQualityOptions(
-      BuildContext context, String downloadlink, String filename) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(
-              height: 8.h,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.h),
-              child: Text(
-                "Choose your preference",
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-            ...[1, 2, 3, 4].map((option) {
-              return ListTile(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                trailing: ElevatedButton.icon(
-                  onPressed: () {
-                    print("download started");
-                    Navigator.pop(context);
-                    // // Start download with selected quality
-                    Provider.of<DownloadProvider>(context, listen: false)
-                        .startDownload(downloadlink, filename);
-                  },
-                  label: const Text("Download"),
-                  icon: const Icon(Icons.download),
-                ),
-                title: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '480P Kali 289 AD[Telugu]',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '687.8mb',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Text(
-                          '02:55:45',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'uploaded by admin',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ],
-                ),
-              );
-            }),
-            const Text("Tori HD"),
-            const Text("© 2024 best place for movie downloads")
-          ]),
-        );
-      },
-    );
-  }
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -374,21 +301,20 @@ class _VideoplayerState extends State<Videoplayer> {
                         ),
                       ],
                     ),
-                    const TableRow(
+                    TableRow(
                       children: [
-                        Text("Release Date"),
+                        const Text("Release Date"),
                         Text(
-                          // movieProvider.currentmovieinfo?.releaseDate ??
-                          "Unknown",
+                          movieProvider.currentmovieinfo?.releasedate ??
+                              "Unknown",
                         ),
                       ],
                     ),
-                    const TableRow(
+                    TableRow(
                       children: [
-                        Text("Country"),
+                        const Text("Country"),
                         Text(
-                          // movieProvider.currentmovieinfo?.country ??
-                          "Unknown",
+                          movieProvider.currentmovieinfo?.country ?? "Unknown",
                         ),
                       ],
                     ),
@@ -397,25 +323,31 @@ class _VideoplayerState extends State<Videoplayer> {
                         const Text("Language"),
                         Wrap(
                           alignment: WrapAlignment.start,
-                          children: [
-                            "English",
-                            "Swahili",
-                          ].map(
-                            (e) {
-                              return DetailCard(
-                                title: e,
-                              );
-                            },
-                          ).toList(),
+                          children:
+                              movieProvider.currentmovieinfo?.language?.map(
+                                    (e) {
+                                      return DetailCard(
+                                        title: e,
+                                      );
+                                    },
+                                  ).toList() ??
+                                  [
+                                    "English",
+                                  ].map(
+                                    (e) {
+                                      return DetailCard(
+                                        title: e,
+                                      );
+                                    },
+                                  ).toList(),
                         ),
                       ],
                     ),
-                    const TableRow(
+                    TableRow(
                       children: [
-                        Text("Genre"),
+                        const Text("Genre"),
                         Text(
-                          // movieProvider.currentmovieinfo?.genre ??
-                          "Unknown",
+                          movieProvider.currentmovieinfo?.genre ?? "Unknown",
                         ),
                       ],
                     ),
@@ -426,17 +358,22 @@ class _VideoplayerState extends State<Videoplayer> {
                           alignment: WrapAlignment.start,
                           spacing: 8.0,
                           runSpacing: 4.0,
-                          children: [
-                            "Sarah Hassan",
-                            "Lenaana Kariba",
-                            "Lenaana Kariba",
-                          ].map(
-                            (e) {
-                              return DetailCard(
-                                title: e,
-                              );
-                            },
-                          ).toList(),
+                          children: movieProvider.currentmovieinfo?.cast?.map(
+                                (e) {
+                                  return DetailCard(
+                                    title: e,
+                                  );
+                                },
+                              ).toList() ??
+                              [
+                                "Unknown",
+                              ].map(
+                                (e) {
+                                  return DetailCard(
+                                    title: e,
+                                  );
+                                },
+                              ).toList(),
                         ),
                       ],
                     ),
@@ -475,7 +412,8 @@ class _VideoplayerState extends State<Videoplayer> {
               ),
             ),
             SizedBox(
-              height: 300.h,
+              height:
+                  Provider.of<ProfileManager>(context).isAdmin ? 320.h : 300.h,
               child: GridView.builder(
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -492,17 +430,18 @@ class _VideoplayerState extends State<Videoplayer> {
                       context,
                       MaterialPageRoute<void>(
                         builder: (BuildContext context) => Videoplayer(
-                          movieid: currentmovie.id,
+                          movieid: currentmovie.id!,
                           type: currentmovie.type,
                           youtubeid: currentmovie.youtubetrailer,
                         ),
                       ),
                     ),
                     child: MovieCard(
+                      movie: currentmovie,
                       title: currentmovie.title,
                       imgUrl: currentmovie.movieImgurl,
                       rating: currentmovie.rating,
-                      movieid: currentmovie.id,
+                      movieid: currentmovie.id!,
                       type: currentmovie.type,
                       youtubeid: currentmovie.youtubetrailer,
                       detail: currentmovie.detail,
@@ -520,6 +459,79 @@ class _VideoplayerState extends State<Videoplayer> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showQualityOptions(
+      BuildContext context, String downloadlink, String filename) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(
+              height: 8.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              child: Text(
+                "Choose your preference",
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            ...[1, 2, 3, 4].map((option) {
+              return ListTile(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                trailing: ElevatedButton.icon(
+                  onPressed: () {
+                    print("download started");
+                    Navigator.pop(context);
+                    // // Start download with selected quality
+                    Provider.of<DownloadProvider>(context, listen: false)
+                        .startDownload(downloadlink, filename);
+                  },
+                  label: const Text("Download"),
+                  icon: const Icon(Icons.download),
+                ),
+                title: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '480P Kali 289 AD[Telugu]',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '687.8mb',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        Text(
+                          '02:55:45',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'uploaded by admin',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              );
+            }),
+            const Text("Tori HD"),
+            const Text("© 2024 best place for movie downloads")
+          ]),
+        );
+      },
     );
   }
 }

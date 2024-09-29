@@ -144,10 +144,16 @@ class MovieProvider extends ChangeNotifier {
   }
 
   void fetchmovie() async {
+    print("fetch");
     _movieisloading = true;
     notifyListeners();
-    final moviesList = await api.fetchmovies();
-    // print(moviesList);
+
+    
+  final moviesList = await api.fetchmovies();
+  for (var movie in moviesList) {
+    print("Title: ${movie.title}, ID: ${movie.id}"); // Check if 'id' is printed
+  }
+
     movies = moviesList;
     _searchResults = movies; // Initialize search results
     _movieisloading = false;

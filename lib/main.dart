@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 // import 'package:al_downloader/al_downloader.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +31,6 @@ Future<void> main() async {
   // ALDownloader.initialize();
   // ALDownloader.configurePrint(true, frequentEnabled: false);
   // await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
-
   AdsController? adsController;
   if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
     adsController = AdsController(instance: MobileAds.instance);
@@ -99,7 +99,6 @@ class _ToriState extends State<Tori> {
       ],
       child: Consumer<ProfileManager>(
         builder: (context, profileManager, child) {
-       
           final router = _appRouter.router;
 
           return ScreenUtilInit(

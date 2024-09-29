@@ -98,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => Videoplayer(
-                                      movieid: movie.id,
+                                      movieid: movie.id!,
                                       type: movie.type,
                                       youtubeid: movie.youtubetrailer,
                                     ),

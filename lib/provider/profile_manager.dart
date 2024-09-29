@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:torihd/api/movie_api.dart';
+import 'package:torihd/cache/local_setting_persistence.dart';
 import 'package:torihd/styles/snack_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_calls/auth.dart';
 import '../models/movie.dart';
@@ -11,19 +14,41 @@ enum ThemeModeType { light, dark, system }
 
 class ProfileManager extends ChangeNotifier {
   ThemeModeType _themeMode = ThemeModeType.system;
+  LocalSettingPersistence localSettingPersistence = LocalSettingPersistence();
+
+  ProfileManager() {
+    init();
+  }
+
+  Future<void> init() async {
+    checkIfLoggedIn();
+    _themeMode = await localSettingPersistence.gettheme();
+    // Initialize user
+    final token = await localSettingPersistence.gettoken();
+    if (token != null) {
+      await _getUserFromToken(token);
+    }
+    notifyListeners();
+  }
 
   ThemeModeType get themeMode => _themeMode;
 
   void setThemeMode(ThemeModeType mode) {
     _themeMode = mode;
+    localSettingPersistence.settheme(mode);
     notifyListeners();
   }
 
   void toggleDarkmode() {
     if (_themeMode == ThemeModeType.light) {
       _themeMode = ThemeModeType.dark;
+      localSettingPersistence.settheme(themeMode);
+    } else if (_themeMode == ThemeModeType.dark) {
+      _themeMode = ThemeModeType.system;
+      localSettingPersistence.settheme(themeMode);
     } else {
       _themeMode = ThemeModeType.light;
+      localSettingPersistence.settheme(themeMode);
     }
     notifyListeners();
   }
@@ -45,20 +70,35 @@ class ProfileManager extends ChangeNotifier {
   Future<void> updateMovie(Movie movie) async {
     MovieApi api = MovieApi();
     try {
-      await api.updateMovieById(movie.id, movie.type, {
+      await api.updateMovieById(movie.id!, movie.type, {
         ...movie.toMap(),
         'edited timestamp': FieldValue.serverTimestamp(),
       });
       notifyListeners();
     } catch (e) {
+      print(e);
       rethrow;
     }
   }
 
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   User? _user;
   User? get currentUser => _user;
+
+  Future<void> _getUserFromToken(String token) async {
+    try {
+      // // Use FirebaseAuth to get the user from the token
+      // final userCredential =
+      //     await FirebaseAuth.instance.signInWithCustomToken(token);
+      // _user = userCredential.user;
+    } catch (e) {
+      print('Failed to get user from token: $e');
+      _user = null; // Clear user on failure
+    }
+    notifyListeners();
+  }
 
   Future<void> signIn(String email, String password) async {
     try {
@@ -68,6 +108,17 @@ class ProfileManager extends ChangeNotifier {
       // Check if the user is not null and assign to _user
       _user = result.user;
       print("Sign-in successful: ${_user?.email}"); // Debug log
+
+      // Save the user's token
+      String? token = await _user!.getIdToken(); // Get the user's ID token
+      if (token != null) {
+        // Store token in SharedPreferences with an expiration of 24 hours
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_token', token);
+        await prefs.setString('token_timestamp',
+            DateTime.now().toIso8601String()); // Store timestamp of login
+      }
+
       isLogin = true;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
@@ -81,6 +132,32 @@ class ProfileManager extends ChangeNotifier {
     } catch (e) {
       print("Unexpected error: $e"); // Improved error logging
       rethrow;
+    }
+  }
+
+  Future<void> checkIfLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('user_token');
+    String? tokenTimestamp = prefs.getString('token_timestamp');
+
+    if (token != null && tokenTimestamp != null) {
+      DateTime loginTime = DateTime.parse(tokenTimestamp);
+      Duration timeSinceLogin = DateTime.now().difference(loginTime);
+
+      // Check if token is still valid (within 24 hours)
+      if (timeSinceLogin.inHours < 24) {
+        // Token is valid, the user remains signed in
+        User? user = FirebaseAuth.instance.currentUser;
+        _user = user;
+        if (user != null) {
+          isLogin = true;
+        }
+        print("User is still logged in.");
+      } else {
+        // Token has expired, log out the user
+        await signOut();
+        print("Session expired, logging out.");
+      }
     }
   }
 

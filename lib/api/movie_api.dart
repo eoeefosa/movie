@@ -38,10 +38,9 @@ class MovieApi {
       final movies = await firestore.collection('Movie').get();
       final moviesdat = movies.docs.map((doc) {
         final data = doc.data();
-        data['id'] = doc.id;
+        data['id'] = doc.id; // Add the 'id' to the data map
         return data;
       }).toList();
-
       final List<Movie> movieslist = moviesdat.map((movie) {
         return Movie.fromMap(movie);
       }).toList();
@@ -158,6 +157,7 @@ class MovieApi {
   Future<void> updateMovieById(
       String id, String type, Map<String, dynamic> updatedData) async {
     try {
+      print(id);
       await firestore.collection(type).doc(id).update(updatedData);
       debugPrint('Movie updated successfully');
     } on FirebaseException catch (e) {

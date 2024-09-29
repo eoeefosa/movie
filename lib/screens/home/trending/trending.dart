@@ -65,7 +65,7 @@ class _TrendingState extends State<Trending> {
                             context,
                             MaterialPageRoute<void>(
                               builder: (BuildContext context) => Videoplayer(
-                                movieid: item.id,
+                                movieid: item.id!,
                                 type: item.type,
                                 youtubeid: item.youtubetrailer,
                               ),
@@ -165,7 +165,7 @@ class _TrendingState extends State<Trending> {
                           imgUrl: topPick.movieImgurl,
                           rating: topPick.rating,
                           youtubeid: topPick.youtubetrailer,
-                          movieid: topPick.id,
+                          movieid: topPick.id!,
                           movie: topPick,
                         );
                       }

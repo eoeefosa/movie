@@ -53,7 +53,7 @@ class _TVSeriesState extends State<TVSeries> {
                 imgUrl: tvserie.movieImgurl,
                 rating: tvserie.rating,
                 youtubeid: tvserie.youtubetrailer,
-                movieid: tvserie.id,
+                movieid: tvserie.id!,
                 movie: tvserie,
               );
             },

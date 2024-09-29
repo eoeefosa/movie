@@ -92,18 +92,6 @@ class UnSigned extends StatelessWidget {
               )
             : Container(),
         const SizedBox(height: 24),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-        //     Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
-        //     Switch(
-        //         value: userProfile.darkMode,
-        //         onChanged: (value) {
-        //           Provider.of<ProfileManager>(context, listen: false)
-        //               .setdarkMode(value);
-        //         })
-        //   ],
-        // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -120,7 +108,6 @@ class UnSigned extends StatelessWidget {
             ),
           ],
         ),
-
         const SizedBox(height: 24),
         const Text(
           'Favorite Movies',
@@ -138,15 +125,6 @@ class UnSigned extends StatelessWidget {
           },
         ),
         const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () {
-            Provider.of<ProfileManager>(context, listen: false).getUser();
-          },
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50),
-            child: Text("get user"),
-          ),
-        ),
         ElevatedButton(
           onPressed: () {
             Provider.of<ProfileManager>(context, listen: false).signOut();
@@ -247,15 +225,7 @@ class SignedIn extends StatelessWidget {
             ),
           ],
         ),
-        ElevatedButton(
-          onPressed: () {
-            Provider.of<ProfileManager>(context, listen: false).getUser();
-          },
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50),
-            child: Text("get user"),
-          ),
-        ),
+
         userProfile.isLogin
             ? Text(
                 userProfile.username,

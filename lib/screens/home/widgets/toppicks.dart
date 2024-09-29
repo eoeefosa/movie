@@ -35,6 +35,170 @@ class TopPickCard extends StatefulWidget {
 }
 
 class _TopPickCardState extends State<TopPickCard> {
+  @override
+  Widget build(BuildContext context) {
+    // Calculate the width and height based on the screen width
+    double cardWidth = 120.w;
+    double cardHeight = 160.h;
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => Videoplayer(
+                movieid: widget.movieid,
+                type: widget.type,
+                youtubeid: widget.youtubeid,
+              ),
+            ),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            constraints: BoxConstraints.expand(
+              width: cardWidth,
+              height: cardHeight,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                colorFilter: const ColorFilter.srgbToLinearGamma(),
+                image: CachedNetworkImageProvider(widget.imgUrl),
+                fit: BoxFit.cover,
+              ),
+              // backgroundBlendMode: BlendMode.darken,
+              // color: Colors.black.withOpacity(),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(8.0),
+              ),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Consumer<ProfileManager>(
+                    builder: (context, profileProvider, child) {
+                  return profileProvider.isAdmin
+                      ? Positioned(
+                          top: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Admin",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12.sp),
+                              ),
+                              PopupMenuButton<String>(
+                                surfaceTintColor: Colors.white,
+                                elevation: 2,
+                                icon: Icon(
+                                  Icons.more_vert,
+                                  color: Colors.white,
+                                  size: 15.sp,
+                                ),
+                                onSelected: (String result) {
+                                  _onSelectedMenuOption(context, result);
+                                },
+                                itemBuilder: (BuildContext context) =>
+                                    <PopupMenuEntry<String>>[
+                                  PopupMenuItem<String>(
+                                    value: 'delete',
+                                    child: TextButton.icon(
+                                      onPressed: null,
+                                      label: Text(
+                                        'Delete movie',
+                                        style: TextStyle(
+                                            color: Colors.red.shade700),
+                                      ),
+                                      icon: Icon(Icons.delete,
+                                          color: Colors.red.shade700),
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'edit',
+                                    child: TextButton.icon(
+                                      onPressed: null,
+                                      label: Text(
+                                        'Edit movie',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade700),
+                                      ),
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'trend',
+                                    child: TextButton.icon(
+                                      onPressed: null,
+                                      label: Text(
+                                        'Make Trending',
+                                        style: TextStyle(
+                                            color: Colors.yellow.shade700),
+                                      ),
+                                      icon: Icon(
+                                        Icons.star,
+                                        color: Colors.yellow.shade700,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      : Container();
+                }),
+                const Positioned(
+                  bottom: 4,
+                  left: 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 4.0, right: 2.0),
+                    child: Icon(
+                      Icons.download,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 4,
+                  right: 0,
+                  child: Text(
+                    widget.rating,
+                    style: ToriTheme.darkTextTheme.bodySmall,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          width: cardWidth,
+          child: Text(
+            widget.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: cardWidth,
+          child: Text(
+            widget.type,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        )
+      ],
+    );
+  }
+
   void _showAlertDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -95,161 +259,13 @@ class _TopPickCardState extends State<TopPickCard> {
               downloadlink: widget.movie.downloadlink,
               source: widget.movie.source,
               youtubelink: widget.youtubeid,
+              movie: widget.movie,
+              id: widget.movieid,
             ),
           ),
         );
 // Perform edit action
         break;
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    // Calculate the width and height based on the screen width
-    double cardWidth = 120.w;
-    double cardHeight = 160.h;
-
-    return Column(
-      children: [
-        InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => Videoplayer(
-                movieid: widget.movieid,
-                type: widget.type,
-                youtubeid: widget.youtubeid,
-              ),
-            ),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            constraints: BoxConstraints.expand(
-              width: cardWidth,
-              height: cardHeight,
-            ),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                colorFilter: const ColorFilter.srgbToLinearGamma(),
-                image: CachedNetworkImageProvider(widget.imgUrl),
-                fit: BoxFit.cover,
-              ),
-              // backgroundBlendMode: BlendMode.darken,
-              // color: Colors.black.withOpacity(),
-              borderRadius: const BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Consumer<ProfileManager>(
-                    builder: (context, profileProvider, child) {
-                  return profileProvider.isAdmin
-                      ? Positioned(
-                          top: 4,
-                          right: 0,
-                          child: PopupMenuButton<String>(
-                            // surfaceTintColor: Colors.yellow,
-                            elevation: 2,
-                            icon: const RotatedBox(
-                                quarterTurns: 1, child: Icon(Icons.more_horiz)),
-                            onSelected: (String result) {
-                              _onSelectedMenuOption(context, result);
-                            },
-                            itemBuilder: (BuildContext context) =>
-                                <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                value: 'delete',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Delete movie',
-                                    style:
-                                        TextStyle(color: Colors.red.shade700),
-                                  ),
-                                  icon: Icon(Icons.delete,
-                                      color: Colors.red.shade700),
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'edit',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Edit movie',
-                                    style:
-                                        TextStyle(color: Colors.grey.shade700),
-                                  ),
-                                  icon: Icon(
-                                    Icons.edit,
-                                    color: Colors.grey.shade700,
-                                  ),
-                                ),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'trend',
-                                child: TextButton.icon(
-                                  onPressed: null,
-                                  label: Text(
-                                    'Make Trending',
-                                    style: TextStyle(
-                                        color: Colors.yellow.shade700),
-                                  ),
-                                  icon: Icon(
-                                    Icons.star,
-                                    color: Colors.yellow.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ))
-                      : Container();
-                }),
-                const Positioned(
-                  bottom: 4,
-                  left: 0,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 4.0, right: 2.0),
-                    child: Icon(
-                      Icons.download,
-                      size: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 4,
-                  right: 0,
-                  child: Text(
-                    widget.rating,
-                    style: ToriTheme.darkTextTheme.bodySmall,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          width: cardWidth,
-          child: Text(
-            widget.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        ),
-        SizedBox(
-          width: cardWidth,
-          child: Text(
-            widget.type,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        )
-      ],
-    );
   }
 }

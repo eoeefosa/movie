@@ -19,6 +19,13 @@ class UploadMovie extends StatefulWidget {
     this.downloadlink,
     this.youtubelink,
     this.source,
+    this.country,
+    this.cast,
+    this.releasedate,
+    this.language,
+    this.tags,
+    this.id,
+    this.movie,
   });
 
   final String? imageUrl;
@@ -30,6 +37,13 @@ class UploadMovie extends StatefulWidget {
   final String? downloadlink;
   final String? youtubelink;
   final String? source;
+  final String? country;
+  final String? cast;
+  final String? releasedate;
+  final String? language;
+  final String? tags;
+  final String? id;
+  final Movie? movie;
 
   @override
   State<UploadMovie> createState() => _UploadMovieState();
@@ -57,40 +71,75 @@ class _UploadMovieState extends State<UploadMovie> {
     return '';
   }
 
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController movieTitleController = TextEditingController();
+  final TextEditingController movieImageUrl = TextEditingController();
+  final TextEditingController detailsController = TextEditingController();
+  final TextEditingController ratingController = TextEditingController();
+  final TextEditingController movieDescriptionController =
+      TextEditingController();
+  final TextEditingController downloadlinkController = TextEditingController();
+  final TextEditingController youtubeTrailerlinkController =
+      TextEditingController();
+  final TextEditingController sourceController = TextEditingController();
+  final TextEditingController countryController = TextEditingController();
+  final TextEditingController castController = TextEditingController();
+  final TextEditingController releasedateController = TextEditingController();
+  final TextEditingController languageController = TextEditingController();
+  final TextEditingController tagsController = TextEditingController();
+  final List<TextEditingController> controllers = [];
+
+  @override
+  void dispose() {
+    for (var controller in controllers) {
+      controller.dispose();
+    }
+
+    super.dispose();
+  }
+
+  void addLinkField() {
+    setState(() {
+      controllers.add(TextEditingController());
+    });
+  }
+
+  void removeLinkField(int index) {
+    setState(() {
+      controllers[index].dispose();
+      controllers.removeAt(index);
+    });
+  }
+
+  void submit() {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState?.save();
+      // Perform the login action here, e.g., send the email and password to your server
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Logging in...')));
+    }
+  }
+
+  final ProfileManager userProfile = ProfileManager();
+
   @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final TextEditingController movieTitleController = TextEditingController();
+    print(widget.cast);
     movieTitleController.text = widget.title ?? '';
-    final TextEditingController movieImageUrl = TextEditingController();
     movieImageUrl.text = widget.imageUrl ?? '';
-    final TextEditingController detailsController = TextEditingController();
     detailsController.text = widget.detail ?? '';
-    final TextEditingController ratingController = TextEditingController();
     ratingController.text = widget.rating ?? '';
-    final TextEditingController movieDescriptionController =
-        TextEditingController();
     movieDescriptionController.text = widget.description ?? '';
-    final TextEditingController downloadlinkController =
-        TextEditingController();
     downloadlinkController.text = widget.downloadlink ?? '';
-    final TextEditingController youtubeTrailerlinkController =
-        TextEditingController();
-    final TextEditingController sourceController = TextEditingController();
     youtubeTrailerlinkController.text = widget.youtubelink ?? '';
     final newlink = convertIdToUrl(youtubeTrailerlinkController.text);
     youtubeTrailerlinkController.text = newlink;
-
-    void submit() {
-      if (formKey.currentState!.validate()) {
-        formKey.currentState?.save();
-        // Perform the login action here, e.g., send the email and password to your server
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Logging in...')));
-      }
-    }
-
-    final ProfileManager userProfile = ProfileManager();
+    sourceController.text = widget.movie?.source ?? '';
+    countryController.text = widget.movie?.country ?? '';
+    castController.text = widget.movie?.cast?.join(', ') ?? '';
+    releasedateController.text = widget.movie?.releasedate ?? '';
+    languageController.text = widget.movie?.language?.join(', ') ?? '';
+    tagsController.text = widget.movie?.tags?.join(', ') ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -112,6 +161,7 @@ class _UploadMovieState extends State<UploadMovie> {
                             ThemeModeType.dark
                         ? Icons.dark_mode
                         : Icons.brightness_auto, // For system theme mode
+                color: Colors.yellow.shade700,
               ))
         ],
       ),
@@ -267,6 +317,53 @@ class _UploadMovieState extends State<UploadMovie> {
                   },
                   // onSaved: (value) => downloadlink = value!,
                 ),
+                Column(children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: controllers.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6.0),
+                          child: TextFormField(
+                            controller: controllers[index],
+                            decoration: InputDecoration(
+                              labelText: 'Download link(${index + 1})',
+                              border: const OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter the Download Link';
+                              }
+
+                              return null;
+                            },
+                            // onSaved: (value) => downloadlink = value!,
+                          ),
+                        );
+                      }),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      const Text("Add or remove download links"),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          addLinkField();
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.remove),
+                        onPressed: () {
+                          if (controllers.isNotEmpty) {
+                            removeLinkField(controllers.length - 1);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ]),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: youtubeTrailerlinkController,
@@ -292,98 +389,62 @@ class _UploadMovieState extends State<UploadMovie> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
-                  controller: sourceController,
+                  controller: countryController,
                   decoration: const InputDecoration(
                     labelText: 'Country',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
-                  controller: sourceController,
+                  controller: castController,
                   decoration: const InputDecoration(
                     labelText: 'cast(separated by commas)',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
-                  controller: sourceController,
+                  controller: releasedateController,
                   decoration: const InputDecoration(
                     labelText: 'Release date',
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
+                  keyboardType: TextInputType.datetime,
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
-                  controller: sourceController,
+                  controller: languageController,
                   decoration: const InputDecoration(
-                    labelText: 'Language',
+                    labelText: 'Language(s) separate by comma if multiple',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
                 TextFormField(
-                  controller: sourceController,
+                  controller: tagsController,
                   decoration: const InputDecoration(
-                    labelText: 'Tags',
+                    labelText: 'Tags(seperated by commas)',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter the Youtube Trailer Link';
-                    }
 
-                    return null;
-                  },
                   // onSaved: (value) => youtubeTrailerLink = value!,
                 ),
                 const SizedBox(height: 8.0),
@@ -413,17 +474,38 @@ class _UploadMovieState extends State<UploadMovie> {
                               detail: detailsController.text,
                               description: movieDescriptionController.text,
                               downloadlink: downloadlinkController.text,
-                              id: "",
+                              id: widget.movie?.id,
                               youtubetrailer: videoId ?? '',
                               source: sourceController.text,
+                              country: countryController.text,
+                              cast: castController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
+                              releasedate: releasedateController.text,
+                              language: languageController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
+                              tags: tagsController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
                             );
-                            await context
-                                .read<ProfileManager>()
-                                .addMovie(uploadmovie);
-                            showsnackBar('upload successfull');
+                            if (widget.title == null) {
+                              await context
+                                  .read<ProfileManager>()
+                                  .addMovie(uploadmovie);
+                              showsnackBar('upload successfull');
+                            } else {
+                              await context
+                                  .read<ProfileManager>()
+                                  .updateMovie(uploadmovie);
+                              showsnackBar('upload successfull');
+                            }
 
-                            Navigator.pop(context);
                             if (!context.mounted) return;
+                            Navigator.pop(context);
                             // context.go("/home/2");
                           } catch (e) {
                             showsnackBar('Failed to sign in $e');
@@ -442,18 +524,37 @@ class _UploadMovieState extends State<UploadMovie> {
                             String? videoId = YoutubePlayer.convertUrlToId(
                               youtubeTrailerlinkController.text,
                             );
+                            final uploadmovie = Movie(
+                              movieImgurl: movieImageUrl.text,
+                              type: selectedState!,
+                              title: movieTitleController.text,
+                              rating: ratingController.text,
+                              detail: detailsController.text,
+                              description: movieDescriptionController.text,
+                              downloadlink: downloadlinkController.text,
+                              id: widget.id ?? "",
+                              youtubetrailer: videoId ?? '',
+                              source: sourceController.text,
+                              country: countryController.text,
+                              cast: castController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
+                              releasedate: releasedateController.text,
+                              language: languageController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
+                              tags: tagsController.text
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList(),
+                            );
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MoviePreviewScreen(
-                                  movieTitle: movieTitleController.text,
-                                  movieDescription:
-                                      movieDescriptionController.text,
-                                  downloadLink: downloadlinkController.text,
-                                  youtubeTrailerLink: videoId!,
-                                  category: selectedState!,
-                                  imagePath: movieImageUrl.text,
-                                  rating: ratingController.text,
+                                  movie: uploadmovie,
                                 ),
                               ),
                             );
