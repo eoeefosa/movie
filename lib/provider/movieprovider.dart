@@ -85,7 +85,6 @@ class MovieProvider extends ChangeNotifier {
           }),
         ]);
       } catch (e) {
-        print(e);
         loadingdownloads = false;
         notifyListeners();
         return; // Exit if there's an error or timeout
@@ -94,7 +93,6 @@ class MovieProvider extends ChangeNotifier {
       loadingdownloads = false;
       notifyListeners();
     } else {
-      print("Storage permission not granted");
       loadingdownloads = false;
       notifyListeners();
     }
@@ -111,7 +109,6 @@ class MovieProvider extends ChangeNotifier {
 
     // Check if the directory exists
     if (!downloadsDir.existsSync()) {
-      print("Directory not found");
       return;
     }
 
@@ -131,7 +128,6 @@ class MovieProvider extends ChangeNotifier {
       if (info != null) {
         // Handle potential null values in VideoData properties
         info.title = info.title ?? 'Unknown Title';
-        print(info.title);
         showsnackBar(info.title.toString());
         info.filesize = info.filesize ?? 0;
         info.path = info.path ?? 'Unknown Path';
@@ -144,15 +140,11 @@ class MovieProvider extends ChangeNotifier {
   }
 
   void fetchmovie() async {
-    print("fetch");
     _movieisloading = true;
     notifyListeners();
 
-    
-  final moviesList = await api.fetchmovies();
-  for (var movie in moviesList) {
-    print("Title: ${movie.title}, ID: ${movie.id}"); // Check if 'id' is printed
-  }
+    final moviesList = await api.fetchmovies();
+    for (var movie in moviesList) {}
 
     movies = moviesList;
     _searchResults = movies; // Initialize search results

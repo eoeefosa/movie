@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:torihd/api/movie_api.dart';
 import 'package:torihd/cache/local_setting_persistence.dart';
 import 'package:torihd/styles/snack_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api/api_calls/auth.dart';
 import '../models/movie.dart';
@@ -76,7 +75,6 @@ class ProfileManager extends ChangeNotifier {
       });
       notifyListeners();
     } catch (e) {
-      print(e);
       rethrow;
     }
   }
@@ -94,7 +92,6 @@ class ProfileManager extends ChangeNotifier {
       //     await FirebaseAuth.instance.signInWithCustomToken(token);
       // _user = userCredential.user;
     } catch (e) {
-      print('Failed to get user from token: $e');
       _user = null; // Clear user on failure
     }
     notifyListeners();
@@ -107,7 +104,6 @@ class ProfileManager extends ChangeNotifier {
 
       // Check if the user is not null and assign to _user
       _user = result.user;
-      print("Sign-in successful: ${_user?.email}"); // Debug log
 
       // Save the user's token
       String? token = await _user!.getIdToken(); // Get the user's ID token
@@ -130,7 +126,6 @@ class ProfileManager extends ChangeNotifier {
         showsnackBar('Error: ${e.message}');
       }
     } catch (e) {
-      print("Unexpected error: $e"); // Improved error logging
       rethrow;
     }
   }
@@ -152,11 +147,9 @@ class ProfileManager extends ChangeNotifier {
         if (user != null) {
           isLogin = true;
         }
-        print("User is still logged in.");
       } else {
         // Token has expired, log out the user
         await signOut();
-        print("Session expired, logging out.");
       }
     }
   }
@@ -171,7 +164,6 @@ class ProfileManager extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
     } catch (e) {
-      print("Error signing up: $e");
       rethrow;
     }
   }
@@ -182,7 +174,6 @@ class ProfileManager extends ChangeNotifier {
       _user = _auth.currentUser; // Get the current user
       notifyListeners(); // Notify listeners about the state change
     } catch (e) {
-      print("Error fetching user: $e");
       rethrow;
     }
   }
@@ -192,9 +183,9 @@ class ProfileManager extends ChangeNotifier {
     try {
       await _auth.signOut();
       _user = null; // Clear user variable
+      isLogin = false;
       notifyListeners();
     } catch (e) {
-      print("Error signing out: $e");
       rethrow;
     }
   }
@@ -203,11 +194,9 @@ class ProfileManager extends ChangeNotifier {
   Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      print("Password reset email sent.");
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
     } catch (e) {
-      print("Error sending password reset email: $e");
       rethrow;
     }
   }
@@ -216,19 +205,14 @@ class ProfileManager extends ChangeNotifier {
   void _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-email':
-        print('The email address is not valid.');
         break;
       case 'user-disabled':
-        print('The user corresponding to the given email has been disabled.');
         break;
       case 'user-not-found':
-        print('No user corresponding to the given email.');
         break;
       case 'wrong-password':
-        print('The password is invalid for the given email.');
         break;
       default:
-        print('An undefined Error happened. ${e.message}');
     }
   }
 

@@ -32,7 +32,6 @@ class _DownloadsState extends State<Downloads> {
     receivePort.listen((message) {
       setState(() {
         progress = message;
-        print(progress);
       });
     });
     super.initState();
@@ -98,7 +97,6 @@ class _DownloadsState extends State<Downloads> {
             padding: const EdgeInsets.symmetric(vertical: 5),
             itemBuilder: (context, index) {
               int reverseIndex = downloads.length - 1 - index;
-              print(data.length);
 
               return Padding(
                 padding: const EdgeInsets.all(8.0),

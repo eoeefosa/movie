@@ -46,7 +46,6 @@ class DownloadTask {
 
 // Start the download
   void start() async {
-    print("Start download clicked");
     try {
       // Get the directory where the downloaded file will be stored
       Directory directory = Directory('/storage/emulated/0/Download/Tori');
@@ -55,9 +54,6 @@ class DownloadTask {
         url,
         cancelToken: cancelToken,
         onReceiveProgress: (receivedBytes, totalBytes) {
-          print("downloading");
-          print(receivedBytes);
-          print(totalBytes);
           received = receivedBytes;
           total = totalBytes;
           onReceiveProgress(receivedBytes, totalBytes);
@@ -79,12 +75,10 @@ class DownloadTask {
       // Write the downloaded file to disk
       File file = File(filePath);
       await file.writeAsBytes(response.data);
-      OpenFile.open(filePath);
+      // OpenFile.open(filePath);
       // File downloaded successfully
-      print('File downloaded to $filePath');
     } catch (e) {
       // Error occurred during download
-      print('Error downloading file: $e');
     }
     // dio.download(
     //   url,

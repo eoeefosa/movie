@@ -6,6 +6,7 @@ import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/screens/moviescreen/moviescreen.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
 
 import '../../../models/movie.dart';
 import '../widgets/moviecard.dart';
@@ -71,7 +72,7 @@ class _MovieswithProviderState extends State<MovieswithProvider> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (BuildContext context) => Videoplayer(
+                      builder: (BuildContext context) => Viewmovies(
                         movieid: movie.id!,
                         type: movie.type,
                         youtubeid: movie.youtubetrailer,
@@ -88,7 +89,6 @@ class _MovieswithProviderState extends State<MovieswithProvider> {
                     movieid: movie.id!,
                     description: movie.description,
                     detail: movie.detail,
-                    downloadlink: movie.downloadlink,
                     source: movie.source,
                   ),
                 );

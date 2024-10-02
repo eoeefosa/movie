@@ -48,13 +48,18 @@ class DownloadProvider extends ChangeNotifier {
 
   // Start a download task
   Future<void> startDownload(String url, String fileName) async {
-    url =
-        'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
-
     if (await _requestPermissions()) {
       try {
+        // Specify the directory path
         final Directory appDir = Directory('/storage/emulated/0/Download/Tori');
-        final String filePath = '${appDir.path}/$fileName';
+
+        // Check if the directory exists; if not, create it
+        if (!(await appDir.exists())) {
+          await appDir.create(recursive: true);
+        }
+
+        final String filePath =
+            '${appDir.path}/$fileName.mp4'; // Updated file path to include .mp4 extension
 
         if (_downloadTasks.containsKey(url)) {
           // Resume an existing download
@@ -72,15 +77,12 @@ class DownloadProvider extends ChangeNotifier {
               notifyListeners(); // Notify listeners after removing
             },
             onError: (error) {
-              _showNotification(fileName, 'Download failed.');
+              _showNotification(fileName, 'Download failed: $error');
             },
             qualityOptions: [],
             onReceiveProgress: (received, total) {
               _onReceiveProgress(url, received, total);
             },
-            // alprogress: (double progress) {
-            //   _alprogress(url, progress);
-            // },
           );
 
           _downloadTasks[url] = task;

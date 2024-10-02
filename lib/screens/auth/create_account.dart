@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:torihd/screens/auth/forgot_password.dart';
 
 import '../../provider/profile_manager.dart';
 import '../../styles/snack_bar.dart';
@@ -99,6 +100,15 @@ class _CreateAccountState extends State<CreateAccount> {
                   }
                 },
                 child: const Text('Create account'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPassword()));
+                },
+                child: const Text('Forgot Password'),
               ),
               // child: const Text('Login'),
               // ),

@@ -433,7 +433,6 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
                       youtubeid: currentmovie.youtubetrailer,
                       detail: currentmovie.detail,
                       description: currentmovie.description,
-                      downloadlink: currentmovie.downloadlink,
                       source: currentmovie.source,
                     ),
                   );
@@ -472,7 +471,6 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
                     EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
                 trailing: ElevatedButton.icon(
                   onPressed: () {
-                    print("download started");
                     Navigator.pop(context);
                     // // Start download with selected quality
                     Provider.of<DownloadProvider>(context, listen: false)

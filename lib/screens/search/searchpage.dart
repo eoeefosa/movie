@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/provider/movieprovider.dart';
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
 
 import '../moviescreen/moviescreen.dart';
 
@@ -97,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Videoplayer(
+                                    builder: (context) => Viewmovies(
                                       movieid: movie.id!,
                                       type: movie.type,
                                       youtubeid: movie.youtubetrailer,

@@ -4,10 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart'; // Import the shimmer package
 import 'package:torihd/ads/banner_ad_widget.dart';
+import 'package:torihd/models/season.dart';
 import 'package:torihd/provider/downloadprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/screens/moviescreen/widgets/detailcard.dart';
+import 'package:torihd/screens/moviescreen/widgets/movie_metadata.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../../ads/ad_controller.dart';
@@ -166,6 +168,121 @@ class _VideoplayerState extends State<Videoplayer> {
     );
   }
 
+  Widget _buildEpisodeList(Movie tvseries, int season) {
+    return SizedBox(
+      height: 100.h, // Height of the scrolling episode list
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: tvseries.seasons![season].episodes.length,
+        itemBuilder: (context, index) {
+          return Container(
+            width: 150.w,
+            margin: EdgeInsets.symmetric(horizontal: 4.w),
+            child: Card(
+              child: Column(
+                children: [
+                  Text(
+                    tvseries.seasons![season].episodes[index].title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _downloadSingleEpisode(
+                          tvseries.seasons![season].episodes[index]);
+                    },
+                    child: const Text("Download"),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _downloadSingleEpisode(Episode episode) {
+    String downloadLink =
+        episode.downloadLinks![0].url; // Get the download link for the episode
+    String filename = "${episode.title}.mp4"; // Set filename
+    Provider.of<DownloadProvider>(context, listen: false)
+        .startDownload(downloadLink, filename);
+  }
+
+  void _downloadAllEpisodes(Movie tvSeriesProvider, int season) {
+    List<Episode> episodes = tvSeriesProvider.seasons![season].episodes;
+    for (Episode episode in episodes) {
+      String downloadLink =
+          episode.downloadLinks![0].url; // Get the download link for the episode
+      String filename = "${episode.title}.mp4"; // Set filename
+      Provider.of<DownloadProvider>(context, listen: false)
+          .startDownload(downloadLink, filename);
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Downloading all episodes of $season")),
+    );
+  }
+
+  void _downloadAllSeasons(Movie tvSeriesProvider) {
+    for (int season = 1; season <= tvSeriesProvider.seasons!.length; season++) {
+      List<Episode> episodes = tvSeriesProvider.seasons![season].episodes;
+      for (Episode episode in episodes) {
+        String downloadLink = episode
+            .downloadLinks![0].url; // Get the download link for the episode
+        String filename = "${episode.title}.mp4"; // Set filename
+        Provider.of<DownloadProvider>(context, listen: false)
+            .startDownload(downloadLink, filename);
+      }
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Downloading all episodes of all seasons")),
+    );
+  }
+
+  Widget _buildDownloadOptions(Movie tvSeriesProvider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            _downloadAllEpisodes(tvSeriesProvider, selectedSeason);
+          },
+          child: const Text("Download All"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            _downloadAllSeasons(tvSeriesProvider);
+          },
+          child: const Text("Download All Seasons"),
+        ),
+      ],
+    );
+  }
+
+  late List<Episode> currentEpisodes;
+
+  Widget _buildSeasonDropdown(Movie tvSeriesProvider) {
+    return DropdownButton<int>(
+      value: selectedSeason,
+      onChanged: (int? newValue) {
+        setState(() {
+          selectedSeason = newValue!;
+          currentEpisodes = tvSeriesProvider.seasons![selectedSeason].episodes;
+        });
+      },
+      items:
+          tvSeriesProvider.seasons!.map<DropdownMenuItem<int>>((Season season) {
+        return DropdownMenuItem<int>(
+          value: season.seasonNumber,
+          child: Text("Season $season"),
+        );
+      }).toList(),
+    );
+  }
+
+  int selectedSeason = 0;
+
   Widget _buildContent(MovieProvider movieProvider) {
     return YoutubePlayerBuilder(
       onEnterFullScreen: () {
@@ -230,9 +347,11 @@ class _VideoplayerState extends State<Videoplayer> {
             ),
             onPressed: () {
               _showQualityOptions(
-                  context,
-                  movieProvider.currentmovieinfo?.downloadlink ?? "",
-                  movieProvider.currentmovieinfo?.title ?? "No Name");
+                context,
+                movieProvider.currentmovieinfo?.downloadlink ?? "",
+                movieProvider.currentmovieinfo?.title ?? "No Name",
+                movieProvider,
+              );
             },
           ),
         ),
@@ -281,255 +400,182 @@ class _VideoplayerState extends State<Videoplayer> {
             ),
             _buildAdvertsWidget(), // Insert Ad Widget here
             gap,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SizedBox(
-                height: 250.h,
-                child: Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(),
-                    1: FlexColumnWidth(),
-                  },
-                  defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                  children: [
-                    TableRow(
-                      children: [
-                        const Text("Type"),
-                        Text(
-                          movieProvider.currentmovieinfo?.type ?? "Unknown",
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Release Date"),
-                        Text(
-                          movieProvider.currentmovieinfo?.releasedate ??
-                              "Unknown",
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Country"),
-                        Text(
-                          movieProvider.currentmovieinfo?.country ?? "Unknown",
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Language"),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          children:
-                              movieProvider.currentmovieinfo?.language?.map(
-                                    (e) {
-                                      return DetailCard(
-                                        title: e,
-                                      );
-                                    },
-                                  ).toList() ??
-                                  [
-                                    "English",
-                                  ].map(
-                                    (e) {
-                                      return DetailCard(
-                                        title: e,
-                                      );
-                                    },
-                                  ).toList(),
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Genre"),
-                        Text(
-                          movieProvider.currentmovieinfo?.genre ?? "Unknown",
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Cast"),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          children: movieProvider.currentmovieinfo?.cast?.map(
-                                (e) {
-                                  return DetailCard(
-                                    title: e,
-                                  );
-                                },
-                              ).toList() ??
-                              [
-                                "Unknown",
-                              ].map(
-                                (e) {
-                                  return DetailCard(
-                                    title: e,
-                                  );
-                                },
-                              ).toList(),
-                        ),
-                      ],
-                    ),
-                    TableRow(
-                      children: [
-                        const Text("Source"),
-                        Text(movieProvider.currentmovieinfo?.source ??
-                            "Unknown"),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            movieProvider.currentmovieinfo?.seasons != null
+                ? _buildSeasonDropdown(movieProvider.currentmovieinfo!)
+                : Container(),
+            gap,
+            movieProvider.currentmovieinfo?.seasons != null
+                ? _buildEpisodeList(
+                    movieProvider.currentmovieinfo!, selectedSeason)
+                : Container(),
+            gap,
+            movieProvider.currentmovieinfo?.seasons != null
+                ? _buildAdvertsWidget()
+                : Container(), // Insert Ad Widget here
+            gap,
+            MovieMetadata(
+              movieProvider: movieProvider,
             ),
             SizedBox(height: 20.h),
             gap,
-            _buildAdvertsWidget(), // Insert Ad Widget here
+            SizedBox(
+                height: 50.h,
+                child: _buildAdvertsWidget()), // Insert Ad Widget here
             gap,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  Row(
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
                     children: [
-                      Text(
-                        "Related Movies",
-                        style: TextStyle(
-                            color: Colors.green.shade700,
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold),
+                      Row(
+                        children: [
+                          Text(
+                            "Related Movies",
+                            style: TextStyle(
+                                color: Colors.green.shade700,
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
+                      SizedBox(height: 10.h),
                     ],
                   ),
-                  SizedBox(height: 10.h),
-                ],
-              ),
-            ),
-            SizedBox(
-              height:
-                  Provider.of<ProfileManager>(context).isAdmin ? 320.h : 300.h,
-              child: GridView.builder(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 400.w,
-                  mainAxisSpacing: 10.w,
-                  childAspectRatio: 5 / 3,
                 ),
-                scrollDirection: Axis.horizontal,
-                itemCount: movieProvider.movies.length,
-                itemBuilder: (context, index) {
-                  final Movie currentmovie = movieProvider.movies[index];
-                  return InkWell(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) => Videoplayer(
+                SizedBox(
+                  height: Provider.of<ProfileManager>(context).isAdmin
+                      ? 320.h
+                      : 300.h,
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 400.w,
+                      mainAxisSpacing: 10.w,
+                      childAspectRatio: 5 / 3,
+                    ),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: movieProvider.movies.length,
+                    itemBuilder: (context, index) {
+                      final Movie currentmovie = movieProvider.movies[index];
+                      return InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => Videoplayer(
+                              movieid: currentmovie.id!,
+                              type: currentmovie.type,
+                              youtubeid: currentmovie.youtubetrailer,
+                            ),
+                          ),
+                        ),
+                        child: MovieCard(
+                          movie: currentmovie,
+                          title: currentmovie.title,
+                          imgUrl: currentmovie.movieImgurl,
+                          rating: currentmovie.rating,
                           movieid: currentmovie.id!,
                           type: currentmovie.type,
                           youtubeid: currentmovie.youtubetrailer,
+                          detail: currentmovie.detail,
+                          description: currentmovie.description,
+                          source: currentmovie.source,
                         ),
-                      ),
-                    ),
-                    child: MovieCard(
-                      movie: currentmovie,
-                      title: currentmovie.title,
-                      imgUrl: currentmovie.movieImgurl,
-                      rating: currentmovie.rating,
-                      movieid: currentmovie.id!,
-                      type: currentmovie.type,
-                      youtubeid: currentmovie.youtubetrailer,
-                      detail: currentmovie.detail,
-                      description: currentmovie.description,
-                      downloadlink: currentmovie.downloadlink,
-                      source: currentmovie.source,
-                    ),
-                  );
-                },
-              ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildAdvertsWidget(), // Insert Ad Widget here
+                const SizedBox(height: 10),
+              ],
             ),
-            gap,
-            _buildAdvertsWidget(), // Insert Ad Widget here
-            gap,
           ],
         ),
       ),
     );
   }
 
-  void _showQualityOptions(
-      BuildContext context, String downloadlink, String filename) {
+  void _showQualityOptions(BuildContext context, String downloadlink,
+      String filename, MovieProvider movieprovider) {
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return SingleChildScrollView(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(
-              height: 8.h,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.h),
-              child: Text(
-                "Choose your preference",
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-            ...[1, 2, 3, 4].map((option) {
-              return ListTile(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                trailing: ElevatedButton.icon(
-                  onPressed: () {
-                    print("download started");
-                    Navigator.pop(context);
-                    // // Start download with selected quality
-                    Provider.of<DownloadProvider>(context, listen: false)
-                        .startDownload(downloadlink, filename);
-                  },
-                  label: const Text("Download"),
-                  icon: const Icon(Icons.download),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 8.h),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: Text(
+                  "Choose your preference",
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                title: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '480P Kali 289 AD[Telugu]',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    Row(
+              ),
+              Consumer<DownloadProvider>(
+                builder: (context, downloadProvider, child) {
+                  final task = downloadProvider.downloadTasks[filename];
+
+                  return ListTile(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                    trailing: task != null
+                        ? task.isCompleted
+                            ? ElevatedButton.icon(
+                                onPressed: () {
+                                  // Play the downloaded file
+                                  Navigator.pop(context);
+                                  // Logic to play the downloaded file goes here
+                                },
+                                label: const Text("Play"),
+                                icon: const Icon(Icons.play_arrow),
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '${task.progress.toStringAsFixed(2)}% completed',
+                                    style:
+                                        Theme.of(context).textTheme.labelSmall,
+                                  ),
+                                  SizedBox(
+                                    width: 100,
+                                    child: LinearProgressIndicator(
+                                      value: task.progress / 100,
+                                    ),
+                                  ),
+                                ],
+                              )
+                        : ElevatedButton.icon(
+                            onPressed: () {
+                              // Start the download
+                              Navigator.pop(context);
+                              Provider.of<DownloadProvider>(context,
+                                      listen: false)
+                                  .startDownload(downloadlink, filename);
+                            },
+                            label: const Text("Download"),
+                            icon: const Icon(Icons.download),
+                          ),
+                    title: Column(
                       mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '687.8mb',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Text(
-                          '02:55:45',
-                          style: Theme.of(context).textTheme.labelSmall,
+                          'link 1',
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
                     ),
-                    Text(
-                      'uploaded by admin',
-                      style: Theme.of(context).textTheme.labelSmall,
-                    ),
-                  ],
-                ),
-              );
-            }),
-            const Text("Tori HD"),
-            const Text("© 2024 best place for movie downloads")
-          ]),
+                  );
+                },
+              ),
+              const Text("Tori HD"),
+              const Text("© 2024 best place for movie downloads")
+            ],
+          ),
         );
       },
     );

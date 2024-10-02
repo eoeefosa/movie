@@ -3,7 +3,9 @@ import 'package:torihd/screens/auth/create_account.dart';
 import 'package:torihd/screens/auth/login.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:torihd/screens/home/updatedlistview.dart';
 import 'package:torihd/screens/home/widgets/threewaytoggle.dart';
+import 'package:torihd/screens/upload/uploadtvseries.dart';
 import 'package:torihd/styles/snack_bar.dart';
 
 import '../../provider/profile_manager.dart';
@@ -19,14 +21,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                hideSnackBar();
-                showsnackBar(userProfile.currentUser.toString());
-              },
-              icon: const Icon(Icons.ads_click))
-        ],
+        actions: const [],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -83,12 +78,27 @@ class UnSigned extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return const UploadMovie();
+                        return const UploadTVMovie();
                       },
                     ),
                   );
                 },
                 child: const Text("Upload Movie"),
+              )
+            : Container(),
+        userProfile.isAdmin
+            ? TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const UpdatedListView();
+                      },
+                    ),
+                  );
+                },
+                child: const Text("update download links"),
               )
             : Container(),
         const SizedBox(height: 24),
@@ -225,7 +235,6 @@ class SignedIn extends StatelessWidget {
             ),
           ],
         ),
-
         userProfile.isLogin
             ? Text(
                 userProfile.username,
@@ -248,25 +257,13 @@ class SignedIn extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        return const UploadMovie();
+                        return const UploadTVMovie();
                       },
                     ),
                   );
                 },
                 child: const Text("Upload Movie"))
             : Container(),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: [
-        //     Text(userProfile.darkMode ? "Dark mode" : "Light Mode"),
-        //     Switch(
-        //         value: userProfile.darkMode,
-        //         onChanged: (value) {
-        //           Provider.of<ProfileManager>(context, listen: false)
-        //               .setdarkMode(value);
-        //         })
-        //   ],
-        // ),
         const SizedBox(height: 24),
         const Text(
           'Favorite Movies',

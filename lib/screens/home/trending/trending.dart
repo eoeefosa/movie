@@ -9,6 +9,7 @@ import 'package:torihd/ads/ad_controller.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/screens/home/widgets/autoslidinggrid.dart';
 import 'package:torihd/screens/moviescreen/moviescreen.dart';
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
 
 import '../../../ads/banner_ad_widget.dart';
 import '../../../provider/movieprovider.dart';
@@ -64,7 +65,7 @@ class _TrendingState extends State<Trending> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute<void>(
-                              builder: (BuildContext context) => Videoplayer(
+                              builder: (BuildContext context) => Viewmovies(
                                 movieid: item.id!,
                                 type: item.type,
                                 youtubeid: item.youtubetrailer,

@@ -1,7 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:torihd/models/season.dart';
 
 class Movie {
   final String movieImgurl;
@@ -10,7 +12,7 @@ class Movie {
   final String rating;
   final String detail;
   final String description;
-  final String downloadlink;
+  final String? downloadlink;
   final String? id;
   final String youtubetrailer;
   final String? source;
@@ -20,6 +22,8 @@ class Movie {
   final List<String>? language;
   final List<String>? tags;
   final String? genre;
+  final DateTime? downloadLinkExpiration;
+  List<Season>? seasons;
 
   Movie({
     required this.movieImgurl,
@@ -28,7 +32,7 @@ class Movie {
     required this.rating,
     required this.detail,
     required this.description,
-    required this.downloadlink,
+    this.downloadlink,
     required this.id,
     required this.youtubetrailer,
     required this.source,
@@ -38,6 +42,8 @@ class Movie {
     this.language,
     this.tags,
     this.genre,
+    this.downloadLinkExpiration,
+    this.seasons,
   });
 
   Movie copyWith({
@@ -96,13 +102,16 @@ class Movie {
       'language': language,
       'tags': tags,
       'genre': genre,
+      'downloadLinkExpiration': downloadLinkExpiration != null
+          ? Timestamp.fromDate(
+              downloadLinkExpiration!) // Convert DateTime to Firestore Timestamp
+          : null,
     };
   }
 
   factory Movie.fromMap(
     Map<String, dynamic> map,
   ) {
-    print(map['id']);
     return Movie(
       movieImgurl: map['movieImgUrl'] ?? '', // Provide default value if null
       type: map['type'] ?? '', // Provide default value if null
@@ -128,6 +137,10 @@ class Movie {
           ? List<String>.from(map['tags'] as List) // Safe casting
           : null,
       genre: map['genre'] != null ? map['genre'] as String : null,
+      downloadLinkExpiration: map['downloadLinkExpiration'] != null
+          ? (map['downloadLinkExpiration'] as Timestamp)
+              .toDate() // Convert Firestore Timestamp to DateTime
+          : null,
     );
   }
   String toJson() => json.encode(toMap());

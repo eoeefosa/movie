@@ -157,7 +157,6 @@ class MovieApi {
   Future<void> updateMovieById(
       String id, String type, Map<String, dynamic> updatedData) async {
     try {
-      print(id);
       await firestore.collection(type).doc(id).update(updatedData);
       debugPrint('Movie updated successfully');
     } on FirebaseException catch (e) {

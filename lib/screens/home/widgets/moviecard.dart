@@ -7,6 +7,7 @@ import 'package:torihd/models/movie.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
+import 'package:torihd/screens/upload/uploadtvseries.dart';
 
 class MovieCard extends StatefulWidget {
   const MovieCard({
@@ -19,7 +20,6 @@ class MovieCard extends StatefulWidget {
     required this.youtubeid,
     required this.detail,
     required this.description,
-    required this.downloadlink,
     this.source,
     this.isLoading = false,
     required this.movie, // Add isLoading parameter with default value
@@ -31,7 +31,6 @@ class MovieCard extends StatefulWidget {
   final String movieid;
   final String detail;
   final String description;
-  final String downloadlink;
   final String? source;
   final String type;
   final String youtubeid;
@@ -103,13 +102,15 @@ class _MovieCardState extends State<MovieCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      "Admin",
-                      style: TextStyle(
-                        color: Colors.purple.shade900,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    profileProvider.isAdmin
+                        ? Text(
+                            "Admin",
+                            style: TextStyle(
+                              color: Colors.purple.shade900,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : Container(),
                     profileProvider.isAdmin
                         ? PopupMenuButton<String>(
                             icon: const RotatedBox(
@@ -263,16 +264,7 @@ class _MovieCardState extends State<MovieCard> {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) => UploadMovie(
-              imageUrl: widget.imgUrl,
-              type: widget.type,
-              title: widget.title,
-              rating: widget.rating,
-              description: widget.description,
-              detail: widget.detail,
-              downloadlink: widget.downloadlink,
-              source: widget.source,
-              youtubelink: widget.youtubeid,
+            builder: (BuildContext context) => UploadTVMovie(
               movie: widget.movie,
               id: widget.movieid,
             ),

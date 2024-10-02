@@ -2,13 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
+import 'package:torihd/screens/upload/uploadtvseries.dart';
 import 'package:torihd/toritheme.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
-import 'package:torihd/screens/upload/uploadmovie.dart';
 
 import '../../../models/movie.dart';
-import '../../moviescreen/moviescreen.dart';
 
 class TopPickCard extends StatefulWidget {
   const TopPickCard({
@@ -47,7 +47,7 @@ class _TopPickCardState extends State<TopPickCard> {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute<void>(
-              builder: (BuildContext context) => Videoplayer(
+              builder: (BuildContext context) => Viewmovies(
                 movieid: widget.movieid,
                 type: widget.type,
                 youtubeid: widget.youtubeid,
@@ -249,16 +249,7 @@ class _TopPickCardState extends State<TopPickCard> {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) => UploadMovie(
-              imageUrl: widget.imgUrl,
-              type: widget.type,
-              title: widget.title,
-              rating: widget.rating,
-              description: widget.movie.description,
-              detail: widget.movie.detail,
-              downloadlink: widget.movie.downloadlink,
-              source: widget.movie.source,
-              youtubelink: widget.youtubeid,
+            builder: (BuildContext context) => UploadTVMovie(
               movie: widget.movie,
               id: widget.movieid,
             ),

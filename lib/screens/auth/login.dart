@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:torihd/provider/profile_manager.dart';
+import 'package:torihd/screens/auth/forgot_password.dart';
 import 'package:torihd/screens/upload/uploadmovie.dart';
 import 'package:provider/provider.dart';
+import 'package:torihd/screens/upload/uploadtvseries.dart';
 
 import '../../styles/snack_bar.dart';
 
@@ -26,7 +28,7 @@ class _LoginState extends State<Login> {
           );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const UploadMovie()),
+        MaterialPageRoute(builder: (context) => const UploadTVMovie()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,6 +124,15 @@ class _LoginState extends State<Login> {
                     }
                   },
                   child: const Text('Login'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ForgotPassword()));
+                  },
+                  child: const Text('Forgot Password'),
                 ),
               ],
             ),
