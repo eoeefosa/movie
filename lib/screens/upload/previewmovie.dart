@@ -33,6 +33,7 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
 
   @override
   void initState() {
+    
     _controller = YoutubePlayerController(
       initialVideoId: widget.movie.youtubetrailer,
       flags: const YoutubePlayerFlags(

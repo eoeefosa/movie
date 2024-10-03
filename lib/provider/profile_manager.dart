@@ -69,12 +69,21 @@ class ProfileManager extends ChangeNotifier {
   Future<void> updateMovie(Movie movie) async {
     MovieApi api = MovieApi();
     try {
-      await api.updateMovieById(movie.id!, movie.type, {
-        ...movie.toMap(),
-        'edited timestamp': FieldValue.serverTimestamp(),
-      });
+      if (movie.id != null && movie.id != '') {
+        print("movie.id ${movie.id} movietitle: ${movie.title} ");
+        await api.updateMovieById(movie.id!, movie.type, {
+          ...movie.toMap(),
+          'edited timestamp': FieldValue.serverTimestamp(),
+        });
+      } else {
+        await _firestore.collection(movie.type).add({
+          ...movie.toMap(),
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      }
       notifyListeners();
     } catch (e) {
+      print(e);
       rethrow;
     }
   }

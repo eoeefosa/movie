@@ -102,7 +102,7 @@ class MovieFormFields extends StatelessWidget {
     return CustomTextField(
       controller: provider.controllers['downloadLink']!,
       label: 'Download Link',
-      validator: (value) => _requiredFieldValidator(value, 'download link'),
+      // validator: (value) => _requiredFieldValidator(value, 'download link'),
     );
   }
 
@@ -118,33 +118,33 @@ class MovieFormFields extends StatelessWidget {
         CustomTextField(
           controller: provider.controllers['source']!,
           label: 'Source',
-          validator: (value) => _requiredFieldValidator(value, 'source'),
+          // validator: (value) => _requiredFieldValidator(value, 'source'),
         ),
         CustomTextField(
           controller: provider.controllers['country']!,
           label: 'Country',
-          validator: (value) => _requiredFieldValidator(value, 'country'),
+          // validator: (value) => _requiredFieldValidator(value, 'country'),
         ),
         CustomTextField(
           controller: provider.controllers['cast']!,
           label: 'Cast (separated by commas)',
-          validator: (value) => _requiredFieldValidator(value, 'cast'),
+          // validator: (value) => _requiredFieldValidator(value, 'cast'),
         ),
         CustomTextField(
           controller: provider.controllers['releaseDate']!,
           label: 'Release Date',
           keyboardType: TextInputType.datetime,
-          validator: (value) => _requiredFieldValidator(value, 'release date'),
+          // validator: (value) => _requiredFieldValidator(value, 'release date'),
         ),
         CustomTextField(
           controller: provider.controllers['language']!,
           label: 'Language(s) separate by comma if multiple',
-          validator: (value) => _requiredFieldValidator(value, 'language'),
+          // validator: (value) => _requiredFieldValidator(value, 'language'),
         ),
         CustomTextField(
           controller: provider.controllers['tags']!,
           label: 'Tags (separated by commas)',
-          validator: (value) => _requiredFieldValidator(value, 'tags'),
+          // validator: (value) => _requiredFieldValidator(value, 'tags'),
         ),
       ],
     );

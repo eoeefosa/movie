@@ -174,8 +174,10 @@ class MovieProvider extends ChangeNotifier {
 
   void fetchTvSeries() async {
     _tvseriesloading = true;
+    print("fetching tvseries");
     notifyListeners();
     final tvseriesList = await api.fetchTvseries();
+    print(tvseriesList);
     tvSeries = tvseriesList;
     _tvseriesloading = false;
     notifyListeners();

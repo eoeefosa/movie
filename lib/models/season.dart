@@ -31,18 +31,18 @@ class Season {
 }
 
 class Episode {
-  String episodeNumber;
-  String title;
-  String description;
-  String releaseDate;
-  List<DownloadLink> downloadLinks;
+  int episodeNumber;
+  String? title;
+  String? description;
+  String? releaseDate;
+  List<DownloadLink>? downloadLinks;
 
   // Constructor
   Episode({
     required this.episodeNumber,
-    required this.title,
-    required this.description,
-    required this.releaseDate,
+    this.title,
+    this.description,
+    this.releaseDate,
     required this.downloadLinks,
   });
 
@@ -53,7 +53,7 @@ class Episode {
         .toList();
 
     return Episode(
-      episodeNumber: json['episodeNumber'] ?? '',
+      episodeNumber: int.tryParse(json['episodeNumber'].toString()) ?? 0,
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       releaseDate: json['releaseDate'] ?? '',
@@ -68,7 +68,7 @@ class Episode {
       'title': title,
       'description': description,
       'releaseDate': releaseDate,
-      'downloadLinks': downloadLinks.map((d) => d.toJson()).toList(),
+      'downloadLinks': downloadLinks?.map((d) => d.toJson()).toList(),
     };
   }
 }

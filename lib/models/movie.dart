@@ -23,7 +23,7 @@ class Movie {
   final List<String>? tags;
   final String? genre;
   final DateTime? downloadLinkExpiration;
-  List<Season>? seasons;
+  final List<Season>? seasons;
 
   Movie({
     required this.movieImgurl,
@@ -35,7 +35,7 @@ class Movie {
     this.downloadlink,
     required this.id,
     required this.youtubetrailer,
-    required this.source,
+    this.source,
     this.releasedate,
     this.country,
     this.cast,
@@ -63,6 +63,7 @@ class Movie {
     List<String>? language,
     List<String>? tags,
     String? genre,
+    List<Season>? seasons, // Add seasons to copyWith
   }) {
     return Movie(
       movieImgurl: movieImgurl ?? this.movieImgurl,
@@ -81,6 +82,7 @@ class Movie {
       language: language ?? this.language,
       tags: tags ?? this.tags,
       genre: genre ?? this.genre,
+      seasons: seasons ?? this.seasons, // Add seasons to copyWith
     );
   }
 
@@ -103,46 +105,42 @@ class Movie {
       'tags': tags,
       'genre': genre,
       'downloadLinkExpiration': downloadLinkExpiration != null
-          ? Timestamp.fromDate(
-              downloadLinkExpiration!) // Convert DateTime to Firestore Timestamp
+          ? Timestamp.fromDate(downloadLinkExpiration!)
           : null,
+      'seasons': seasons?.map((Season x) => x.toJson()).toList(), // Convert seasons to Map
     };
   }
 
-  factory Movie.fromMap(
-    Map<String, dynamic> map,
-  ) {
+  factory Movie.fromMap(Map<String, dynamic> map) {
     return Movie(
-      movieImgurl: map['movieImgUrl'] ?? '', // Provide default value if null
-      type: map['type'] ?? '', // Provide default value if null
-      title: map['title'] ?? '', // Provide default value if null
-      rating: map['rating'] ?? '', // Provide default value if null
-      detail: map['detail'] ?? '', // Provide default value if null
-      description: map['description'] ?? '', // Provide default value if null
-      downloadlink: map['downloadlink'] ?? '', // Provide default value if null
+      movieImgurl: map['movieImgUrl'] ?? map['movieImgurl'] ?? '',
+      type: map['type'] ?? '',
+      title: map['title'] ?? '',
+      rating: map['rating'] ?? '',
+      detail: map['detail'] ?? '',
+      description: map['description'] ?? '',
+      downloadlink: map['downloadlink'] ?? '',
       id: map['id'] ?? '',
-      youtubetrailer:
-          map['youtubetrailer'] ?? '', // Provide default value if null
-      source: map['source'] ?? '', // Safe null handling for optional fields
-      releasedate:
-          map['releasedate'] != null ? map['releasedate'] as String : null,
+      youtubetrailer: map['youtubetrailer'] ?? '',
+      source: map['source'] ?? '',
+      releasedate: map['releasedate'] != null ? map['releasedate'] as String : null,
       country: map['country'] != null ? map['country'] as String : null,
-      cast: map['cast'] != null
-          ? List<String>.from(map['cast'] as List) // Safe casting
-          : null,
-      language: map['language'] != null
-          ? List<String>.from(map['language'] as List) // Safe casting
-          : null,
-      tags: map['tags'] != null
-          ? List<String>.from(map['tags'] as List) // Safe casting
-          : null,
+      cast: map['cast'] != null ? List<String>.from(map['cast'] as List) : null,
+      language: map['language'] != null ? List<String>.from(map['language'] as List) : null,
+      tags: map['tags'] != null ? List<String>.from(map['tags'] as List) : null,
       genre: map['genre'] != null ? map['genre'] as String : null,
       downloadLinkExpiration: map['downloadLinkExpiration'] != null
-          ? (map['downloadLinkExpiration'] as Timestamp)
-              .toDate() // Convert Firestore Timestamp to DateTime
+          ? (map['downloadLinkExpiration'] as Timestamp).toDate()
           : null,
+      seasons: map['seasons'] != null
+          ? List<Season>.from(
+              (map['seasons'] as List<dynamic>)
+                  .map<Season>((dynamic item) => Season.fromJson(item)),
+            )
+          : null, // Deserialize seasons
     );
   }
+
   String toJson() => json.encode(toMap());
 
   factory Movie.fromJson(String source) =>
@@ -150,7 +148,7 @@ class Movie {
 
   @override
   String toString() {
-    return 'Movie(movieImgurl: $movieImgurl, type: $type, title: $title, rating: $rating, detail: $detail, description: $description, downloadlink: $downloadlink, id: $id, youtubetrailer: $youtubetrailer, source: $source, releasedate: $releasedate, country: $country, cast: $cast, language: $language, tags: $tags, genre: $genre)';
+    return 'Movie(movieImgurl: $movieImgurl, type: $type, title: $title, rating: $rating, detail: $detail, description: $description, downloadlink: $downloadlink, id: $id, youtubetrailer: $youtubetrailer, source: $source, releasedate: $releasedate, country: $country, cast: $cast, language: $language, tags: $tags, genre: $genre, seasons: $seasons)';
   }
 
   @override
@@ -172,7 +170,8 @@ class Movie {
         listEquals(other.cast, cast) &&
         listEquals(other.language, language) &&
         listEquals(other.tags, tags) &&
-        other.genre == genre;
+        other.genre == genre &&
+        listEquals(other.seasons, seasons); // Compare seasons
   }
 
   @override
@@ -192,6 +191,7 @@ class Movie {
         cast.hashCode ^
         language.hashCode ^
         tags.hashCode ^
-        genre.hashCode;
+        genre.hashCode ^
+        seasons.hashCode; // Include seasons in hashcode
   }
 }

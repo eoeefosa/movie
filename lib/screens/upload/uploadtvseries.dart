@@ -91,8 +91,8 @@ class ActionButtons extends StatelessWidget {
           ElevatedButton(
             onPressed: () => _handleUpload(context, provider),
             child: Text(provider.selectedType == "TV series"
-                ? 'Upload TV Series'
-                : 'Upload Movie'),
+                ? '${provider.initializemovie ? "update" : "upload"}  TV Series'
+                : '${provider.initializemovie ? "update" : "upload"}  Movie'),
           ),
           ElevatedButton(
             onPressed: () => _handlePreview(context, provider),
@@ -106,19 +106,30 @@ class ActionButtons extends StatelessWidget {
   void _handleUpload(BuildContext context, UploadMovieProvider provider) async {
     if (Form.of(context).validate()) {
       try {
+        // Check if we're editing an existing movie or creating a new one
         final movie = provider.createMovie(null);
-        await context.read<ProfileManager>().addMovie(movie);
+
+        if (provider.initializemovie) {
+          await context.read<ProfileManager>().updateMovie(movie);
+        } else {
+          // Adding a new movie
+          await context.read<ProfileManager>().addMovie(movie);
+        }
+
         if (!context.mounted) return;
+
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                '${provider.selectedType == "TV series" ? "TV series" : "Movie"} upload successful'),
+                '${provider.selectedType == "TV series" ? "TV series" : "Movie"} ${provider.initializemovie ? "update" : "upload"} successful'),
           ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to upload: $e')),
+          SnackBar(
+              content: Text(
+                  'Failed to ${provider.initializemovie ? "update" : "upload"}: $e')),
         );
       }
     }

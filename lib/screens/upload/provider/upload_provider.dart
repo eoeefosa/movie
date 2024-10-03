@@ -6,6 +6,7 @@ import 'package:torihd/screens/upload/models/season.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class UploadMovieProvider extends ChangeNotifier {
+  String? movieId;
   // Map for managing various text controllers for movie properties
   final Map<String, TextEditingController> controllers = {
     'movieTitle': TextEditingController(),
@@ -25,6 +26,7 @@ class UploadMovieProvider extends ChangeNotifier {
 
   // List of season controllers
   List<SeasonController> seasons = [];
+  bool initializemovie = false;
 
   // Movie type
   String selectedType = "Movie";
@@ -37,6 +39,8 @@ class UploadMovieProvider extends ChangeNotifier {
 
   // Initialize text controllers based on the provided movie object
   void initializeControllers(Movie? movie) {
+    movieId = movie?.id;
+    print("initialize movieid: $movieId ");
     controllers['movieTitle']!.text = movie?.title ?? '';
     controllers['movieImage']!.text = movie?.movieImgurl ?? '';
     controllers['details']!.text = movie?.detail ?? '';
@@ -59,6 +63,7 @@ class UploadMovieProvider extends ChangeNotifier {
         addInitialSeason();
       }
     }
+    initializemovie = true;
   }
 
   // Initialize seasons with given list of seasons
@@ -73,12 +78,13 @@ class UploadMovieProvider extends ChangeNotifier {
 
       for (var episode in season.episodes) {
         final episodeController = EpisodeController(
-          episodeNumber: int.parse(episode.episodeNumber),
+          episodeNumber: episode.episodeNumber,
           episodeController:
               TextEditingController(text: episode.episodeNumber.toString()),
           downloadLinkController: TextEditingController(
-            text: (episode.downloadLinks.isNotEmpty)
-                ? episode.downloadLinks[0].url
+            text: (episode.downloadLinks != null &&
+                    episode.downloadLinks!.isNotEmpty)
+                ? episode.downloadLinks![0].url
                 : '',
           ),
         );
@@ -192,12 +198,12 @@ class UploadMovieProvider extends ChangeNotifier {
 
   // Create a Movie object from the current state
   Movie createMovie(String? id) {
-    String? videoId =
-        YoutubePlayer.convertUrlToId(controllers['youtubeTrailer']!.text);
+    // String? videoId =
+    //     YoutubePlayer.convertUrlToId(controllers['youtubeTrailer']!.text);
 
     if (selectedType == "TV series") {
       return Movie(
-        id: id ?? '',
+        id: movieId ?? '',
         type: selectedType,
         movieImgurl: controllers['movieImage']!.text,
         youtubetrailer: controllers['youtubeTrailer']!.text,
@@ -206,6 +212,7 @@ class UploadMovieProvider extends ChangeNotifier {
         description: controllers['description']!.text,
         source: controllers['source']!.text,
         country: controllers['country']!.text,
+        releasedate: controllers['releaseDate']!.text,
         cast:
             controllers['cast']!.text.split(',').map((e) => e.trim()).toList(),
         language: controllers['language']!
@@ -228,11 +235,12 @@ class UploadMovieProvider extends ChangeNotifier {
         description: controllers['description']!.text,
         downloadlink: controllers['downloadLink']!.text,
         id: id,
-        youtubetrailer: videoId ?? '',
+        youtubetrailer: controllers['youtubeTrailer']!.text,
         source: controllers['source']!.text,
         country: controllers['country']!.text,
         cast:
             controllers['cast']!.text.split(',').map((e) => e.trim()).toList(),
+        downloadLinkExpiration: DateTime.now(),
         releasedate: controllers['releaseDate']!.text,
         language: controllers['language']!
             .text
@@ -247,15 +255,12 @@ class UploadMovieProvider extends ChangeNotifier {
 
   // Create a list of seasons from the current state
   List<Season> _createSeasonsList() {
-    return seasons.map((season) {
+    return seasons.map((SeasonController season) {
       return Season(
         seasonNumber: season.seasonNumber,
         episodes: season.episodes.map((episode) {
           return Episode(
-            episodeNumber: episode.episodeNumber.toString(),
-            title: '', // Placeholder if needed
-            description: '', // Placeholder if needed
-            releaseDate: '', // Placeholder if needed
+            episodeNumber: episode.episodeNumber,
             downloadLinks: [
               DownloadLink(
                 url: episode.downloadLinkController.text,

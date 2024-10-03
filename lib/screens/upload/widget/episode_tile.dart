@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:torihd/screens/upload/models/episode.dart';
@@ -70,49 +69,6 @@ class EpisodeTile extends StatelessWidget {
     return Column(
       children: [
         TextFormField(
-          controller: episodeData.titleController,
-          decoration: const InputDecoration(
-            labelText: 'Episode Title',
-            border: OutlineInputBorder(),
-          ),
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter episode title';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: episodeData.descriptionController,
-          decoration: const InputDecoration(
-            labelText: 'Episode Description',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter episode description';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: episodeData.releaseDateController,
-          decoration: const InputDecoration(
-            labelText: 'Release Date',
-            border: OutlineInputBorder(),
-          ),
-          validator: (value) {
-            if (value?.isEmpty ?? true) {
-              return 'Please enter release date';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
           controller: episodeData.downloadLinkController,
           decoration: const InputDecoration(
             labelText: 'Download Link',
@@ -141,6 +97,8 @@ class EpisodeTile extends StatelessWidget {
   }
 
   void _removeEpisode(BuildContext context) {
-    context.read<UploadMovieProvider>().removeEpisode(seasonIndex, episodeIndex);
+    context
+        .read<UploadMovieProvider>()
+        .removeEpisode(seasonIndex, episodeIndex);
   }
 }

@@ -64,7 +64,7 @@ class MovieApi {
 
   Future<List<Movie>> fetchTvseries() async {
     try {
-      final movies = await firestore.collection('TV Series').get();
+      final movies = await firestore.collection('TV series').get();
       final moviesdt = movies.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
@@ -156,12 +156,14 @@ class MovieApi {
   // Update a movie by ID
   Future<void> updateMovieById(
       String id, String type, Map<String, dynamic> updatedData) async {
+    print(id);
     try {
       await firestore.collection(type).doc(id).update(updatedData);
       debugPrint('Movie updated successfully');
     } on FirebaseException catch (e) {
       debugPrint('Failed to update movie: $e');
       throw Exception('Failed to update movie: ${e.message}');
+      print(e);
     }
   }
 

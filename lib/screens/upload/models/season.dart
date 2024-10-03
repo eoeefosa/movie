@@ -12,7 +12,7 @@ class SeasonController {
     required this.episodes,
   TextEditingController? seasonController
   }):
-  seasonController = seasonController ?? TextEditingController();
+  seasonController = seasonController ?? TextEditingController(text: "1");
 
   // Similar factory for parsing JSON-like data
   factory SeasonController.fromMap(Map<String, dynamic> data) {

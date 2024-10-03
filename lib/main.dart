@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-// import 'package:al_downloader/al_downloader.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

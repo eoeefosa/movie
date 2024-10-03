@@ -37,12 +37,16 @@ class _VideoplayerState extends State<Viewmovies> {
 
   @override
   void initState() {
+    String videoid =
+        YoutubePlayer.convertUrlToId(widget.movieid) ?? widget.movieid;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MovieProvider>(context, listen: false)
           .getmovieinfo(widget.type, widget.movieid);
     });
     _controller = YoutubePlayerController(
-      initialVideoId: widget.youtubeid,
+      // initialVideoId: widget.youtubeid,
+      initialVideoId: videoid,
       flags: const YoutubePlayerFlags(
         mute: false,
         autoPlay: false,
@@ -145,46 +149,47 @@ class _VideoplayerState extends State<Viewmovies> {
     );
   }
 
+  int? _selectedEpisodeIndex; // Holds the index of the selected episode
+  int _season = 1;
+
   Widget _buildEpisodeList(Movie tvseries, int season) {
+    _season = season; // Update current season state
     return SizedBox(
       height: 100.h, // Height of the scrolling episode list
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: tvseries.seasons![season].episodes.length,
-        itemBuilder: (context, index) {
-          return Container(
-            width: 150.w,
-            margin: EdgeInsets.symmetric(horizontal: 4.w),
-            child: Card(
-              child: Column(
-                children: [
-                  Text(
-                    tvseries.seasons![season].episodes[index].title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
+      child: Wrap(
+        spacing: 8.w, // Space between episode items
+        children: List.generate(
+          tvseries.seasons![_season].episodes.length,
+          (index) {
+            bool isSelected = _selectedEpisodeIndex ==
+                index; // Check if the episode is selected
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedEpisodeIndex = index; // Set the selected episode
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.green
+                      : Colors.red, // Color based on selection
+                  borderRadius: BorderRadius.circular(4.w),
+                ),
+                child: Text(
+                  'Episode ${tvseries.seasons![_season].episodes[index].episodeNumber}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _downloadSingleEpisode(
-                          tvseries.seasons![season].episodes[index]);
-                    },
-                    child: const Text("Download"),
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
-  }
-
-  void _downloadSingleEpisode(Episode episode) {
-    String downloadLink =
-        episode.downloadLinks[0].url; // Get the download link for the episode
-    String filename = "${episode.title}.mp4"; // Set filename
-    Provider.of<DownloadProvider>(context, listen: false)
-        .startDownload(downloadLink, filename);
   }
 
   void _showQualityOptions(BuildContext context, String downloadlink,
@@ -242,9 +247,23 @@ class _VideoplayerState extends State<Viewmovies> {
                             onPressed: () {
                               // Start the download
                               Navigator.pop(context);
-                              Provider.of<DownloadProvider>(context,
-                                      listen: false)
-                                  .startDownload(downloadlink, filename);
+                              if (movieprovider.currentmovieinfo?.type ==
+                                  "movie") {
+                                Provider.of<DownloadProvider>(context,
+                                        listen: false)
+                                    .startDownload(downloadlink, filename);
+                              } else {
+                                Provider.of<DownloadProvider>(context,
+                                        listen: false)
+                                    .startDownload(
+                                        movieprovider
+                                            .currentmovieinfo!
+                                            .seasons![_season]
+                                            .episodes[_selectedEpisodeIndex!]
+                                            .downloadLinks![0]
+                                            .url,
+                                        filename);
+                              }
                             },
                             label: const Text("Download"),
                             icon: const Icon(Icons.download),

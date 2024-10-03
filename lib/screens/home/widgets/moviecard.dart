@@ -264,10 +264,14 @@ class _MovieCardState extends State<MovieCard> {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) => UploadTVMovie(
-              movie: widget.movie,
-              id: widget.movieid,
-            ),
+            builder: (BuildContext context) {
+              print("movieid` ${widget.movieid}");
+              print("type ${widget.type}");
+              return UploadTVMovie(
+                movie: widget.movie,
+                id: widget.movieid,
+              );
+            },
           ),
         );
         break;

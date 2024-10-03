@@ -249,10 +249,15 @@ class _TopPickCardState extends State<TopPickCard> {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (BuildContext context) => UploadTVMovie(
-              movie: widget.movie,
-              id: widget.movieid,
-            ),
+            builder: (BuildContext context) {
+              print("movie id: ${widget.movieid}");
+              print("movie type: ${widget.type}");
+
+              return UploadTVMovie(
+                movie: widget.movie,
+                id: widget.movieid,
+              );
+            },
           ),
         );
 // Perform edit action
