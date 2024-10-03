@@ -3,9 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart'; // Import shimmer package
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
 import '../../../models/movie.dart';
 import '../../../provider/movieprovider.dart';
-import '../../moviescreen/moviescreen.dart';
 
 class AutoSlidingGridView extends StatefulWidget {
   final MovieProvider movieProvider;
@@ -90,7 +90,7 @@ class _AutoSlidingGridViewState extends State<AutoSlidingGridView> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (BuildContext context) => Videoplayer(
+                        builder: (BuildContext context) => Viewmovies(
                           movieid: currentmovie.id!,
                           type: currentmovie.type,
                           youtubeid: currentmovie.youtubetrailer,

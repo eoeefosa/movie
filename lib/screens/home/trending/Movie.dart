@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart'; // Import the Shimmer package
 import 'package:torihd/provider/movieprovider.dart';
-import 'package:torihd/screens/moviescreen/moviescreen.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 import 'package:torihd/screens/moviescreen/viewmovies.dart';

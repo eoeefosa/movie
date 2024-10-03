@@ -8,7 +8,6 @@ import 'package:shimmer/shimmer.dart'; // Import shimmer package
 import 'package:torihd/ads/ad_controller.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/screens/home/widgets/autoslidinggrid.dart';
-import 'package:torihd/screens/moviescreen/moviescreen.dart';
 import 'package:torihd/screens/moviescreen/viewmovies.dart';
 
 import '../../../ads/banner_ad_widget.dart';

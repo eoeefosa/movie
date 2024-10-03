@@ -7,7 +7,7 @@ import 'package:torihd/ads/ad_controller.dart';
 import 'package:torihd/models/movie.dart';
 import 'package:torihd/provider/downloadprovider.dart';
 import 'package:torihd/provider/profile_manager.dart';
-import 'package:torihd/screens/moviescreen/moviescreen.dart';
+import 'package:torihd/screens/moviescreen/viewmovies.dart';
 import 'package:torihd/screens/moviescreen/widgets/detailcard.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -33,7 +33,7 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
 
   @override
   void initState() {
-    
+
     _controller = YoutubePlayerController(
       initialVideoId: widget.movie.youtubetrailer,
       flags: const YoutubePlayerFlags(
@@ -417,7 +417,7 @@ class _MoviePreviewScreenState extends State<MoviePreviewScreen> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (BuildContext context) => Videoplayer(
+                        builder: (BuildContext context) => Viewmovies(
                           movieid: currentmovie.id!,
                           type: currentmovie.type,
                           youtubeid: currentmovie.youtubetrailer,

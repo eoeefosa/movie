@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:torihd/provider/movieprovider.dart';
 import 'package:torihd/screens/moviescreen/viewmovies.dart';
 
-import '../moviescreen/moviescreen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
